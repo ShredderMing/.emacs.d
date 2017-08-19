@@ -1,0 +1,6 @@
+*.elc
+auto-save-list
+elpa
+recentf
+.directory
+network-security.data
