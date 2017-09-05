@@ -5,6 +5,4 @@
 (add-hook 'rjsx-mode-hook
           (lambda ()
             (setq js-indent-level 2)
-            (electric-pair-mode t)
-            (auto-complete-mode t);;虽然(global-auto-complete-mode t)，但是没效果。
-            ))
+            (electric-pair-mode t)))
