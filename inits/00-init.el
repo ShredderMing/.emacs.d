@@ -20,3 +20,5 @@
 (require-or-install 'exec-path-from-shell)
 (exec-path-from-shell-initialize)
 
+(show-paren-mode 1)
+
