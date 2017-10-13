@@ -6,6 +6,7 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
 (add-to-list 'load-path (expand-file-name "shredderming-color-theme-moe/" *emacs-config-directory*))
+(add-to-list 'load-path (expand-file-name "inits/lib/" *emacs-config-directory*))
 
 (defun package-install-with-refresh (package)
   (unless (assq package package-alist)
