@@ -1,3 +1,5 @@
+(require-or-install 'nlinum)
+(setq nlinum-format " %2d ")
 (when window-system
   (fringe-mode 0)
   (menu-bar-mode -1)

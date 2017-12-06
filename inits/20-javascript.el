@@ -6,8 +6,10 @@
 (add-hook 'js2-mode-hook
 	  (lambda ()
 	    (setq js-indent-level 2)
-	    (electric-pair-mode t)))
+	    (electric-pair-mode t)
+	    (nlinum-mode t)))
 (add-hook 'rjsx-mode-hook
           (lambda ()
             (setq js-indent-level 2)
-            (electric-pair-mode t)))
+            (electric-pair-mode t)
+	    (nlinum-mode t)))
