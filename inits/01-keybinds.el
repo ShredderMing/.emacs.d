@@ -15,3 +15,4 @@
 (global-set-key (kbd "C-'") 'recenter)
 (global-set-key (kbd "C--") 'font-small)
 (global-set-key (kbd "C-+") 'font-big)
+(global-set-key (kbd "C-c m") 'toggle-frame-fullscreen)
