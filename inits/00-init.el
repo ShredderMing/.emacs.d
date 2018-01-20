@@ -22,3 +22,5 @@
 
 (show-paren-mode 1)
 
+;; graphql-mode
+(require-or-install 'graphql-mode)
