@@ -267,8 +267,10 @@
   #+END_SRC
   modeline样式
   #+BEGIN_SRC emacs-lisp
-    (set-face-attribute 'mode-line nil :background "NavajoWhite")
-    (set-face-attribute 'mode-line-inactive nil :background "#fafafa")
+    (use-package powerline
+      :ensure t
+      :config
+      (powerline-default-theme))
   #+END_SRC
   字体设置
   #+BEGIN_SRC emacs-lisp
