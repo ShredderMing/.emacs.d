@@ -1,0 +1,372 @@
+#+TITLE: Emacs configuration file
+#+AUTHOR: shredderming
+#+BABEL: :cache yes
+#+LATEX_HEADER: \usepackage{parskip}
+#+LATEX_HEADER: \usepackage{inconsolata}
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+PROPERTY: header-args :tangle yes
+
+* 前言
+  这个配置文件参考了larstvei的[[https://github.com/larstvei/dot-emacs][dot-emacs]]配置。首先有个init.el的启动文件，该文件
+  在第一次启动后被init.org生成的init.el文件覆盖。
+  #+BEGIN_SRC emacs-lisp :tangle no
+  (require 'org)
+  (find-file (concat user-emacs-directory "init.org"))
+  (org-babel-tangle)
+  #+END_SRC
+* 配置
+** 初始化
+   lexical scoping 词法闭包
+   #+BEGIN_SRC emacs-lisp
+   ;;;; -*- lexical-binding: t -*-
+   #+END_SRC
+   设置tangle，当该文件被保存时，自动转换成init.el文件，这里就不编译成elc文件了，
+   感觉每次保存都等一段时间很麻烦。
+   #+BEGIN_SRC emacs-lisp
+   (defun tangle-init ()
+     (when (equal (buffer-file-name)
+                  (expand-file-name (concat user-emacs-directory "init.org")))
+       (let ((prog-mode-hook nil))
+         (org-babel-tangle))))
+
+   (add-hook 'after-save-hook 'tangle-init)
+   #+END_SRC
+** 包管理器（use-package）
+   #+BEGIN_SRC emacs-lisp
+   (require 'package)
+   (setq package-enable-at-startup nil)
+   (add-to-list 'package-archives
+                '("melpa" . "https://melpa.org/packages/"))
+   (package-initialize)
+
+   (unless (package-installed-p 'use-package)
+     (package-refresh-contents)
+     (package-install 'use-package))
+   #+END_SRC
+** 默认设置
+   关闭以及打开一些emacs功能
+   不要生成备份文件
+   #+BEGIN_SRC emacs-lisp
+   (setq make-backup-files nil) ; stop creating backup~ files
+   (setq auto-save-default nil) ; stop creating #autosave# files
+   (setq create-lockfiles nil)  ; stop creating .# files
+   #+END_SRC
+   一些基础设置
+   #+BEGIN_SRC emacs-lisp
+     (setq
+      inhibit-startup-message t         ; Don't show the startup message
+      inhibit-startup-screen t          ; or screen
+      cursor-in-non-selected-windows t  ; Hide the cursor in inactive windows
+
+      echo-keystrokes 0.1               ; Show keystrokes right away, don't show the message in the scratch buffer
+      initial-scratch-message nil       ; Empty scratch buffer
+      sentence-end-double-space nil     ; Sentences should end in one space, come on!
+      confirm-kill-emacs 'y-or-n-p      ; y and n instead of yes and no when quitting
+      )
+
+     (fset 'yes-or-no-p 'y-or-n-p)      ; y and n instead of yes and no everywhere else
+     (dolist (mode
+	      '(tool-bar-mode
+		menu-bar-mode
+		fringe-mode
+		scroll-bar-mode
+		blink-cursor-mode))
+       (funcall mode 0))
+     (column-number-mode 1)
+   #+END_SRC
+** 环境变量
+   #+BEGIN_SRC emacs-lisp
+     (use-package exec-path-from-shell
+       :if (memq window-system '(mac ns x))
+       :ensure t
+       :config
+       (exec-path-from-shell-initialize))
+   #+END_SRC
+** Helm 
+   #+BEGIN_SRC emacs-lisp
+     (use-package helm
+       :ensure t
+       :bind (("C-x b" . helm-buffers-list)
+	      ("C-S-y" . helm-show-kill-ring)
+	      ("M-x" . helm-M-x)
+	      ("C-x C-f" . helm-find-files)
+	      ("C-r" . helm-recentf))
+       :config
+       (helm-mode 1)
+       (setq helm-ff-file-name-history-use-recentf t)
+       (setq helm-M-x-fuzzy-match t)
+       (setq helm-buffers-fuzzy-matching t)
+       (setq helm-recentf-fuzzy-match t)
+       (setq helm-apropos-fuzzy-match t)
+       (setq helm-split-window-inside-p t))
+   #+END_SRC
+** projectile
+   #+BEGIN_SRC emacs-lisp
+     (use-package projectile
+       :ensure t
+       :after helm
+       :bind-keymap (("C-c p" . projectile-command-map))
+       :config
+       (projectile-mode 1)
+       (setq-default
+	projectile-completion-system 'helm
+	projectile-switch-project-action #'projectile-find-file-dwim
+	projectile-mode-line '(:eval (if (string= "-" (projectile-project-name))
+					 ""
+				       (format " [%s] " (projectile-project-name))))))
+   #+END_SRC
+** 自动补全
+   #+BEGIN_SRC emacs-lisp
+     (use-package company
+       :ensure t
+       :init (add-hook 'after-init-hook 'global-company-mode)
+       :config
+       (setq company-idle-delay 0.1)
+       (setq company-global-modes '(not org-mode markdown-mode))
+       (setq company-minimum-prefix-length 1))
+   #+END_SRC
+** 拼写检查
+   来自chenbin的[[https://blog.binchen.org/posts/what-s-the-best-spell-check-set-up-in-emacs.html][blog]]
+   #+BEGIN_SRC emacs-lisp
+     ;; if (aspell installed) { use aspell}
+     ;; else if (hunspell installed) { use hunspell }
+     ;; whatever spell checker I use, I always use English dictionary
+     ;; I prefer use aspell because:
+     ;; 1. aspell is older
+     ;; 2. looks Kevin Atkinson still get some road map for aspell:
+     ;; @see http://lists.gnu.org/archive/html/aspell-announce/2011-09/msg00000.html
+     (defun flyspell-detect-ispell-args (&optional run-together)
+       "if RUN-TOGETHER is true, spell check the CamelCase words."
+       (let (args)
+	 (cond
+	  ((string-match  "aspell$" ispell-program-name)
+	   ;; Force the English dictionary for aspell
+	   ;; Support Camel Case spelling check (tested with aspell 0.6)
+	   (setq args (list "--sug-mode=ultra" "--lang=en_US"))
+	   (if run-together
+	       (setq args (append args '("--run-together")))))
+	  ((string-match "hunspell$" ispell-program-name)
+	   ;; Force the English dictionary for hunspell
+	   (setq args "-d en_US")))
+	  args))
+
+     (cond
+      ((executable-find "aspell")
+       ;; you may also need `ispell-extra-args'
+       (setq ispell-program-name "aspell"))
+      ((executable-find "hunspell")
+       (setq ispell-program-name "hunspell")
+  
+       ;; Please note that `ispell-local-dictionary` itself will be passed to hunspell cli with "-d"
+       ;; it's also used as the key to lookup ispell-local-dictionary-alist
+       ;; if we use different dictionary
+       (setq ispell-local-dictionary "en_US")
+       (setq ispell-local-dictionary-alist
+	     '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))))
+      (t (setq ispell-program-name nil)))
+
+     ;; ispell-cmd-args is useless, it's the list of *extra* arguments we will append to the ispell process when "ispell-word" is called.
+     ;; ispell-extra-args is the command arguments which will *always* be used when start ispell process
+     ;; Please note when you use hunspell, ispell-extra-args will NOT be used.
+     ;; Hack ispell-local-dictionary-alist instead.
+     (setq-default ispell-extra-args (flyspell-detect-ispell-args t))
+     ;; (setq ispell-cmd-args (flyspell-detect-ispell-args))
+     (defadvice ispell-word (around my-ispell-word activate)
+       (let ((old-ispell-extra-args ispell-extra-args))
+	 (ispell-kill-ispell t)
+	 (setq ispell-extra-args (flyspell-detect-ispell-args))
+	 ad-do-it
+	 (setq ispell-extra-args old-ispell-extra-args)
+	 (ispell-kill-ispell t)))
+
+     (defadvice flyspell-auto-correct-word (around my-flyspell-auto-correct-word activate)
+       (let ((old-ispell-extra-args ispell-extra-args))
+	 (ispell-kill-ispell t)
+	 ;; use emacs original arguments
+	 (setq ispell-extra-args (flyspell-detect-ispell-args))
+	 ad-do-it
+	 ;; restore our own ispell arguments
+	 (setq ispell-extra-args old-ispell-extra-args)
+	 (ispell-kill-ispell t)))
+
+     (defun text-mode-hook-setup ()
+       ;; Turn off RUN-TOGETHER option when spell check text-mode
+       (setq-local ispell-extra-args (flyspell-detect-ispell-args)))
+     (add-hook 'text-mode-hook 'text-mode-hook-setup)
+   #+END_SRC
+** 窗口管理
+   通过shift和方向键在窗口之间移动
+   #+BEGIN_SRC emacs-lisp
+     (windmove-default-keybindings)
+   #+END_SRC
+   通过C-c left 或者 right进行窗口布局切换
+   #+BEGIN_SRC emacs-lisp
+     (winner-mode 1)
+   #+END_SRC
+   shackle 窗口布局
+   #+BEGIN_SRC emacs-lisp
+     (use-package shackle
+       :ensure t
+       :init
+       (setq shackle-default-alignment 'below
+	     shackle-default-size 0.4
+	     shackle-rules '((help-mode           :align below :select t)
+			     (helpful-mode        :align below)
+			     (compilation-mode    :select t   :size 0.25)
+			     ("*compilation*"     :select nil :size 0.25)
+			     ("*ag search*"       :select nil :size 0.25)
+			     ("*Flycheck errors*" :select nil :size 0.25)
+			     ("*Warnings*"        :select nil :size 0.25)
+			     ("*Error*"           :select nil :size 0.25)
+			     ("*Org Links*"       :select nil :size 0.1)
+			     (magit-status-mode                :align bottom :size 0.5  :inhibit-window-quit t)
+			     (magit-log-mode                   :same t                  :inhibit-window-quit t)
+			     (magit-commit-mode                :ignore t)
+			     (magit-diff-mode     :select nil  :align left   :size 0.5)
+			     (git-commit-mode                  :same t)
+			     (vc-annotate-mode                 :same t)
+			     ))
+       :config
+       (shackle-mode 1))
+   #+END_SRC
+** 快捷键提示（which key）
+   #+BEGIN_SRC emacs-lisp
+     (use-package which-key
+       :ensure t
+       :config
+       (which-key-mode)
+       (setq which-key-idle-delay 3))
+   #+END_SRC
+** 包试用（try）
+   #+BEGIN_SRC emacs-lisp
+     (use-package try
+       :ensure t)
+   #+END_SRC
+** 侧边栏（NeoTree）
+   #+BEGIN_SRC emacs-lisp
+     (use-package neotree
+       :ensure t
+       :config
+       (setq neo-window-width 32
+	     neo-create-file-auto-open t
+	     neo-banner-message nil
+	     neo-mode-line-type 'neotree
+	     neo-smart-open t
+	     neo-show-hidden-files t
+	     neo-mode-line-type 'none
+	     neo-auto-indent-point t)
+       (setq neo-theme (if (display-graphic-p) 'nerd 'arrow))
+       (global-set-key (kbd "s-B") 'neotree-toggle))
+   #+END_SRC
+* 主题（Theme）
+  主题设置
+  #+BEGIN_SRC emacs-lisp
+    (load-theme 'tsdh-light)
+    (add-to-list 'default-frame-alist '(ns-transparent-titlebar .t ))
+    (add-to-list 'default-frame-alist '(ns-appearance . light))
+  #+END_SRC
+  modeline样式
+  #+BEGIN_SRC emacs-lisp
+    (set-face-attribute 'mode-line nil :background "NavajoWhite")
+    (set-face-attribute 'mode-line-inactive nil :background "#fafafa")
+  #+END_SRC
+  字体设置
+  #+BEGIN_SRC emacs-lisp
+    (set-language-environment "UTF-8")
+       (set-default-coding-systems 'utf-8-unix)
+
+       ;; 默认字体
+       (when (member "CamingoCode" (font-family-list))
+	 (set-face-attribute 'default nil :font "CamingoCode" :height 120))
+       ;; unicode字符
+       (when (member "Symbola" (font-family-list))
+	 (set-fontset-font t 'unicode "Symbola" nil 'prepend))
+       ;; 中文字体
+       ;;(when (member "WenQuanYi Micro Hei" (font-family-list))
+       ;;(set-fontset-font t '(#x4e00 . #x9fff) "WenQuanYi Micro Hei"))
+       (when (member "Noto Sans CJK SC" (font-family-list))
+	 (set-fontset-font t 'han (font-spec :family "Noto Sans CJK SC")))
+  #+END_SRC
+* 开发相关
+** LSP相关
+   #+BEGIN_SRC emacs-lisp
+     (use-package eglot
+       :ensure t)
+   #+END_SRC
+** Shell
+   shell-pop
+   #+BEGIN_SRC emacs-lisp
+     (use-package shell-pop
+       :ensure t)
+   #+END_SRC
+** Scheme
+   来自[[http://www.yinwang.org/blog-cn/2013/04/11/scheme-setup][王垠的blog]]
+   #+BEGIN_SRC emacs-lisp
+     (use-package cmuscheme
+       :config
+       (setq scheme-program-name "scheme")
+       ;; bypass the interactive question and start the default interpreter
+       (defun scheme-proc ()
+	 "Return the current Scheme process, starting one if necessary."
+	 (unless (and scheme-buffer
+		      (get-buffer scheme-buffer)
+		      (comint-check-proc scheme-buffer))
+	   (save-window-excursion
+	     (run-scheme scheme-program-name)))
+	 (or (scheme-get-process)
+	     (error "No current process. See variable `scheme-buffer'")))
+
+       (defun scheme-split-window ()
+	 (cond
+	  ((= 1 (count-windows))
+	   (delete-other-windows)
+	   (split-window-vertically (floor (* 0.68 (window-height))))
+	   (other-window 1)
+	   (switch-to-buffer "*scheme*")
+	   (other-window 1))
+	  ((not (find "*scheme*"
+		      (mapcar (lambda (w) (buffer-name (window-buffer w)))
+			      (window-list))
+		      :test 'equal))
+	   (other-window 1)
+	   (switch-to-buffer "*scheme*")
+	   (other-window -1))))
+
+       (defun scheme-send-last-sexp-split-window ()
+	 (interactive)
+	 (scheme-split-window)
+	 (scheme-send-last-sexp))
+
+       (defun scheme-send-definition-split-window ()
+	 (interactive)
+	 (scheme-split-window)
+	 (scheme-send-definition))
+
+       (add-hook 'scheme-mode-hook
+		 (lambda ()
+		   (paredit-mode 1)
+		   (define-key scheme-mode-map (kbd "<f5>") 'scheme-send-last-sexp-split-window)
+		   (define-key scheme-mode-map (kbd "<f6>") 'scheme-send-definition-split-window))))
+
+   #+END_SRC
+** JavaScript
+   #+BEGIN_SRC emacs-lisp
+     (use-package js2-mode
+       ;; A better javascript mode
+       :ensure t
+       :config (setq js2-global-externs '("require" "module" "jest" "jasmine"
+					  "it" "expect" "describe" "beforeEach")))
+ 
+     (use-package web-mode
+       :ensure t
+       :requires js2-mode
+       :mode "\\.js\\'\\|\\.html\\'"
+       :config (progn
+		 (setq web-mode-attr-indent-offset 4)
+		 (defun rm-maybe-jsx-mode ()
+		   (when (string-equal "jsx" web-mode-content-type)
+		     (subword-mode 1)
+		     (js2-minor-mode 1)))
+		 (add-hook 'web-mode-hook 'rm-maybe-jsx-mode)
+		 (add-to-list 'web-mode-content-types '("jsx" . "jsx/.*\\.js\\'"))))
+   #+END_SRC
