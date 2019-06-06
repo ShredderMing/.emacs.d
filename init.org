@@ -99,6 +99,8 @@
        (setq helm-recentf-fuzzy-match t)
        (setq helm-apropos-fuzzy-match t)
        (setq helm-split-window-inside-p t))
+     (use-package helm-company
+       :ensure t)
    #+END_SRC
 ** projectile
    #+BEGIN_SRC emacs-lisp
@@ -119,6 +121,15 @@
    #+BEGIN_SRC emacs-lisp
      (use-package company
        :ensure t
+       :bind (:map company-active-map
+		   ("C-d" . company-show-doc-buffer)
+		   ("C-n" . company-select-next)
+		   ("C-p" . company-select-previous)
+		   ("<tab>" . company-complete)
+		   :map company-mode-map
+		   ("C-:" . helm-company)
+		   :map company-active-map
+		   ("C-:" . helm-company))
        :init (add-hook 'after-init-hook 'global-company-mode)
        :config
        (setq company-idle-delay 0.1)
@@ -258,12 +269,24 @@
        (setq neo-theme (if (display-graphic-p) 'nerd 'arrow))
        (global-set-key (kbd "s-B") 'neotree-toggle))
    #+END_SRC
+** 词典
+   #+BEGIN_SRC emacs-lisp
+     (use-package youdao-dictionary
+       :ensure t
+       :bind (("C-c y" . youdao-dictionary-search-at-point))
+       :config
+       (setq url-automatic-caching t))
+   #+END_SRC
 * 主题（Theme）
   主题设置
   #+BEGIN_SRC emacs-lisp
     (load-theme 'tsdh-light)
     (add-to-list 'default-frame-alist '(ns-transparent-titlebar .t ))
     (add-to-list 'default-frame-alist '(ns-appearance . light))
+  #+END_SRC
+  光标样式
+  #+BEGIN_SRC emacs-lisp
+    (setq-default cursor-type 'bar)
   #+END_SRC
   modeline样式
   #+BEGIN_SRC emacs-lisp
@@ -293,7 +316,13 @@
 ** LSP相关
    #+BEGIN_SRC emacs-lisp
      (use-package eglot
-       :ensure t)
+       :ensure t
+       :hook ((web-mode) . eglot-ensure)
+       :config
+       (add-to-list 'eglot-server-programs
+		    '(
+		      ;; yarn global add javascript-typescript-langserver
+		      web-mode . ("javascript-typescript-stdio"))))
    #+END_SRC
 ** Shell
    shell-pop
@@ -301,56 +330,71 @@
      (use-package shell-pop
        :ensure t)
    #+END_SRC
-** Scheme
-   来自[[http://www.yinwang.org/blog-cn/2013/04/11/scheme-setup][王垠的blog]]
+** Lisp
+   使用 =Paredit= 匹配括号
    #+BEGIN_SRC emacs-lisp
-     (use-package cmuscheme
-       :config
-       (setq scheme-program-name "scheme")
-       ;; bypass the interactive question and start the default interpreter
-       (defun scheme-proc ()
-	 "Return the current Scheme process, starting one if necessary."
-	 (unless (and scheme-buffer
-		      (get-buffer scheme-buffer)
-		      (comint-check-proc scheme-buffer))
-	   (save-window-excursion
-	     (run-scheme scheme-program-name)))
-	 (or (scheme-get-process)
-	     (error "No current process. See variable `scheme-buffer'")))
-
-       (defun scheme-split-window ()
-	 (cond
-	  ((= 1 (count-windows))
-	   (delete-other-windows)
-	   (split-window-vertically (floor (* 0.68 (window-height))))
-	   (other-window 1)
-	   (switch-to-buffer "*scheme*")
-	   (other-window 1))
-	  ((not (find "*scheme*"
-		      (mapcar (lambda (w) (buffer-name (window-buffer w)))
-			      (window-list))
-		      :test 'equal))
-	   (other-window 1)
-	   (switch-to-buffer "*scheme*")
-	   (other-window -1))))
-
-       (defun scheme-send-last-sexp-split-window ()
-	 (interactive)
-	 (scheme-split-window)
-	 (scheme-send-last-sexp))
-
-       (defun scheme-send-definition-split-window ()
-	 (interactive)
-	 (scheme-split-window)
-	 (scheme-send-definition))
-
-       (add-hook 'scheme-mode-hook
-		 (lambda ()
-		   (paredit-mode 1)
-		   (define-key scheme-mode-map (kbd "<f5>") 'scheme-send-last-sexp-split-window)
-		   (define-key scheme-mode-map (kbd "<f6>") 'scheme-send-definition-split-window))))
-
+     (use-package paredit
+       :ensure t
+       :hook ((ielm-mode
+	       geiser-repl-mode
+	       slime-repl-mode
+	       lisp-mode
+	       emacs-lisp-mode
+	       lisp-interaction-mode
+	       scheme-mode) . paredit-mode))
    #+END_SRC
+*** Emacs Lisp
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'elisp-mode-hook 'turn-on-eldoc-mode)
+      (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+    #+END_SRC
+*** Scheme
+    来自[[http://www.yinwang.org/blog-cn/2013/04/11/scheme-setup][王垠的blog]]
+    #+BEGIN_SRC emacs-lisp
+      (use-package cmuscheme
+	:bind (:map scheme-mode-map
+		    ("<f5>" . scheme-send-last-sexp-split-window)
+		    ("<f6>" . scheme-send-definition-split-window))
+	:config
+	(setq scheme-program-name "scheme")
+	;; bypass the interactive question and start the default interpreter
+	(defun scheme-proc ()
+	  "Return the current Scheme process, starting one if necessary."
+	  (unless (and scheme-buffer
+		       (get-buffer scheme-buffer)
+		       (comint-check-proc scheme-buffer))
+	    (save-window-excursion
+	      (run-scheme scheme-program-name)))
+	  (or (scheme-get-process)
+	      (error "No current process. See variable `scheme-buffer'")))
+
+	(defun scheme-split-window ()
+	  (cond
+	   ((= 1 (count-windows))
+	    (delete-other-windows)
+	    (split-window-vertically (floor (* 0.68 (window-height))))
+	    (other-window 1)
+	    (switch-to-buffer "*scheme*")
+	    (other-window 1))
+	   ((not (find "*scheme*"
+		       (mapcar (lambda (w) (buffer-name (window-buffer w)))
+			       (window-list))
+		       :test 'equal))
+	    (other-window 1)
+	    (switch-to-buffer "*scheme*")
+	    (other-window -1))))
+
+	(defun scheme-send-last-sexp-split-window ()
+	  (interactive)
+	  (scheme-split-window)
+	  (scheme-send-last-sexp))
+
+	(defun scheme-send-definition-split-window ()
+	  (interactive)
+	  (scheme-split-window)
+	  (scheme-send-definition)))
+
+    #+END_SRC
 ** JavaScript
    #+BEGIN_SRC emacs-lisp
      (use-package js2-mode
@@ -372,3 +416,4 @@
 		 (add-hook 'web-mode-hook 'rm-maybe-jsx-mode)
 		 (add-to-list 'web-mode-content-types '("jsx" . "jsx/.*\\.js\\'"))))
    #+END_SRC
+   
