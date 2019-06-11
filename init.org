@@ -33,15 +33,22 @@
    #+END_SRC
 ** 包管理器（use-package）
    #+BEGIN_SRC emacs-lisp
-   (require 'package)
-   (setq package-enable-at-startup nil)
-   (add-to-list 'package-archives
-                '("melpa" . "https://melpa.org/packages/"))
-   (package-initialize)
+     (require 'package)
+     (setq package-enable-at-startup nil)
+     (require 'package-x)
+     (defvar local-archive
+       (expand-file-name "local/" user-emacs-directory)
+       "Location of the package archive.")
+     (setq package-archive-upload-base local-archive)
+     (add-to-list 'package-archives
+		  '("melpa" . "https://melpa.org/packages/"))
+     (add-to-list 'package-archives
+		  `("local" . ,local-archive) t)
+     (package-initialize)
 
-   (unless (package-installed-p 'use-package)
-     (package-refresh-contents)
-     (package-install 'use-package))
+     (unless (package-installed-p 'use-package)
+       (package-refresh-contents)
+       (package-install 'use-package))
    #+END_SRC
 ** 默认设置
    关闭以及打开一些emacs功能
@@ -90,7 +97,9 @@
 	      ("C-S-y" . helm-show-kill-ring)
 	      ("M-x" . helm-M-x)
 	      ("C-x C-f" . helm-find-files)
-	      ("C-r" . helm-recentf))
+	      ("C-r" . helm-recentf)
+	      :map helm-find-files-map
+	      ([tab] . helm-execute-persistent-action))
        :config
        (helm-mode 1)
        (setq helm-ff-file-name-history-use-recentf t)
@@ -277,12 +286,20 @@
        :config
        (setq url-automatic-caching t))
    #+END_SRC
+** Undo Tree
+   undo: *C-/* redo: *C-S-/* tree: *C-x u*
+   #+BEGIN_SRC emacs-lisp
+     (use-package undo-tree
+       :ensure t
+       :init
+       (global-undo-tree-mode))
+   #+END_SRC
 * 主题（Theme）
   主题设置
   #+BEGIN_SRC emacs-lisp
-    (load-theme 'tsdh-light)
-    (add-to-list 'default-frame-alist '(ns-transparent-titlebar .t ))
-    (add-to-list 'default-frame-alist '(ns-appearance . light))
+    (use-package tear-theme
+      :ensure t
+      :config (load-theme 'tear t))
   #+END_SRC
   光标样式
   #+BEGIN_SRC emacs-lisp
@@ -312,7 +329,22 @@
        (when (member "Noto Sans CJK SC" (font-family-list))
 	 (set-fontset-font t 'han (font-spec :family "Noto Sans CJK SC")))
   #+END_SRC
+* Org Mode
+  org-bullets
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :hook (org-mode . org-bullets-mode))
+#+END_SRC
 * 开发相关
+** auto-yasnippet
+   #+BEGIN_SRC emacs-lisp
+     (use-package auto-yasnippet
+       :ensure t
+       :bind (("C-S-w" . aya-create)
+	      ("C-S-y" . aya-expand)
+	      ("C-o" . aya-open-line)))
+   #+END_SRC
 ** LSP相关
    #+BEGIN_SRC emacs-lisp
      (use-package eglot
@@ -352,9 +384,10 @@
     来自[[http://www.yinwang.org/blog-cn/2013/04/11/scheme-setup][王垠的blog]]
     #+BEGIN_SRC emacs-lisp
       (use-package cmuscheme
+	:after scheme
 	:bind (:map scheme-mode-map
-		    ("<f5>" . scheme-send-last-sexp-split-window)
-		    ("<f6>" . scheme-send-definition-split-window))
+		    ([f5] . scheme-send-last-sexp-split-window)
+		    ([f6] . scheme-send-definition-split-window))
 	:config
 	(setq scheme-program-name "scheme")
 	;; bypass the interactive question and start the default interpreter
@@ -416,4 +449,5 @@
 		 (add-hook 'web-mode-hook 'rm-maybe-jsx-mode)
 		 (add-to-list 'web-mode-content-types '("jsx" . "jsx/.*\\.js\\'"))))
    #+END_SRC
+   
    
