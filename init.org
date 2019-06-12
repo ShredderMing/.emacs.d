@@ -68,7 +68,6 @@
       echo-keystrokes 0.1               ; Show keystrokes right away, don't show the message in the scratch buffer
       initial-scratch-message nil       ; Empty scratch buffer
       sentence-end-double-space nil     ; Sentences should end in one space, come on!
-      confirm-kill-emacs 'y-or-n-p      ; y and n instead of yes and no when quitting
       )
 
      (fset 'yes-or-no-p 'y-or-n-p)      ; y and n instead of yes and no everywhere else
