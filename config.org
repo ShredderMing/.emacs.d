@@ -1,0 +1,44 @@
+#+TITLE: Emacs 配置文件
+#+AUTHOR: shredderming
+#+BABEL: :cache yes
+#+LATEX_HEADER: \usepackage{ctex}
+#+PROPERTY: header-args :tangle yes
+
+* 前言
+* 配置
+** 包管理器（use-package）
+   #+BEGIN_SRC emacs-lisp
+     (require 'package)
+     (setq package-enable-at-startup nil)
+     (require 'package-x)
+     (defvar local-archive
+       (expand-file-name "local/" user-emacs-directory)
+       "Location of the package archive.")
+     (setq package-archive-upload-base local-archive)
+     (add-to-list 'package-archives
+		  '("melpa" . "https://melpa.org/packages/"))
+     (add-to-list 'package-archives
+		  `("local" . ,local-archive) t)
+     (package-initialize)
+
+     (unless (package-installed-p 'use-package)
+       (package-refresh-contents)
+       (package-install 'use-package))
+   #+END_SRC
+** Auto tangle
+   保存时，自动导出配置代码并编译，由于编译速度慢，用async包优化
+   #+BEGIN_SRC emacs-lisp
+     (use-package async
+       :ensure t
+       :commands (async-start))
+   #+END_SRC
+   保存时自动编译
+   #+BEGIN_SRC emacs-lisp
+     (defun tangle-init ()
+       (when )
+       )
+   #+END_SRC
+* 主题（Theme）
+* Org相关
+* 开发相关
+* 参考的配置（不完全）

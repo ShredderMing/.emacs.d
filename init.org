@@ -353,6 +353,30 @@
        :ensure t
        :bind (("C-x M-c" . restart-emacs)))
    #+END_SRC
+** dired
+   #+BEGIN_SRC emacs-lisp
+     (use-package dired
+       :bind (:map dired-mode-map
+		   ("C-c C-e" . wdired-change-to-wdired-mode))
+       :init
+       (setq dired-dwin-target t
+	     dired-recursive-copies 'top
+	     dired-recursive-deletes 'top
+	     dired-listing-switches "-alh")
+       :config
+       (add-hook 'dired-mode-hook 'dired-hide-details-mode))
+   #+END_SRC
+** eww
+   #+BEGIN_SRC emacs-lisp
+     (use-package eww
+       :bind* (("M-m g x" . eww)
+	       ("M-m g :" . eww-browse-with-external-browser)
+	       ("M-m g #" . eww-list-histories)
+	       ("M-m g {" . eww-back-url)
+	       ("M-m g }" . eww-forward-url))
+       :config
+       (add-hook 'eww-mode-hook 'visual-line-mode))
+   #+END_SRC
 * 主题（Theme）
   主题设置
   #+BEGIN_SRC emacs-lisp
@@ -390,11 +414,11 @@
   #+END_SRC
 * Org Mode
   org-bullets
-#+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :hook (org-mode . org-bullets-mode))
-#+END_SRC
+  #+BEGIN_SRC emacs-lisp
+    (use-package org-bullets
+      :ensure t
+      :hook (org-mode . org-bullets-mode))
+  #+END_SRC
 * 开发相关
 ** auto-yasnippet
    #+BEGIN_SRC emacs-lisp
@@ -487,26 +511,53 @@
 	  (scheme-send-definition)))
 
     #+END_SRC
-** JavaScript
-   #+BEGIN_SRC emacs-lisp
-     (use-package js2-mode
-       ;; A better javascript mode
-       :ensure t
-       :config (setq js2-global-externs '("require" "module" "jest" "jasmine"
-					  "it" "expect" "describe" "beforeEach")))
+** Web
+*** Prettier
+    #+BEGIN_SRC emacs-lisp
+      (use-package prettier-js
+	:ensure t
+	:init
+	(defun enable-minor-mode (my-pair)
+	  "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+	  (if (buffer-file-name)
+	      (if (string-match (car my-pair) buffer-file-name)
+		  (funcall (cdr my-pair)))))
+	(add-hook 'js-mode-hook #'(lambda ()
+				    (enable-minor-mode
+				     '("\\.jsx?\\'" . prettier-js-mode))))
+	(add-hook 'web-mode-hook #'(lambda ()
+				     (enable-minor-mode
+				      '("\\.jsx?\\" . prettier-js-mode))))
+	:config
+	(setq prettier-js-command "npx")
+	(setq prettier-js-args '("prettier"
+				 "--use-tabs" "false"
+				 "--jsx-bracket-same-line" "true"
+				 "--parser" "babylon"
+				 "--print-width" "80"
+				 "--trailing-comma" "none"
+				 "--bracket-spacing" "false")))
+    #+END_SRC
+*** JavaScript
+    #+BEGIN_SRC emacs-lisp
+      (use-package js2-mode
+	;; A better javascript mode
+	:ensure t
+	:config (setq js2-global-externs '("require" "module" "jest" "jasmine"
+					   "it" "expect" "describe" "beforeEach")))
  
-     (use-package web-mode
-       :ensure t
-       :requires js2-mode
-       :mode "\\.js\\'\\|\\.html\\'"
-       :config (progn
-		 (setq web-mode-attr-indent-offset 4)
-		 (defun rm-maybe-jsx-mode ()
-		   (when (string-equal "jsx" web-mode-content-type)
-		     (subword-mode 1)
-		     (js2-minor-mode 1)))
-		 (add-hook 'web-mode-hook 'rm-maybe-jsx-mode)
-		 (add-to-list 'web-mode-content-types '("jsx" . "jsx/.*\\.js\\'"))))
-   #+END_SRC
+      (use-package web-mode
+	:ensure t
+	:requires js2-mode
+	:mode "\\.js\\'\\|\\.html\\'"
+	:config (progn
+		  (setq web-mode-attr-indent-offset 4)
+		  (defun rm-maybe-jsx-mode ()
+		    (when (string-equal "jsx" web-mode-content-type)
+		      (subword-mode 1)
+		      (js2-minor-mode 1)))
+		  (add-hook 'web-mode-hook 'rm-maybe-jsx-mode)
+		  (add-to-list 'web-mode-content-types '("jsx" . "jsx/.*\\.js\\'"))))
+    #+END_SRC
    
    
