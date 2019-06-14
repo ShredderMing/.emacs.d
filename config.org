@@ -5,7 +5,7 @@
 #+PROPERTY: header-args :tangle yes
 
 * 前言
-* 配置
+* 基础配置
 ** 包管理器（use-package）
    #+BEGIN_SRC emacs-lisp
      (eval-when-compile
@@ -69,21 +69,211 @@
    #+BEGIN_SRC emacs-lisp
      (setq inhibit-startup-message t
 	   inhibit-startup-screen t
-	   cursor-in-non-selected-windows t
 	   echo-keystrokes 0.1
 	   initial-scratch-message nil
-	   sentence-end-double-space nil)
+	   sentence-end-double-space nil
+	   doc-view-continuous t)
      (fset 'yes-or-no-p 'y-or-n-p)
      (setq-default truncate-lines t)
      (dolist (mode '(tool-bar-mode
 		     menu-bar-mode
 		     fringe-mode
 		     scroll-bar-mode
-		     blink-cursor-mode
 		     tooltip-mode))
        (funcall mode 0))
-     (dolist (mode '(column-number-mode))
+     (dolist (mode '(column-number-mode
+		     winner-mode
+		     subword-mode))
        (funcall mode 1))
+   #+END_SRC
+** 光标
+   #+BEGIN_SRC emacs-lisp
+     (setq-default cursor-type '(bar . 1))
+     (setq cursor-in-non-selected-windows t)
+     (blink-cursor-mode 0)
+   #+END_SRC
+** 备份以及自动保存
+   #+BEGIN_SRC emacs-lisp
+     (setq backup-by-copying t
+	   backup-directory-alist
+	   '(("." . "~/.saves"))
+	   delete-old-versions t
+	   kept-new-versions 6
+	   kept-old-versions 2
+	   version-control t)
+     (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
+	   create-lockfiles nil)
+   #+END_SRC
+** 大文件警告
+   #+BEGIN_SRC emacs-lisp
+     (setq large-file-warning-threshold (* 15 1024 1024))
+   #+END_SRC
+** 远程编辑文件（tramp）
+   #+BEGIN_SRC emacs-lisp
+     (setq tramp-default-method "ssh"
+	   tramp-backup-directory-alist backup-directory-alist
+	   tramp-ssh-controlmaster-options "ssh")
+   #+END_SRC
+** 最近打开的文件
+   #+BEGIN_SRC emacs-lisp
+     (setq recentf-max-saved-items 1000
+	   recentf-exclude '("/tmp/" "/ssh:"))
+     (recentf-mode)
+   #+END_SRC
+** 文件浏览（dired）
+   #+BEGIN_SRC emacs-lisp
+     (use-package dired
+       :bind (:map dired-mode-map
+		   ("C-c C-e" . wdired-change-to-wdired-mode))
+       :init
+       (setq dired-dwim-target t
+	     dired-recursive-copies 'top
+	     dired-recursive-deletes 'top
+	     dired-listing-switches "-alh")
+       :config
+       (add-hook 'dired-mode-hook 'dired-hide-details-mode))
+   #+END_SRC
+** 拼写检查
+   来自chenbin的[[https://blog.binchen.org/posts/what-s-the-best-spell-check-set-up-in-emacs.html][blog]]
+   #+BEGIN_SRC emacs-lisp
+     (use-package flyspell
+       :diminish (flyspell-mode . "φ")
+       :bind* (("M-m ] s" . flyspell-goto-next-error))
+       :config
+       ;; if (aspell installed) { use aspell}
+       ;; else if (hunspell installed) { use hunspell }
+       ;; whatever spell checker I use, I always use English dictionary
+       ;; I prefer use aspell because:
+       ;; 1. aspell is older
+       ;; 2. looks Kevin Atkinson still get some road map for aspell:
+       ;; @see http://lists.gnu.org/archive/html/aspell-announce/2011-09/msg00000.html
+       (defun flyspell-detect-ispell-args (&optional run-together)
+	 "if RUN-TOGETHER is true, spell check the CamelCase words."
+	 (let (args)
+	   (cond
+	    ((string-match  "aspell$" ispell-program-name)
+	     ;; Force the English dictionary for aspell
+	     ;; Support Camel Case spelling check (tested with aspell 0.6)
+	     (setq args (list "--sug-mode=ultra" "--lang=en_US"))
+	     (if run-together
+		 (setq args (append args '("--run-together")))))
+	    ((string-match "hunspell$" ispell-program-name)
+	     ;; Force the English dictionary for hunspell
+	     (setq args "-d en_US")))
+	   args))
+  
+       (cond
+	((executable-find "aspell")
+	 ;; you may also need `ispell-extra-args'
+	 (setq ispell-program-name "aspell"))
+	((executable-find "hunspell")
+	 (setq ispell-program-name "hunspell")
+    
+	 ;; Please note that `ispell-local-dictionary` itself will be passed to hunspell cli with "-d"
+	 ;; it's also used as the key to lookup ispell-local-dictionary-alist
+	 ;; if we use different dictionary
+	 (setq ispell-local-dictionary "en_US")
+	 (setq ispell-local-dictionary-alist
+	       '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))))
+	(t (setq ispell-program-name nil)))
+  
+       ;; ispell-cmd-args is useless, it's the list of *extra* arguments we will append to the ispell process when "ispell-word" is called.
+       ;; ispell-extra-args is the command arguments which will *always* be used when start ispell process
+       ;; Please note when you use hunspell, ispell-extra-args will NOT be used.
+       ;; Hack ispell-local-dictionary-alist instead.
+       (setq-default ispell-extra-args (flyspell-detect-ispell-args t))
+       ;; (setq ispell-cmd-args (flyspell-detect-ispell-args))
+       (defadvice ispell-word (around my-ispell-word activate)
+	 (let ((old-ispell-extra-args ispell-extra-args))
+	   (ispell-kill-ispell t)
+	   (setq ispell-extra-args (flyspell-detect-ispell-args))
+	   ad-do-it
+	   (setq ispell-extra-args old-ispell-extra-args)
+	   (ispell-kill-ispell t)))
+  
+       (defadvice flyspell-auto-correct-word (around my-flyspell-auto-correct-word activate)
+	 (let ((old-ispell-extra-args ispell-extra-args))
+	   (ispell-kill-ispell t)
+	   ;; use emacs original arguments
+	   (setq ispell-extra-args (flyspell-detect-ispell-args))
+	   ad-do-it
+	   ;; restore our own ispell arguments
+	   (setq ispell-extra-args old-ispell-extra-args)
+	   (ispell-kill-ispell t)))
+  
+       (defun text-mode-hook-setup ()
+	 ;; Turn off RUN-TOGETHER option when spell check text-mode
+	 (setq-local ispell-extra-args (flyspell-detect-ispell-args)))
+       (add-hook 'text-mode-hook 'text-mode-hook-setup))
+   #+END_SRC
+** 内置浏览器（eww）
+   #+BEGIN_SRC emacs-lisp
+     (use-package eww
+       :bind* (("M-m g x" . eww)
+	       ("M-m g :" . eww-browse-with-external-browser)
+	       ("M-m g #" . eww-list-histories)
+	       ("M-m g {" . eww-back-url)
+	       ("M-m g }" . eww-forward-url))
+       :config
+       (add-hook 'eww-mode-hook 'visual-line-mode))
+   #+END_SRC
+** 按键绑定
+   #+BEGIN_SRC emacs-lisp
+     (bind-keys*
+       ("C-r"       . dabbrev-expand)
+       ("M-/"       . hippie-expand)
+       ("C-S-d"     . kill-whole-line)
+       ("M-m SPC c" . load-theme)
+       ("M-m SPC R" . locate)
+       ("M-m W"     . winner-undo)
+       ("M-m g m"   . make-frame)
+       ("M-m g M"   . delete-frame)
+       ("M-m g n"   . select-frame-by-name)
+       ("M-m g N"   . set-frame-name)
+       ("M-m B"     . mode-line-other-buffer)
+       ("M-m ="     . indent-region)
+       ("M-m g ("   . Info-prev)
+       ("M-m g )"   . Info-next)
+       ("M-m ^"     . Info-up)
+       ("M-m &"     . Info-goto-node)
+       ("M-m g f"   . find-file-at-point)
+       ("M-m g u"   . downcase-region)
+       ("M-m g U"   . upcase-region)
+       ("M-m g C"   . capitalize-region)
+       ("M-m g F"   . follow-mode)
+       ("M-m R"     . overwrite-mode)
+       ("M-m g j"   . doc-view-next-page)
+       ("M-m g k"   . doc-view-previous-page)
+       ("M-m : t"   . emacs-init-time)
+       ("M-m g q"   . fill-paragraph)
+       ("M-m g @"   . compose-mail)
+       ("M-m SPC ?" . describe-bindings))
+   #+END_SRC
+* 扩展配置
+** 环境变量
+   #+BEGIN_SRC emacs-lisp
+     (use-package exec-path-from-shell
+       :ensure t
+       :demand t
+       :init
+       (setq exec-path-from-shell-check-startup-files nil)
+       :config
+       (when (memq window-system '(mac ns x))
+	 (exec-path-from-shell-initialize)))
+   #+END_SRC
+** 快捷键提示（which key）
+   #+BEGIN_SRC emacs-lisp
+     (use-package which-key
+       :ensure t
+       :defer t
+       :diminish which-key-mode
+       :init
+       (setq which-key-sort-order 'which-key-key-order-alpha)
+       :bind* (("M-m ?" . which-key-show-top-level))
+       :config
+       (which-key-mode)
+       (which-key-add-key-based-replacements
+	"M-m ?" "top level bindings"))
    #+END_SRC
 ** 词典
    #+BEGIN_SRC emacs-lisp
@@ -93,7 +283,399 @@
        :config
        (setq url-automatic-caching t))
    #+END_SRC
+** 重启emacs
+   #+BEGIN_SRC emacs-lisp
+     (use-package restart-emacs
+       :ensure t
+       :bind* (("C-x M-c" .restart-emacs)))
+   #+END_SRC
+
+* Modal editing
+** 初始化
+   #+BEGIN_SRC emacs-lisp
+     (use-package modalka
+       :ensure t
+       :demand t
+       :bind* (("C-z" . modalka-mode))
+       :diminish (modalka-mode . "μ")
+       :init
+       (setq modalka-cursor-type 'box)
+       :config
+       (global-set-key (kbd "<escape>") #'modalka-mode)
+       (modalka-global-mode 1)
+       (add-to-list 'modalka-excluded-modes 'magit-status-mode)
+       (add-to-list 'modalka-excluded-modes 'magit-popup-mode)
+       (add-to-list 'modalka-excluded-modes 'eshell-mode)
+       (add-to-list 'modalka-excluded-modes 'deft-mode)
+       (add-to-list 'modalka-excluded-modes 'term-mode)
+       (which-key-add-key-based-replacements
+	"M-m"     "Modalka prefix"
+	"M-m :"   "extended prefix"
+	"M-m m"   "move prefix"
+	"M-m s"   "send code prefix"
+	"M-m SPC" "user prefix"
+	"M-m g"   "global prefix"
+	"M-m o"   "org prefix"
+	"M-m a"   "expand around prefix"
+	"M-m i"   "expand inside prefix"
+	"M-m ["   "prev nav prefix"
+	"M-m ]"   "next nav prefix"))
+   #+END_SRC
+** 按键绑定
+*** Numbers
+    #+BEGIN_SRC emacs-lisp
+      (modalka-define-kbd "0" "C-0")
+      (modalka-define-kbd "1" "C-1")
+      (modalka-define-kbd "2" "C-2")
+      (modalka-define-kbd "3" "C-3")
+      (modalka-define-kbd "4" "C-4")
+      (modalka-define-kbd "5" "C-5")
+      (modalka-define-kbd "6" "C-6")
+      (modalka-define-kbd "7" "C-7")
+      (modalka-define-kbd "8" "C-8")
+      (modalka-define-kbd "9" "C-9")
+    #+END_SRC
+*** Movement and one key presses
+    #+BEGIN_SRC emacs-lisp
+      (modalka-define-kbd "h" "C-b")
+      (modalka-define-kbd "j" "C-n")
+      (modalka-define-kbd "k" "C-p")
+      (modalka-define-kbd "l" "C-f")
+      (modalka-define-kbd "e" "M-f")
+      (modalka-define-kbd "b" "M-b")
+      (modalka-define-kbd "n" "M-n")
+      (modalka-define-kbd "N" "M-p")
+      (modalka-define-kbd "{" "M-{")
+      (modalka-define-kbd "}" "M-}")
+      (modalka-define-kbd "0" "C-a")
+      (modalka-define-kbd "$" "C-e")
+      (modalka-define-kbd "G" "M->")
+      (modalka-define-kbd "y" "M-w")
+      (modalka-define-kbd "p" "C-y")
+      (modalka-define-kbd "P" "M-y")
+      (modalka-define-kbd "x" "C-d")
+      (modalka-define-kbd "D" "C-k")
+      (modalka-define-kbd "z" "C-l")
+      (modalka-define-kbd "!" "M-&")
+      (modalka-define-kbd "J" "C-v")
+      (modalka-define-kbd "K" "M-v")
+      (modalka-define-kbd "M" "C-u")
+      (modalka-define-kbd "(" "M-a")
+      (modalka-define-kbd ")" "M-e")
+      (modalka-define-kbd "/" "C-s")
+      (modalka-define-kbd "E" "C-g")
+      (modalka-define-kbd "d" "C-w")
+      (modalka-define-kbd "w" "C-x o")
+      (modalka-define-kbd "W" "M-m W")
+      (modalka-define-kbd "B" "M-m B")
+      (modalka-define-kbd "H" "C-x >")
+      (modalka-define-kbd "L" "C-x <")
+      (modalka-define-kbd "Z" "C-x 1")
+      (modalka-define-kbd "q" "C-x (")
+      (modalka-define-kbd "Q" "C-x )")
+      (modalka-define-kbd "." "M-m .")
+      (modalka-define-kbd "?" "M-m ?")
+      (modalka-define-kbd "v" "C-SPC")
+      (modalka-define-kbd "V" "M-m V")
+      (modalka-define-kbd "=" "M-m =")
+      (modalka-define-kbd "R" "M-m R")
+      (modalka-define-kbd "X" "C-x C-x")
+      (modalka-define-kbd "+" "C-x r m")
+      (modalka-define-kbd "'" "C-x r b")
+      (modalka-define-kbd "\\" "C-c C-c")
+    #+END_SRC
+*** Global prefixed keys
+    #+BEGIN_SRC emacs-lisp
+      (modalka-define-kbd "g g" "M-<")
+      (modalka-define-kbd "g o" "C-x C-e")
+      (modalka-define-kbd "g O" "C-M-x")
+      (modalka-define-kbd "g m" "M-m g m")
+      (modalka-define-kbd "g M" "M-m g M")
+      (modalka-define-kbd "g n" "M-m g n")
+      (modalka-define-kbd "g N" "M-m g N")
+      (modalka-define-kbd "g f" "M-m g f")
+      (modalka-define-kbd "g F" "M-m g F")
+      (modalka-define-kbd "g j" "M-m g j")
+      (modalka-define-kbd "g k" "M-m g k")
+      (modalka-define-kbd "g q" "M-m g q")
+      (modalka-define-kbd "g w" "C-x 3")
+      (modalka-define-kbd "g W" "C-x 2")
+      (modalka-define-kbd "g @" "M-m g @")
+      (modalka-define-kbd "g ;" "M-m g ;")
+      (modalka-define-kbd "g :" "M-m g :")
+      (modalka-define-kbd "g #" "M-m g #")
+      (modalka-define-kbd "g {" "M-m g {")
+      (modalka-define-kbd "g }" "M-m g }")
+      (modalka-define-kbd "g (" "M-m g (")
+      (modalka-define-kbd "g )" "M-m g )")
+      (modalka-define-kbd "^" "M-m ^")
+      (modalka-define-kbd "&" "M-m &")
+      (modalka-define-kbd "g S" "C-j")
+      (modalka-define-kbd "g ?" "C-h k")
+    #+END_SRC
+*** Select region prefixed keys
+    #+BEGIN_SRC emacs-lisp
+      (modalka-define-kbd "i a" "C-x h")
+    #+END_SRC
+*** Forward navigation prefixed keys
+    #+BEGIN_SRC emacs-lisp
+      (modalka-define-kbd "] ]" "C-x n n")
+      (modalka-define-kbd "] s" "M-m ] s")
+    #+END_SRC
+*** Backward navigation prefixed keys
+    #+BEGIN_SRC emacs-lisp
+      (modalka-define-kbd "[ [" "C-x n w")
+    #+END_SRC
+*** Extended prefix to quit/restart and time
+    #+BEGIN_SRC emacs-lisp
+      (modalka-define-kbd ": q" "C-x C-c")
+      (modalka-define-kbd ": r" "C-x M-c")
+      (modalka-define-kbd ": t" "M-m : t")
+    #+END_SRC
+*** User prefix for common functions
+    #+BEGIN_SRC emacs-lisp
+      (modalka-define-kbd "g U" "C-c C-k")
+      (modalka-define-kbd "SPC j" "M-x")
+      (modalka-define-kbd "SPC a" "C-x b")
+      (modalka-define-kbd "SPC k" "C-x k")
+      (modalka-define-kbd "SPC g" "M-g g")
+      (modalka-define-kbd "SPC d" "C-x d")
+      (modalka-define-kbd "SPC q" "C-x 0")
+      (modalka-define-kbd "SPC f" "C-x C-f")
+      (modalka-define-kbd "SPC w" "C-x C-s")
+      (modalka-define-kbd "SPC c" "M-m SPC c")
+      (modalka-define-kbd "SPC R" "M-m SPC R")
+      (modalka-define-kbd "SPC ?" "M-m SPC ?")
+    #+END_SRC
+** which-key
+** Hydras
+   #+BEGIN_SRC emacs-lisp
+     (use-package hydra
+       :ensure t)
+   #+END_SRC
+*** Number
+    #+BEGIN_SRC emacs-lisp
+      (which-key-add-key-based-replacements
+	"0" "0"
+	"1" "1"
+	"2" "2"
+	"3" "3"
+	"4" "4"
+	"5" "5"
+	"6" "6"
+	"7" "7"
+	"8" "8"
+	"9" "9")
+    #+END_SRC
+*** Movement and one key presses
+    #+BEGIN_SRC emacs-lisp
+      (which-key-add-key-based-replacements
+	"ESC" "toggle mode"
+	"DEL" "smart del"
+	"TAB" "smart tab"
+	"RET" "smart enter"
+	"h"   "prev char"
+	"j"   "next line"
+	"k"   "prev line"
+	"l"   "next char"
+	"e"   "next word"
+	"b"   "prev word"
+	"n"   "next history item"
+	"N"   "prev history item"
+	"{"   "next para"
+	"}"   "prev para"
+	"0"   "start of line"
+	"$"   "end of line"
+	"("   "start of sentence"
+	")"   "end of sentence"
+	"/" "search"
+	"E"   "exit anything"
+	"B"   "previous buffer"
+	"W"   "winner undo"
+	"w"   "other window"
+	"G"   "end of file"
+	"d"   "delete selection"
+	"y"   "copy selection"
+	"p"   "paste"
+	"P"   "paste history"
+	"x"   "delete char"
+	"D"   "delete rest of line"
+	"M"   "modify argument"
+	"z"   "scroll center/top/bot"
+	"Z"   "zoom into window"
+	"H"   "scroll left"
+	"J"   "scroll down"
+	"K"   "scroll up"
+	"L"   "scroll right"
+	"'"   "org edit separately"
+	"q"   "start macro"
+	"Q"   "end macro"
+	"?"   "top level bindings"
+	"v"   "start selection"
+	"R"   "overwrite mode"
+	"X"   "exchange point and mark"
+	"+"   "set bookmark"
+	"'"   "jump to bookmark"
+	"="   "indent region"
+	"\\"  "C-c C-c"
+	"!"   "async shell command"
+	"&"   "shell command")
+
+    #+END_SRC
+*** Global prefixed keys
+    #+BEGIN_SRC emacs-lisp
+      (which-key-add-key-based-replacements
+	"g"   "global prefix"
+	"g g" "start of file"
+	"g m" "make frame"
+	"g M" "delete frame"
+	"g n" "select frame by name"
+	"g N" "name frame"
+	"g j" "next pdf page"
+	"g k" "previous pdf page"
+	"g f" "file/url at cursor"
+	"g F" "enable follow mode"
+	"g o" "eval elisp"
+	"g O" "eval defun"
+	"g w" "vertical split win"
+	"g W" "horizontal split win"
+	"g S" "split line"
+	"g @" "compose mail"
+	"g #" "list eww histories"
+	"g x" "browse with eww"
+	"g :" "browse with external browser"
+	"g {" "eww back"
+	"g }" "eww forward"
+	"g (" "info previous"
+	"g )" "info next"
+	"^"   "info up"
+	"&"   "info goto"
+	"g q" "format para"
+	"g ?" "find command bound to key")
+    #+END_SRC
+*** Select region prefixed keys
+    #+BEGIN_SRC emacs-lisp
+      (which-key-add-key-based-replacements
+       "i" "expand prefix"
+       "i a" "expand entire buffer")
+    #+END_SRC
+*** Forward navigation prefixed keys
+    #+BEGIN_SRC emacs-lisp
+      (which-key-add-key-based-replacements
+	"]"   "forward nav/edit"
+	"] ]" "narrow region"
+	"] s" "next spell error")
+    #+END_SRC
+*** Backward navigation prefixed keys
+    #+BEGIN_SRC emacs-lisp
+      (which-key-add-key-based-replacements
+	"["   "backward nav/edit"
+	"[ [" "widen region")
+    #+END_SRC
+*** Extended prefix to quit/restart and time
+    #+BEGIN_SRC emacs-lisp
+      (which-key-add-key-based-replacements
+	":"   "extended prefix"
+	": q" "quit emacs"
+	": r" "restart emacs"
+	": t" "initiliazation time")
+    #+END_SRC
+*** User prefix for common functions
+    #+BEGIN_SRC emacs-lisp
+      (which-key-add-key-based-replacements
+	"SPC"   "custom prefix"
+	"SPC ?" "describe bindings"
+	"SPC j" "jump to cmd"
+	"SPC f" "find file"
+	"SPC a" "switch buffers"
+	"SPC g" "goto line"
+	"SPC d" "dired"
+	"SPC k" "close buffer"
+	"SPC w" "save buffer"
+	"SPC c" "load theme"
+	"SPC R" "locate"
+	"SPC q" "quit window"
+	"g U"   "simulate C-c C-k")
+    #+END_SRC
+* 导航相关（Navigating）
+** Undo tree
+   #+BEGIN_SRC emacs-lisp
+     (use-package undo-tree
+       :ensure t
+       :diminish undo-tree-mode
+       :bind* (("M-m u" . undo-tree-undo)
+	       ("M-m r" . undo-tree-redo)
+	       ("M-m U" . undo-tree-visualize))
+       :config
+       (global-undo-tree-mode 1))
+   #+END_SRC
+   - Modal binding
+    #+BEGIN_SRC emacs-lisp
+      (modalka-define-kbd "u" "M-m u")
+      (modalka-define-kbd "U" "M-m U")
+      (modalka-define-kbd "r" "M-m r")
+    #+END_SRC
+   - Which key
+    #+BEGIN_SRC emacs-lisp
+      (which-key-add-key-based-replacements
+       "u" "undo"
+       "r" "redo"
+       "U" "undo tree")
+    #+END_SRC
+** 导航到最后修改位置
+   #+BEGIN_SRC emacs-lisp
+     (use-package goto-chg
+       :ensure t
+       :bind* (("M-m g ;" . goto-last-change)
+	       ("M-m g ," . goto-last-change-reverse)))
+   #+END_SRC 
+   - Modal binding
+     #+BEGIN_SRC emacs-lisp
+       (modalka-define-kbd "g ;" "M-m g ;")
+       (modalka-define-kbd "g ," "M-m g ,")
+     #+END_SRC
+   - Whick key
+     #+BEGIN_SRC emacs-lisp
+       (which-key-add-key-based-replacements
+	"g ;" "goto last change"
+	"g ," "goto last change reverse")
+     #+END_SRC
+** Avy
+   #+BEGIN_SRC emacs-lisp
+     (use-package avy
+       :ensure t
+       :init
+       (setq avy-keys-alist
+	     `((avy-goto-char-timer . (?j ?k ?l ?f ?s ?d ?e ?r ?u ?i))
+	       (avy-goto-line . (?j ?k ?l ?f ?s ?d ?e ?r ?u ?i))))
+       (setq avy-style 'pre)
+       :bind* (("M-m f" . avy-goto-char-timer)
+	       ("M-m F" . avy-goto-line)))
+   #+END_SRC
+   - Modal binding
+     #+BEGIN_SRC emacs-lisp
+       (modalka-define-kbd "f" "M-m f")
+       (modalka-define-kbd "F" "M-m F")
+     #+END_SRC
+   - Which key
+     #+BEGIN_SRC emacs-lisp
+       (which-key-add-key-based-replacements
+	"f" "find on-screen"
+	"F" "find line")
+     #+END_SRC
+
 * 主题（Theme）
+** 字体设置
+   #+BEGIN_SRC emacs-lisp
+     ;; 默认字体
+     (when (member "CamingoCode" (font-family-list))
+       (set-face-attribute 'default nil :font "CamingoCode" :height 120))
+     ;; unicode字符
+     (when (member "Symbola" (font-family-list))
+       (set-fontset-font t 'unicode "Symbola" nil 'prepend))
+     (when (member "Noto Sans CJK SC" (font-family-list))
+       (set-fontset-font t 'han (font-spec :family "Noto Sans CJK SC")))
+   #+END_SRC
 * Org相关
 * 开发相关
 * 参考的配置（不完全）
