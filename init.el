@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 
-;; live with emacs
+;; live with Emacs
 
 ;;; Code:
 

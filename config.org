@@ -21,11 +21,11 @@
        (add-to-list 'package-archives
 		    `("local" . ,local-archive) t)
        (package-initialize)
-  
        (unless (package-installed-p 'use-package)
 	 (package-refresh-contents)
 	 (package-install 'use-package))
-       (require 'use-package)) 
+       (require 'use-package))
+
    #+END_SRC
 ** Auto tangle
    保存时，自动导出配置代码并编译，由于编译速度慢，用async包优化
@@ -71,8 +71,7 @@
 	   inhibit-startup-screen t
 	   echo-keystrokes 0.1
 	   initial-scratch-message nil
-	   sentence-end-double-space nil
-	   doc-view-continuous t)
+	   sentence-end-double-space nil)
      (fset 'yes-or-no-p 'y-or-n-p)
      (setq-default truncate-lines t)
      (dolist (mode '(tool-bar-mode
@@ -82,7 +81,6 @@
 		     tooltip-mode))
        (funcall mode 0))
      (dolist (mode '(column-number-mode
-		     winner-mode
 		     subword-mode))
        (funcall mode 1))
    #+END_SRC
@@ -110,15 +108,21 @@
    #+END_SRC
 ** 远程编辑文件（tramp）
    #+BEGIN_SRC emacs-lisp
-     (setq tramp-default-method "ssh"
-	   tramp-backup-directory-alist backup-directory-alist
-	   tramp-ssh-controlmaster-options "ssh")
+     (use-package tramp
+       :config
+       (setq tramp-default-method "ssh"
+	     tramp-backup-directory-alist backup-directory-alist))
+     (use-package tramp-sh
+       :config
+       (setq tramp-ssh-controlmaster-options "ssh"))
    #+END_SRC
 ** 最近打开的文件
    #+BEGIN_SRC emacs-lisp
-     (setq recentf-max-saved-items 1000
-	   recentf-exclude '("/tmp/" "/ssh:"))
-     (recentf-mode)
+     (use-package recentf
+       :config
+       (setq recentf-max-saved-items 1000
+	     recentf-exclude '("/tmp/" "/ssh:"))
+       (recentf-mode))
    #+END_SRC
 ** 文件浏览（dired）
    #+BEGIN_SRC emacs-lisp
@@ -133,79 +137,6 @@
        :config
        (add-hook 'dired-mode-hook 'dired-hide-details-mode))
    #+END_SRC
-** 拼写检查
-   来自chenbin的[[https://blog.binchen.org/posts/what-s-the-best-spell-check-set-up-in-emacs.html][blog]]
-   #+BEGIN_SRC emacs-lisp
-     (use-package flyspell
-       :diminish (flyspell-mode . "φ")
-       :bind* (("M-m ] s" . flyspell-goto-next-error))
-       :config
-       ;; if (aspell installed) { use aspell}
-       ;; else if (hunspell installed) { use hunspell }
-       ;; whatever spell checker I use, I always use English dictionary
-       ;; I prefer use aspell because:
-       ;; 1. aspell is older
-       ;; 2. looks Kevin Atkinson still get some road map for aspell:
-       ;; @see http://lists.gnu.org/archive/html/aspell-announce/2011-09/msg00000.html
-       (defun flyspell-detect-ispell-args (&optional run-together)
-	 "if RUN-TOGETHER is true, spell check the CamelCase words."
-	 (let (args)
-	   (cond
-	    ((string-match  "aspell$" ispell-program-name)
-	     ;; Force the English dictionary for aspell
-	     ;; Support Camel Case spelling check (tested with aspell 0.6)
-	     (setq args (list "--sug-mode=ultra" "--lang=en_US"))
-	     (if run-together
-		 (setq args (append args '("--run-together")))))
-	    ((string-match "hunspell$" ispell-program-name)
-	     ;; Force the English dictionary for hunspell
-	     (setq args "-d en_US")))
-	   args))
-  
-       (cond
-	((executable-find "aspell")
-	 ;; you may also need `ispell-extra-args'
-	 (setq ispell-program-name "aspell"))
-	((executable-find "hunspell")
-	 (setq ispell-program-name "hunspell")
-    
-	 ;; Please note that `ispell-local-dictionary` itself will be passed to hunspell cli with "-d"
-	 ;; it's also used as the key to lookup ispell-local-dictionary-alist
-	 ;; if we use different dictionary
-	 (setq ispell-local-dictionary "en_US")
-	 (setq ispell-local-dictionary-alist
-	       '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8))))
-	(t (setq ispell-program-name nil)))
-  
-       ;; ispell-cmd-args is useless, it's the list of *extra* arguments we will append to the ispell process when "ispell-word" is called.
-       ;; ispell-extra-args is the command arguments which will *always* be used when start ispell process
-       ;; Please note when you use hunspell, ispell-extra-args will NOT be used.
-       ;; Hack ispell-local-dictionary-alist instead.
-       (setq-default ispell-extra-args (flyspell-detect-ispell-args t))
-       ;; (setq ispell-cmd-args (flyspell-detect-ispell-args))
-       (defadvice ispell-word (around my-ispell-word activate)
-	 (let ((old-ispell-extra-args ispell-extra-args))
-	   (ispell-kill-ispell t)
-	   (setq ispell-extra-args (flyspell-detect-ispell-args))
-	   ad-do-it
-	   (setq ispell-extra-args old-ispell-extra-args)
-	   (ispell-kill-ispell t)))
-  
-       (defadvice flyspell-auto-correct-word (around my-flyspell-auto-correct-word activate)
-	 (let ((old-ispell-extra-args ispell-extra-args))
-	   (ispell-kill-ispell t)
-	   ;; use emacs original arguments
-	   (setq ispell-extra-args (flyspell-detect-ispell-args))
-	   ad-do-it
-	   ;; restore our own ispell arguments
-	   (setq ispell-extra-args old-ispell-extra-args)
-	   (ispell-kill-ispell t)))
-  
-       (defun text-mode-hook-setup ()
-	 ;; Turn off RUN-TOGETHER option when spell check text-mode
-	 (setq-local ispell-extra-args (flyspell-detect-ispell-args)))
-       (add-hook 'text-mode-hook 'text-mode-hook-setup))
-   #+END_SRC
 ** 内置浏览器（eww）
    #+BEGIN_SRC emacs-lisp
      (use-package eww
@@ -216,6 +147,28 @@
 	       ("M-m g }" . eww-forward-url))
        :config
        (add-hook 'eww-mode-hook 'visual-line-mode))
+   #+END_SRC
+** Info
+   #+BEGIN_SRC emacs-lisp
+     (use-package info
+       :bind* (("M-m g (" . Info-prev)
+	       ("M-m g )" . Info-next)
+	       ("M-m g ^" . Info-up)
+	       ("M-m g &" . Info-goto-node)))
+   #+END_SRC
+** doc
+   #+BEGIN_SRC emacs-lisp
+     (use-package doc-view
+       :commands (doc-view-next-page doc-view-previous-page)
+       :config
+       (setq doc-view-continuous t))
+   #+END_SRC
+** winner-mode
+   #+BEGIN_SRC emacs-lisp
+     (use-package winner
+       :commands (winner-undo)
+       :config
+       (winner-mode 1))
    #+END_SRC
 ** 按键绑定
    #+BEGIN_SRC emacs-lisp
@@ -232,10 +185,6 @@
        ("M-m g N"   . set-frame-name)
        ("M-m B"     . mode-line-other-buffer)
        ("M-m ="     . indent-region)
-       ("M-m g ("   . Info-prev)
-       ("M-m g )"   . Info-next)
-       ("M-m ^"     . Info-up)
-       ("M-m &"     . Info-goto-node)
        ("M-m g f"   . find-file-at-point)
        ("M-m g u"   . downcase-region)
        ("M-m g U"   . upcase-region)
@@ -255,6 +204,7 @@
      (use-package exec-path-from-shell
        :ensure t
        :demand t
+       :commands (exec-path-from-shell-initialize)
        :init
        (setq exec-path-from-shell-check-startup-files nil)
        :config
@@ -266,7 +216,7 @@
      (use-package which-key
        :ensure t
        :defer t
-       :diminish which-key-mode
+       :commands (which-key-mode which-key-add-key-based-replacements)
        :init
        (setq which-key-sort-order 'which-key-key-order-alpha)
        :bind* (("M-m ?" . which-key-show-top-level))
@@ -287,7 +237,7 @@
    #+BEGIN_SRC emacs-lisp
      (use-package restart-emacs
        :ensure t
-       :bind* (("C-x M-c" .restart-emacs)))
+       :bind* (("C-x M-c" . restart-emacs)))
    #+END_SRC
 
 * Modal editing
@@ -296,6 +246,7 @@
      (use-package modalka
        :ensure t
        :demand t
+       :commands (modalka-global-mode modalka-define-kbd)
        :bind* (("C-z" . modalka-mode))
        :diminish (modalka-mode . "μ")
        :init
@@ -602,7 +553,7 @@
    #+BEGIN_SRC emacs-lisp
      (use-package undo-tree
        :ensure t
-       :diminish undo-tree-mode
+       :commands (global-undo-tree-mode)
        :bind* (("M-m u" . undo-tree-undo)
 	       ("M-m r" . undo-tree-redo)
 	       ("M-m U" . undo-tree-visualize))
