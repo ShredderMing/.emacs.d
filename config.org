@@ -153,8 +153,8 @@
      (use-package info
        :bind* (("M-m g (" . Info-prev)
 	       ("M-m g )" . Info-next)
-	       ("M-m g ^" . Info-up)
-	       ("M-m g &" . Info-goto-node)))
+	       ("M-m ^" . Info-up)
+	       ("M-m &" . Info-goto-node)))
    #+END_SRC
 ** doc
    #+BEGIN_SRC emacs-lisp
@@ -399,11 +399,6 @@
       (modalka-define-kbd "SPC ?" "M-m SPC ?")
     #+END_SRC
 ** which-key
-** Hydras
-   #+BEGIN_SRC emacs-lisp
-     (use-package hydra
-       :ensure t)
-   #+END_SRC
 *** Number
     #+BEGIN_SRC emacs-lisp
       (which-key-add-key-based-replacements
@@ -548,6 +543,11 @@
 	"SPC q" "quit window"
 	"g U"   "simulate C-c C-k")
     #+END_SRC
+** Hydras
+   #+BEGIN_SRC emacs-lisp
+     (use-package hydra
+       :ensure t)
+   #+END_SRC
 * 导航相关（Navigating）
 ** Undo tree
    #+BEGIN_SRC emacs-lisp
@@ -615,6 +615,75 @@
 	"F" "find line")
      #+END_SRC
 
+** Highlight symbol
+   #+BEGIN_SRC emacs-lisp
+     (use-package highlight-symbol
+       :ensure t
+       :commands (highlight-symbol-next highlight-symbol-prev highlight-symbol-nav-mode)
+       :bind (("M-n" . highlight-symbol-next)
+	      ("M-p" . highlight-symbol-prev))
+       :config
+       (highlight-symbol-nav-mode))
+   #+END_SRC
+
+** Projectile
+   #+BEGIN_SRC emacs-lisp
+     (use-package projectile
+       :ensure t
+       :init
+       (setq projectile-file-exists-remote-cache-expire (* 10 60))
+       :commands (projectile-find-file
+		  projectile-switch-project
+		  projectile-find-other-file
+		  projectile-mode)
+       :bind* (("M-m SPC d" . projectile-find-file)
+	       ("M-m SPC D" . projectile-switch-project)
+	       ("M-m SPC TAB" . projectile-find-other-file))
+       :diminish projectile-mode
+       :config
+       (projectile-mode))
+   #+END_SRC
+   - Modal binding
+     #+BEGIN_SRC emacs-lisp
+       (modalka-define-kbd "SPC d" "M-m SPC d")
+       (modalka-define-kbd "SPC D" "M-m SPC D")
+       (modalka-define-kbd "SPC TAB" "M-m SPC TAB")
+     #+END_SRC
+    - which key
+      #+BEGIN_SRC emacs-lisp
+	(which-key-add-key-based-replacements
+	  "SPC d" "project files"
+	  "SPC D" "project switch"
+	  "SPC TAB" "alternate file")
+      #+END_SRC
+** Ztree
+   #+BEGIN_SRC emacs-lisp
+     (use-package ztree
+       :ensure t
+       :commands (ztree-dir ztree-diff)
+       :bind* (("M-m g v" . ztree-dir)
+	       ("M-m g V" . ztree-diff))
+       :init
+       (setq ztree-dir-move-focus t))
+   #+END_SRC
+** Neotree
+   #+BEGIN_SRC emacs-lisp
+     (use-package neotree
+       :ensure t
+       :commands (neotree-toggle)
+       :bind* (("M-m SPC n" . neotree-toggle))
+       :init
+       (setq neo-smart-open t))
+   #+END_SRC
+   - Modal binding
+     #+BEGIN_SRC emacs-lisp
+       (modalka-define-kbd "SPC n" "M-m SPC n")
+     #+END_SRC
+   - which key
+     #+BEGIN_SRC emacs-lisp
+       (which-key-add-key-based-replacements
+	 "SPC n" "directory tree")
+     #+END_SRC
 * 主题（Theme）
 ** 字体设置
    #+BEGIN_SRC emacs-lisp
