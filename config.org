@@ -240,6 +240,10 @@
        :bind* (("C-x M-c" . restart-emacs)))
    #+END_SRC
 
+** 全屏切换
+   #+BEGIN_SRC emacs-lisp
+     
+   #+END_SRC
 * Modal editing
 ** 初始化
    #+BEGIN_SRC emacs-lisp
@@ -684,12 +688,171 @@
        (which-key-add-key-based-replacements
 	 "SPC n" "directory tree")
      #+END_SRC
+** Tags based navigation
+   #+BEGIN_SRC emacs-lisp
+     (use-package ggtags
+       :ensure t
+       :diminish ggtags-mode
+       :commands (ggtags-build-imenu-index)
+       :bind* (("M-m T" . ggtags-find-tag-regexp)
+	       ("M-m g t" . ggtags-create-tags)
+	       ("M-m g T" . ggtags-update-tags))
+       :init
+       (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
+       :config
+       (add-hook 'prog-mode-hook 'ggtags-mode))
+   #+END_SRC
+   - Modal binding
+     #+BEGIN_SRC emacs-lisp
+       (modalka-define-kbd "T" "M-m T")
+       (modalka-define-kbd "g t" "M-m g t")
+       (modalka-define-kbd "g T" "M-m g T")
+     #+END_SRC
+   - which key
+     #+BEGIN_SRC emacs-lisp
+       (which-key-add-key-based-replacements
+	 "g t" "create tags"
+	 "g T" "update tags"
+	 "T" "global tags search")
+     #+END_SRC
+** Dumb jump
+   #+BEGIN_SRC emacs-lisp
+     (use-package dumb-jump
+       :ensure t
+       :commands (dumb-jump-mode)
+       :bind (("C-c S" . dumb-jump-go))
+       :config
+       (dumb-jump-mode))
+
+     (modalka-define-kbd "S" "C-c S")
+
+     (which-key-add-key-based-replacements
+       "S" "src at point")
+   #+END_SRC
+** Perspective
+   #+BEGIN_SRC emacs-lisp
+     (use-package perspective
+       :ensure t
+       :commands (persp-mode)
+       :bind* (("M-m SPC p" . persp-switch)
+	       ("M-m SPC P" . persp-kill)
+	       ("M-m SPC A" . persp-switch-to-buffer)
+	       ("M-m g r" . persp-rename))
+       :config
+       (persp-mode 1))
+   #+END_SRC
+   - Modal binding
+     #+BEGIN_SRC emacs-lisp
+       (modalka-define-kbd "SPC p" "M-m SPC p")
+       (modalka-define-kbd "SPC P" "M-m SPC P")
+       (modalka-define-kbd "SPC A" "M-m SPC A")
+       (modalka-define-kbd "g r" "M-m g r")
+     #+END_SRC
+   - which key
+     #+BEGIN_SRC emacs-lisp
+       (which-key-add-key-based-replacements
+	 "SPC p" "perspective switch"
+	 "SPC P" "perspective kill"
+	 "SPC A" "perspective buffer switch"
+	 "g r" "perspective rename")
+     #+END_SRC
+** Toggle zoom
+   #+BEGIN_SRC emacs-lisp
+     (use-package zoom-window
+       :ensure t
+       :bind* (("M-m Z" . zoom-window-zoom)))
+
+     (modalka-define-kbd "Z" "M-m Z")
+
+     (which-key-add-key-based-replacements
+       "Z" "zoom window")
+   #+END_SRC
+** Code documentation
+   #+BEGIN_SRC emacs-lisp
+     (use-package dash-at-point
+       :ensure t
+       :bind (("C-c I" . dash-at-point))
+       :bind* (("M-m SPC i" . dash-at-point-with-docset)
+	       ("M-m SPC I" . dash-at-point)))
+
+     (modalka-define-kbd "SPC i" "M-m SPC i")
+     (modalka-define-kbd "SPC I" "M-m SPC I")
+     (modalka-define-kbd "I" "C-c I")
+
+     (which-key-add-key-based-replacements
+       "I" "info at point"
+       "SPC i" "documentation prompt"
+       "SPC I" "documentation at point")
+   #+END_SRC
+** Hydras
+*** 窗口导航
+    #+BEGIN_SRC emacs-lisp
+      (defhydra st/hydra-of-windows (:color red
+				     :hint nil)
+	"
+       ^Move^    ^Size^    ^Change^                    ^Split^           ^Text^
+       ^^^^^^^^^^^------------------------------------------------------------------
+       ^ ^ _k_ ^ ^   ^ ^ _K_ ^ ^   _u_: winner-undo _o_: rotate  _v_: vertical     _+_: zoom in
+       _h_ ^+^ _l_   _H_ ^+^ _L_   _r_: winner-redo            _s_: horizontal   _-_: zoom out
+       ^ ^ _j_ ^ ^   ^ ^ _J_ ^ ^   _c_: close                  _z_: zoom         _q_: quit
+      "
+	("h" windmove-left)
+	("j" windmove-down)
+	("k" windmove-up)
+	("l" windmove-right)
+	("H" shrink-window-horizontally)
+	("K" shrink-window)
+	("J" enlarge-window)
+	("L" enlarge-window-horizontally)
+	("v" utils/split-right-and-move)
+	("s" utils/split-below-and-move)
+	("c" delete-window)
+	("f" toggle-frame-fullscreen :color blue)
+	("o" utils/rotate-windows)
+	("z" delete-other-windows)
+	("u" (progn
+	       (winner-undo)
+	       (setq this-command 'winner-undo)))
+	("r" winner-redo)
+	("+" text-scale-increase)
+	("-" text-scale-decrease)
+	("q" nil :color blue))
+
+      (bind-keys*
+       ("M-m SPC u" . st/hydra-of-windows/body))
+
+      (modalka-define-kbd "SPC u" "M-m SPC u")
+
+      (which-key-add-key-based-replacements
+	"SPC u" "window menu")
+    #+END_SRC
+*** 书签导航
+    #+BEGIN_SRC emacs-lisp
+      (defhydra st/hydra-bookmarks (:color blue
+				    :hint nil)
+	"
+       _s_: set  _b_: bookmark   _j_: jump   _d_: delete   _q_: quit
+	"
+	("s" bookmark-set)
+	("b" bookmark-save)
+	("j" bookmark-jump)
+	("d" bookmark-delete)
+	("q" nil :color blue))
+
+      (bind-keys*
+       ("M-m `" . st/hydra-bookmarks/body))
+
+      (modalka-define-kbd "`" "M-m `")
+
+      (which-key-add-key-based-replacements
+	"`" "bookmark menu")
+    #+END_SRC
 * 主题（Theme）
 ** 字体设置
    #+BEGIN_SRC emacs-lisp
      ;; 默认字体
-     (when (member "CamingoCode" (font-family-list))
-       (set-face-attribute 'default nil :font "CamingoCode" :height 120))
+     (when (member "Hack" (font-family-list))
+       (set-face-attribute 'default nil :font "Hack" :height 120))
      ;; unicode字符
      (when (member "Symbola" (font-family-list))
        (set-fontset-font t 'unicode "Symbola" nil 'prepend))
@@ -697,5 +860,133 @@
        (set-fontset-font t 'han (font-spec :family "Noto Sans CJK SC")))
    #+END_SRC
 * Org相关
+** 基础设置
+   #+BEGIN_SRC emacs-lisp
+     (use-package org
+       :pin org
+       :ensure org-plus-contrib
+       :config
+       (setq org-directory "~/Notes"
+	     org-hide-emphasis-markers t
+	     org-image-actual-width '(300)
+	     org-src-fontify-natively t
+	     org-src-tab-acts-natively t
+	     org-export-with-smart-quotes t
+	     org-export-backends '(beamer html latex md)))
+   #+END_SRC
+** org-bullets   
+   #+BEGIN_SRC emacs-lisp
+     (use-package org-bullets
+       :ensure t
+       :hook (org-mode . org-bullets-mode))
+   #+END_SRC
 * 开发相关
+* 工具函数
+** 打开 *config.org* 文件
+   #+BEGIN_SRC emacs-lisp
+     (defun utils/open-config ()
+       "打开emacs配置文件config.org"
+       (interactive)
+       (find-file (concat user-emacs-directory "config.org")))
+
+     (bind-keys*
+      ("M-m SPC v" . utils/open-config))
+
+     (modalka-define-kbd "SPC v" "M-m SPC v")
+
+     (which-key-add-key-based-replacements
+       "SPC v" "view configuration file")
+   #+END_SRC
+** 创建新窗口并focus
+   #+BEGIN_SRC emacs-lisp
+     (defun utils/split-below-and-move ()
+       (interactive)
+       (split-window-below)
+       (other-window 1))
+
+     (defun utils/split-right-and-move ()
+       (interactive)
+       (split-window-right)
+       (other-window 1))
+
+     (bind-keys
+      ("C-x 2" . utils/split-below-and-move)
+      ("C-x 3" . utils/split-right-and-move))
+   #+END_SRC
+** 两个窗口时滚动隔壁窗口中的pdf文件
+   #+BEGIN_SRC emacs-lisp
+     (defun utils/other-pdf-next ()
+       "Turns the next page in adjoining PDF file"
+       (interactive)
+       (other-window 1)
+       (doc-view-next-page)
+       (other-window 1))
+     (defun utils/other-pdf-previous ()
+       "Turns the previous page in adjoining PDF file"
+       (interactive)
+       (other-window 1)
+       (doc-view-previous-page)
+       (other-window 1))
+
+     (bind-keys*
+       ("M-m ] d" . utils/other-pdf-next)
+       ("M-m [ d" . utils/other-pdf-previous))
+
+     (modalka-define-kbd "] d" "M-m ] d")
+     (modalka-define-kbd "[ d" "M-m [ d")
+
+     (which-key-add-key-based-replacements
+       "] d" "adjacent pdf next page"
+       "[ d" "adjacent pdf prev page")
+   #+END_SRC
+** 两个窗口时滚动隔壁的窗口
+   #+BEGIN_SRC emacs-lisp
+     (defun utils/other-window-down ()
+       "Scrolls down in adjoining window"
+       (interactive)
+       (other-window 1)
+       (scroll-up-command)
+       (other-window 1))
+     (defun utils/other-window-up ()
+       "Scrolls up in adjoining window"
+       (interactive)
+       (other-window 1)
+       (scroll-down-command)
+       (other-window 1))
+
+     (bind-keys*
+       ("M-m g ]" . utils/other-window-down)
+       ("M-m g [" . utils/other-window-up))
+
+     (modalka-define-kbd "g ]" "M-m g ]")
+     (modalka-define-kbd "g [" "M-m g [")
+
+     (which-key-add-key-based-replacements
+       "g ]" "adjacent window next page"
+       "g [" "adjacent window prev page")
+   #+END_SRC
+** smater start of line
+   #+BEGIN_SRC emacs-lisp
+     (defun utils/smarter-move-beginning-of-line (arg)
+       "Move point back to indentation of beginning of line.
+     Move point to the first non-whitespace character on this line.
+     If point is already there, move to the beginning of the line.
+     Effectively toggle between the first non-whitespace character and
+     the beginning of the line.
+     If ARG is not nil or 1, move forward ARG - 1 lines first.  If
+     point reaches the beginning or end of the buffer, stop there."
+       (interactive "^p")
+       (setq arg (or arg 1))
+       ;; Move lines first
+       (when (/= arg 1)
+	 (let ((line-move-visual nil))
+	   (forward-line (1- arg))))
+       (let ((orig-point (point)))
+	 (back-to-indentation)
+	 (when (= orig-point (point))
+	   (move-beginning-of-line 1))))
+
+     (global-set-key [remap move-beginning-of-line]
+		     'utils/smarter-move-beginning-of-line)
+   #+END_SRC
 * 参考的配置（不完全）
