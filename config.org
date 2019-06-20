@@ -19,6 +19,8 @@
        (add-to-list 'package-archives
 		    '("melpa" . "https://melpa.org/packages/"))
        (add-to-list 'package-archives
+		    '("org" . "https://orgmode.org/elpa/") t)
+       (add-to-list 'package-archives
 		    `("local" . ,local-archive) t)
        (package-initialize)
        (unless (package-installed-p 'use-package)
@@ -166,7 +168,7 @@
 ** winner-mode
    #+BEGIN_SRC emacs-lisp
      (use-package winner
-       :commands (winner-undo)
+       :commands (winner-undo winner-redo)
        :config
        (winner-mode 1))
    #+END_SRC
@@ -549,8 +551,13 @@
     #+END_SRC
 ** Hydras
    #+BEGIN_SRC emacs-lisp
-     (use-package hydra
-       :ensure t)
+	  (use-package hydra
+	    :ensure t
+	    :commands (hydra-default-pre
+		       hydra-keyboard-quit
+		       hydra--call-interactively-remap-maybe
+		       hydra-show-hint
+		       hydra-set-transient-map))
    #+END_SRC
 * 导航相关（Navigating）
 ** Undo tree
@@ -871,7 +878,7 @@
 	     org-image-actual-width '(300)
 	     org-src-fontify-natively t
 	     org-src-tab-acts-natively t
-	     org-export-with-smart-quotes t
+	     ;org-export-with-smart-quotes t
 	     org-export-backends '(beamer html latex md)))
    #+END_SRC
 ** org-bullets   
@@ -988,5 +995,28 @@
 
      (global-set-key [remap move-beginning-of-line]
 		     'utils/smarter-move-beginning-of-line)
+   #+END_SRC
+** rotate windows
+   #+BEGIN_SRC emacs-lisp
+     (defun utils/rotate-windows ()
+       "Rotate your windows"
+       (interactive)
+       (cond ((not (> (count-windows) 1))
+	      (message "You can't rotate a single window!"))
+	     (t
+	      (let ((i 1)
+		    (numWindows (count-windows)))
+		(while (< i numWindows)
+		  (let* ((w1 (elt (window-list) i))
+			 (w2 (elt (window-list) (+ (% i numWindows) 1)))
+			 (b1 (window-buffer w1))
+			 (b2 (window-buffer w2))
+			 (s1 (window-start w1))
+			 (s2 (window-start w2)))
+		    (set-window-buffer w1 b2)
+		    (set-window-buffer w2 b1)
+		    (set-window-start w1 s2)
+		    (set-window-start w2 s1)
+		    (setq i (1+ i))))))))
    #+END_SRC
 * 参考的配置（不完全）
