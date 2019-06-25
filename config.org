@@ -69,6 +69,11 @@
      (setq initial-frame-alist '((width . 102) (height . 54)))
      (setq default-frame-alist '((width . 100) (height . 52)))
    #+end_src
+** margin
+   #+begin_src emacs-lisp
+     (setq-default left-margin-width 1 right-margin-width 1)
+     (set-window-buffer nil (current-buffer))
+   #+end_src
 ** 编码
    #+begin_src emacs-lisp
      (prefer-coding-system 'utf-8)
@@ -1342,7 +1347,134 @@
       "m B" "splice backward"
       "m A" "splice around")
   #+end_src
-* 主题（Theme）
+* 视觉相关
+** Volatile highlights
+   #+begin_src emacs-lisp
+     (use-package volatile-highlights
+       :ensure t
+       :diminish volatile-highlights-mode
+       :config
+       (volatile-highlights-mode t))
+   #+end_src
+** Hight thing
+   #+begin_src emacs-lisp
+     (use-package highlight-thing
+       :ensure t
+       :diminish highlight-thing-mode
+       :bind* (("M-m g *" . highlight-thing-mode)))
+
+     (modalka-define-kbd "g *" "M-m g *")
+
+     (which-key-add-key-based-replacements
+       "g *" "highlight symbol")
+   #+end_src
+** Column enforce mode
+   #+begin_src emacs-lisp
+     (use-package column-enforce-mode
+       :ensure t
+       :init
+       (setq column-enforce-column 99)
+       :hook (prog-mode . column-enforce-mode))
+   #+end_src
+** Highlight indentation
+   #+begin_src emacs-lisp
+     (use-package highlight-indentation
+       :ensure t
+       :commands (highlight-indentation-mode))
+   #+end_src
+** Fill column indicator
+   #+begin_src emacs-lisp
+     (use-package fill-column-indicator
+       :ensure t
+       :commands (fci-mode)
+       :init
+       (setq fci-rule-width 5
+	     fci-rule-column 79))
+   #+end_src
+** White space butler
+   #+begin_src emacs-lisp
+     (use-package ws-butler
+       :ensure t
+       :diminish ws-butler-mode
+       :config
+       (ws-butler-global-mode))
+   #+end_src
+** Region state
+   #+begin_src emacs-lisp
+     (use-package region-state
+       :ensure t
+       :config
+       (region-state-mode))
+   #+end_src
+** Mode line
+   #+begin_src emacs-lisp
+     (use-package spaceline
+       :ensure t
+       :init
+       (setq powerline-default-separator 'arrow-fade)
+       :config
+       (require 'spaceline-config)
+       (spaceline-spacemacs-theme)
+       (spaceline-helm-mode))
+   #+end_src
+** Fancy battery
+   #+begin_src emacs-lisp
+     (use-package fancy-battery
+       :ensure t
+       :init
+       (setq fancy-battery-show-percentage t)
+       :config
+       (fancy-battery-mode))
+   #+end_src
+** Origami
+   #+begin_src emacs-lisp
+     (use-package origami
+       :ensure t
+       :commands (origami-toggle-node)
+       :bind* (("M-m -" . orgiami-toggle-node)))
+
+     (modalka-define-kbd "-" "M-m -")
+
+     (which-key-add-key-based-replacements
+       "-" "syntax-based fold toggle")
+   #+end_src
+** Vimish fold
+   #+begin_src emacs-lisp
+     (use-package vimish-fold
+       :ensure t
+       :commands (vimish-fold-toggle
+		  vimish-fold))
+
+     (defhydra st/hydra-vimish-fold (:color red
+				     :hint nil)
+       "
+      _f_: fold  _u_: unfold  _r_: refold  _t_: toggle  _d_: delete    _n_: next      _q_: quit
+	       _U_: Unfold  _R_: Refold  _T_: Toggle  _D_: Delete    _p_: previous
+       "
+       ("f" vimish-fold)
+       ("u" vimish-fold-unfold)
+       ("r" vimish-fold-refold)
+       ("t" vimish-fold-toggle)
+       ("d" vimish-fold-delete)
+       ("U" vimish-fold-unfold-all)
+       ("R" vimish-fold-refold-all)
+       ("T" vimish-fold-toggle-all)
+       ("D" vimish-fold-delete-all)
+       ("n" vimish-fold-next-fold)
+       ("p" vimish-fold-previous-fold)
+       ("q" nil :color blue))
+
+     (bind-keys*
+       ("M-m _" . vimish-fold-toggle)
+       ("M-m |" . st/hydra-vimish-fold/body))
+
+     (modalka-define-kbd "_" "M-m _")
+     (modalka-define-kbd "|" "M-m |")
+
+     (which-key-add-key-based-replacements
+       "_" "sel-based fold toggle"
+       "|" "sel-based fold menu")
+   #+end_src
 ** 字体设置
    #+begin_src emacs-lisp
      ;; 默认字体
@@ -1432,22 +1564,22 @@
    #+end_src
 ** Agenda
    #+begin_src emacs-lisp
-     (setq-default org-agenda-files '("~/Notes/Brain"))
+     (setq-default org-agenda-files '("~/Notes/brain"))
      (setq-default org-deadline-warnings-days 7
 		   org-agenda-span 'fortnight
 		   org-agenda-skip-scheduled-if-deadline-is-shown t)
    #+end_src
 ** Capture
    #+begin_src emacs-lisp
-     (defvar org-agenda-file-inbox "~/Notes/Brain/Inbox.org")
-     (setq-default org-directory "~/Notes/Brain"
-		   org-default-notes-file "~/Notes/Brain/Inbox.org")
+     (defvar org-agenda-file-inbox "~/Notes/brain/Inbox.org")
+     (setq-default org-directory "~/Notes/brain"
+		   org-default-notes-file "~/Notes/brain/Inbox.org")
      (setq-default org-capture-templates
 		   '(("t" "todo" entry (file org-agenda-file-inbox)
 		      "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
 		     ("n" "note" entry (file org-agenda-file-inbox)
 		      "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
-		     ("b" "Brain" plain (function org-brain-goto-end)
+		     ("b" "brain" plain (function org-brain-goto-end)
 		      "* %i%?" :empty-lines 1)))
      (setq-default org-refile-targets '((nil :maxlevel . 9)
 					(org-agenda-files :maxlevel . 9))
@@ -1455,120 +1587,6 @@
 	   org-outline-path-complete-in-steps nil
 	   org-refile-allow-creating-parent-nodes 'confirm
 	   org-indirect-buffer-display 'current-window)
-   #+end_src
-** 按键绑定
-   #+begin_src emacs-lisp
-     (bind-keys*
-      ("M-m o a"   . org-agenda)
-      ("M-m o c"   . org-capture)
-      ("M-m o i"   . org-insert-link)
-      ("M-m o s"   . org-store-link)
-      ("M-m o S"   . org-list-make-subtree)
-      ("M-m o A"   . org-archive-subtree)
-      ("M-m o g"   . org-goto)
-      ("M-m o l"   . org-toggle-latex-fragment)
-      ("M-m o L"   . org-toggle-link-display)
-      ("M-m o I"   . org-toggle-inline-images)
-      ("M-m o k"   . org-cut-subtree)
-      ("M-m o V"   . org-reveal)
-      ("M-m o R"   . org-refile)
-      ("M-m o y"   . org-copy-subtree)
-      ("M-m o h"   . org-toggle-heading)
-      ("M-m o H"   . org-insert-heading-respect-content)
-      ("M-m o e"   . org-export-dispatch)
-      ("M-m o u"   . org-update-dblock)
-      ("M-m o U"   . org-update-all-dblocks)
-      ("M-m o O"   . org-footnote-new)
-      ("M-m o ]"   . org-narrow-to-subtree)
-      ("M-m o ["   . widen)
-      ("M-m o N"   . org-add-note)
-      ("M-m o E"   . org-set-effort)
-      ("M-m o B"   . org-table-blank-field)
-      ("M-m o <"   . org-date-from-calendar)
-      ("M-m o >"   . org-goto-calendar)
-      ("M-m o d"   . org-todo)
-      ("M-m o t"   . org-set-tags-command)
-      ("M-m o w"   . org-edit-special)
-      ("M-m o q"   . org-edit-src-exit)
-      ("M-m o z"   . clone-indirect-buffer-other-window)
-      ("M-m a s"   . org-mark-subtree)
-      ("M-m o RET" . org-open-at-point))
-
-     (which-key-add-key-based-replacements
-       "M-m o" "org mode prefix")
-
-     (modalka-define-kbd "o a"   "M-m o a")
-     (modalka-define-kbd "o c"   "M-m o c")
-     (modalka-define-kbd "o i"   "M-m o i")
-     (modalka-define-kbd "o s"   "M-m o s")
-     (modalka-define-kbd "o S"   "M-m o S")
-     (modalka-define-kbd "o A"   "M-m o A")
-     (modalka-define-kbd "o g"   "M-m o g")
-     (modalka-define-kbd "o l"   "M-m o l")
-     (modalka-define-kbd "o L"   "M-m o L")
-     (modalka-define-kbd "o I"   "M-m o I")
-     (modalka-define-kbd "o k"   "M-m o k")
-     (modalka-define-kbd "o V"   "M-m o V")
-     (modalka-define-kbd "o R"   "M-m o R")
-     (modalka-define-kbd "o y"   "M-m o y")
-     (modalka-define-kbd "o h"   "M-m o h")
-     (modalka-define-kbd "o H"   "M-m o H")
-     (modalka-define-kbd "o e"   "M-m o e")
-     (modalka-define-kbd "o u"   "M-m o u")
-     (modalka-define-kbd "o U"   "M-m o U")
-     (modalka-define-kbd "o O"   "M-m o O")
-     (modalka-define-kbd "o ]"   "M-m o ]")
-     (modalka-define-kbd "o ["   "M-m o [")
-     (modalka-define-kbd "o N"   "M-m o N")
-     (modalka-define-kbd "o E"   "M-m o E")
-     (modalka-define-kbd "o B"   "M-m o B")
-     (modalka-define-kbd "o <"   "M-m o <")
-     (modalka-define-kbd "o >"   "M-m o >")
-     (modalka-define-kbd "o d"   "M-m o d")
-     (modalka-define-kbd "o t"   "M-m o t")
-     (modalka-define-kbd "o z"   "M-m o z")
-     (modalka-define-kbd "o w"   "M-m o w")
-     (modalka-define-kbd "o q"   "M-m o q")
-     (modalka-define-kbd "a s"   "M-m a s")
-     (modalka-define-kbd "o RET" "M-m o RET")
-
-     (which-key-add-key-based-replacements
-       "o"     "org prefix"
-       "o a"   "org agenda"
-       "o c"   "org capture"
-       "o i"   "org insert link"
-       "o s"   "org store link"
-       "o S"   "org subtree from list"
-       "o A"   "org archive subtree"
-       "o g"   "org goto"
-       "o l"   "org latex preview"
-       "o L"   "org toggle link display"
-       "o I"   "org image preview"
-       "o k"   "org kill subtree"
-       "o V"   "org reveal"
-       "o R"   "org refile"
-       "o y"   "org copy subtree"
-       "o h"   "org toggle heading"
-       "o H"   "org insert heading"
-       "o e"   "org export"
-       "o u"   "org update current"
-       "o U"   "org update all"
-       "o O"   "org footnote"
-       "o ]"   "org narrow subtree"
-       "o ["   "org widen"
-       "o N"   "org note"
-       "o F"   "org attach"
-       "o E"   "org set effort"
-       "o B"   "org table blank field"
-       "o <"   "org select from cal"
-       "o >"   "org goto cal"
-       "o t"   "org tag"
-       "o d"   "org todo"
-       "o z"   "split and clone"
-       "o w"   "org special edit"
-       "o q"   "org special edit quit"
-       "a s"   "mark org subtree"
-       "o RET" "org open link")
    #+end_src
 ** Org drill
    #+begin_src emacs-lisp
@@ -1629,7 +1647,7 @@
      (defun st/deft-brain ()
        "Uses the st/deft function to search in the org-brain directory"
        (interactive)
-       (st/deft "~/Notes/Brain"))
+       (st/deft "~/Notes/brain"))
 
      (bind-keys*
       ("M-m o f" . st/deft-org)
@@ -1671,17 +1689,122 @@
        (setq org-brain-visualize-default-choices 'all)
        (setq org-brain-title-max-length 24))
    #+end_src
-* Blog
-** Blog admin
+** 按键绑定
    #+begin_src emacs-lisp
-     (use-package blog-admin
-       :ensure t
-       :init
-       (setq blog-admin-backend-type 'hexo)
-       (setq blog-admin-backend-path "~/Notes/blog")
-       (setq blog-admin-backend-new-post-in-drafts t)
-       (setq blog-admin-backend-new-post-with-same-name-dir t)
-       (setq blog-admin-backend-hexo-config-file "my_config.yml"))
+     (bind-keys*
+      ("M-m o a"   . org-agenda)
+      ("M-m o c"   . org-capture)
+      ("M-m o i"   . org-insert-link)
+      ("M-m o s"   . org-store-link)
+      ("M-m o S"   . org-list-make-subtree)
+      ("M-m o A"   . org-archive-subtree)
+      ("M-m o g"   . org-goto)
+      ("M-m o l"   . org-toggle-latex-fragment)
+      ("M-m o L"   . org-toggle-link-display)
+      ("M-m o I"   . org-toggle-inline-images)
+      ("M-m o k"   . org-cut-subtree)
+      ("M-m o V"   . org-reveal)
+      ("M-m o R"   . org-refile)
+      ("M-m o y"   . org-copy-subtree)
+      ("M-m o h"   . org-toggle-heading)
+      ("M-m o H"   . org-insert-heading-respect-content)
+      ("M-m o e"   . org-export-dispatch)
+      ("M-m o u"   . org-update-dblock)
+      ("M-m o U"   . org-update-all-dblocks)
+      ("M-m o O"   . org-footnote-new)
+      ("M-m o ]"   . org-narrow-to-subtree)
+      ("M-m o ["   . widen)
+      ("M-m o N"   . org-add-note)
+      ("M-m o E"   . org-set-effort)
+      ("M-m o B"   . org-table-blank-field)
+      ("M-m o b"   . org-brain-visualize-random)
+      ("M-m o <"   . org-date-from-calendar)
+      ("M-m o >"   . org-goto-calendar)
+      ("M-m o d"   . org-todo)
+      ("M-m o t"   . org-set-tags-command)
+      ("M-m o w"   . org-edit-special)
+      ("M-m o q"   . org-edit-src-exit)
+      ("M-m o z"   . clone-indirect-buffer-other-window)
+      ("M-m a s"   . org-mark-subtree)
+      ("M-m o RET" . org-open-at-point))
+
+     (which-key-add-key-based-replacements
+       "M-m o" "org mode prefix")
+
+     (modalka-define-kbd "o a"   "M-m o a")
+     (modalka-define-kbd "o c"   "M-m o c")
+     (modalka-define-kbd "o i"   "M-m o i")
+     (modalka-define-kbd "o s"   "M-m o s")
+     (modalka-define-kbd "o S"   "M-m o S")
+     (modalka-define-kbd "o A"   "M-m o A")
+     (modalka-define-kbd "o g"   "M-m o g")
+     (modalka-define-kbd "o l"   "M-m o l")
+     (modalka-define-kbd "o L"   "M-m o L")
+     (modalka-define-kbd "o I"   "M-m o I")
+     (modalka-define-kbd "o k"   "M-m o k")
+     (modalka-define-kbd "o V"   "M-m o V")
+     (modalka-define-kbd "o R"   "M-m o R")
+     (modalka-define-kbd "o y"   "M-m o y")
+     (modalka-define-kbd "o h"   "M-m o h")
+     (modalka-define-kbd "o H"   "M-m o H")
+     (modalka-define-kbd "o e"   "M-m o e")
+     (modalka-define-kbd "o u"   "M-m o u")
+     (modalka-define-kbd "o U"   "M-m o U")
+     (modalka-define-kbd "o O"   "M-m o O")
+     (modalka-define-kbd "o ]"   "M-m o ]")
+     (modalka-define-kbd "o ["   "M-m o [")
+     (modalka-define-kbd "o N"   "M-m o N")
+     (modalka-define-kbd "o E"   "M-m o E")
+     (modalka-define-kbd "o B"   "M-m o B")
+     (modalka-define-kbd "o b"   "M-m o b")
+     (modalka-define-kbd "o <"   "M-m o <")
+     (modalka-define-kbd "o >"   "M-m o >")
+     (modalka-define-kbd "o d"   "M-m o d")
+     (modalka-define-kbd "o t"   "M-m o t")
+     (modalka-define-kbd "o z"   "M-m o z")
+     (modalka-define-kbd "o w"   "M-m o w")
+     (modalka-define-kbd "o q"   "M-m o q")
+     (modalka-define-kbd "a s"   "M-m a s")
+     (modalka-define-kbd "o RET" "M-m o RET")
+
+     (which-key-add-key-based-replacements
+       "o"     "org prefix"
+       "o a"   "org agenda"
+       "o c"   "org capture"
+       "o i"   "org insert link"
+       "o s"   "org store link"
+       "o S"   "org subtree from list"
+       "o A"   "org archive subtree"
+       "o g"   "org goto"
+       "o l"   "org latex preview"
+       "o L"   "org toggle link display"
+       "o I"   "org image preview"
+       "o k"   "org kill subtree"
+       "o V"   "org reveal"
+       "o R"   "org refile"
+       "o y"   "org copy subtree"
+       "o h"   "org toggle heading"
+       "o H"   "org insert heading"
+       "o e"   "org export"
+       "o u"   "org update current"
+       "o U"   "org update all"
+       "o O"   "org footnote"
+       "o ]"   "org narrow subtree"
+       "o ["   "org widen"
+       "o N"   "org note"
+       "o F"   "org attach"
+       "o E"   "org set effort"
+       "o B"   "org table blank field"
+       "o b"   "org brain random"
+       "o <"   "org select from cal"
+       "o >"   "org goto cal"
+       "o t"   "org tag"
+       "o d"   "org todo"
+       "o z"   "split and clone"
+       "o w"   "org special edit"
+       "o q"   "org special edit quit"
+       "a s"   "mark org subtree"
+       "o RET" "org open link")
    #+end_src
 * 开发相关
 ** company
