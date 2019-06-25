@@ -221,6 +221,13 @@
        (when (memq window-system '(mac ns x))
 	 (exec-path-from-shell-initialize)))
    #+end_src
+** 图标
+   #+begin_src emacs-lisp
+     (use-package all-the-icons
+       :ensure t
+       :config (unless (member "all-the-icons" (font-family-list))
+		 (all-the-icons-install-fonts t)))
+   #+end_src
 ** 快捷键提示（which key）
    #+begin_src emacs-lisp
      (use-package which-key
@@ -273,6 +280,7 @@
        (add-to-list 'modalka-excluded-modes 'eshell-mode)
        (add-to-list 'modalka-excluded-modes 'deft-mode)
        (add-to-list 'modalka-excluded-modes 'term-mode)
+       (add-to-list 'modalka-excluded-modes 'blog-admin-mode)
        (which-key-add-key-based-replacements
 	"M-m"     "Modalka prefix"
 	"M-m :"   "extended prefix"
@@ -726,7 +734,15 @@
        :commands (neotree-toggle)
        :bind* (("M-m SPC n" . neotree-toggle))
        :init
-       (setq neo-smart-open t))
+       (setq neo-window-width 32
+	     neo-create-file-auto-open t
+	     neo-banner-message nil
+	     neo-mode-line-type 'neotree
+	     neo-smart-open t
+	     neo-show-hidden-files t
+	     neo-mode-line-type 'none
+	     neo-auto-indent-point t
+	     neo-theme (if (display-graphic-p) 'icons 'arrow)))
    #+end_src
    - Modal binding
      #+begin_src emacs-lisp
@@ -1388,7 +1404,7 @@
 	:init
 	(setq org-export-with-smart-quotes t))
    #+end_src
-** org-bullets
+** Org bullets
    #+begin_src emacs-lisp
      (use-package org-bullets
        :ensure t
@@ -1430,7 +1446,9 @@
 		   '(("t" "todo" entry (file org-agenda-file-inbox)
 		      "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
 		     ("n" "note" entry (file org-agenda-file-inbox)
-		      "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)))
+		      "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
+		     ("b" "Brain" plain (function org-brain-goto-end)
+		      "* %i%?" :empty-lines 1)))
      (setq-default org-refile-targets '((nil :maxlevel . 9)
 					(org-agenda-files :maxlevel . 9))
 	   org-refile-use-outline-path t
@@ -1552,7 +1570,7 @@
        "a s"   "mark org subtree"
        "o RET" "org open link")
    #+end_src
-** org-drill
+** Org drill
    #+begin_src emacs-lisp
      (use-package org-drill
        :defer t
@@ -1574,7 +1592,7 @@
        (progn
 	 (add-to-list 'org-modules 'org-drill)))
    #+end_src
-** org-babel
+** Org babel
    #+begin_src emacs-lisp
      (use-package babel
        :ensure t
@@ -1640,6 +1658,30 @@
    #+begin_src emacs-lisp
      (use-package org-download
        :ensure t)
+   #+end_src
+** Org brain
+   #+begin_src emacs-lisp
+     (use-package org-brain
+       :ensure t
+       :init
+       (setq org-brain-path "~/Notes/brain")
+       :config
+       (setq org-id-track-globally t)
+       (setq org-id-locations-file "~/Notes/brain/.org-id-locations")
+       (setq org-brain-visualize-default-choices 'all)
+       (setq org-brain-title-max-length 24))
+   #+end_src
+* Blog
+** Blog admin
+   #+begin_src emacs-lisp
+     (use-package blog-admin
+       :ensure t
+       :init
+       (setq blog-admin-backend-type 'hexo)
+       (setq blog-admin-backend-path "~/Notes/blog")
+       (setq blog-admin-backend-new-post-in-drafts t)
+       (setq blog-admin-backend-new-post-with-same-name-dir t)
+       (setq blog-admin-backend-hexo-config-file "my_config.yml"))
    #+end_src
 * 开发相关
 ** company
