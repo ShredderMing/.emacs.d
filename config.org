@@ -1642,7 +1642,7 @@
      (defun st/deft-blog ()
        "Uses the st/deft function to search in the blog posts directory"
        (interactive)
-       (st/deft "~/Notes/Blog"))
+       (st/deft "~/Notes/blog"))
 
      (defun st/deft-brain ()
        "Uses the st/deft function to search in the org-brain directory"
@@ -1806,6 +1806,16 @@
        "a s"   "mark org subtree"
        "o RET" "org open link")
    #+end_src
+* Blog
+  #+begin_src emacs-lisp
+    (use-package blog-admin
+      :ensure t
+      :init
+      (setq blog-admin-backend-path "~/blog"
+	    blog-admin-backend-type 'hexo
+	    blog-admin-backend-new-post-in-drafts t
+	    blog-admin-backend-new-post-with-same-name-dir t))
+  #+end_src
 * 开发相关
 ** company
 #+begin_src emacs-lisp
