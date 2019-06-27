@@ -1348,6 +1348,24 @@
       "m A" "splice around")
   #+end_src
 * 视觉相关
+** Ascii-art-to-unicode
+   #+begin_src emacs-lisp
+     (use-package ascii-art-to-unicode
+       :ensure t
+       :config
+       (defface aa2u-face '((t . nil))
+	 "Face for aa2u box drawing characters")
+       (advice-add #'aa2u-1c :filter-return
+		   (lambda (str) (propertize str 'face 'aa2u-face)))
+       (defun aa2u-org-brain-buffer ()
+	 (let ((inhibit-read-only t))
+	   (make-local-variable 'face-remapping-alist)
+	   (add-to-list 'face-remapping-alist
+			'(aa2u-face . org-brain-wires))
+	   (ignore-errors (aa2u (point-min) (point-max)))))
+       (with-eval-after-load 'org-brain
+	 (add-hook 'org-brain-after-visualize-hook #'aa2u-org-brain-buffer)))
+   #+end_src
 ** Volatile highlights
    #+begin_src emacs-lisp
      (use-package volatile-highlights
@@ -1477,14 +1495,11 @@
    #+end_src
 ** 字体设置
    #+begin_src emacs-lisp
-     ;; 默认字体
-     (when (member "Hack" (font-family-list))
-       (set-face-attribute 'default nil :font "Hack" :height 120))
-     ;; unicode字符
-     (when (member "Symbola" (font-family-list))
-       (set-fontset-font t 'unicode "Symbola" nil 'prepend))
-     (when (member "Noto Sans CJK SC" (font-family-list))
-       (set-fontset-font t 'han (font-spec :family "Noto Sans CJK SC")))
+     (use-package cnfonts
+       :ensure t
+       :config
+       (cnfonts-enable)
+       (setq cnfonts-use-face-font-rescale t))
    #+end_src
 ** 主题
    #+begin_src emacs-lisp
@@ -1686,6 +1701,7 @@
        :config
        (setq org-id-track-globally t)
        (setq org-id-locations-file "~/Notes/brain/.org-id-locations")
+       (setq org-brain-data-file "~/Notes/brain/.org-brain-data.el")
        (setq org-brain-visualize-default-choices 'all)
        (setq org-brain-title-max-length 24))
    #+end_src
@@ -2204,6 +2220,15 @@
 		    (set-window-start w2 s1)
 		    (setq i (1+ i))))))))
    #+end_src
+* 音乐播放
+  #+begin_src emacs-lisp
+    (use-package bongo
+      :ensure t
+      :init
+      (setq bongo-display-header-icons nil)
+      (setq bongo-display-track-icons nil)
+      (setq bongo-enabled-backends '(vlc)))
+  #+end_src
 * 参考的配置（不完全）
   - [[https://sriramkswamy.github.io/dotemacs/][https://sriramkswamy.github.io/dotemacs/]]
   - [[http://huxiaoxing.com/setup/emacs.html][http://huxiaoxing.com/setup/emacs.html]]
