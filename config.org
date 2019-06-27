@@ -1350,21 +1350,25 @@
 * 视觉相关
 ** Ascii-art-to-unicode
    #+begin_src emacs-lisp
+     (defun aa2u-org-brain-buffer ()
+       (let ((inhibit-read-only t))
+	 (make-local-variable 'face-remapping-alist)
+	 (add-to-list 'face-remapping-alist
+		      '(aa2u-face . org-brain-wires))
+	 (ignore-errors (aa2u (point-min) (point-max)))))
+
      (use-package ascii-art-to-unicode
        :ensure t
-       :config
-       (defface aa2u-face '((t . nil))
-	 "Face for aa2u box drawing characters")
-       (advice-add #'aa2u-1c :filter-return
-		   (lambda (str) (propertize str 'face 'aa2u-face)))
-       (defun aa2u-org-brain-buffer ()
-	 (let ((inhibit-read-only t))
-	   (make-local-variable 'face-remapping-alist)
-	   (add-to-list 'face-remapping-alist
-			'(aa2u-face . org-brain-wires))
-	   (ignore-errors (aa2u (point-min) (point-max)))))
-       (with-eval-after-load 'org-brain
-	 (add-hook 'org-brain-after-visualize-hook #'aa2u-org-brain-buffer)))
+       :commands (aa2u-1c)
+       :hook (org-brain-after-visualize . aa2u-org-brain-buffer))
+
+     (defface aa2u-face '((t . nil))
+       "Face for aa2u box drawing characters"
+       :group 'org-brain-visualize-mode)
+
+     (advice-add #'aa2u-1c
+		 :filter-return
+		 (lambda (str) (propertize str 'face 'aa2u-face)))
    #+end_src
 ** Volatile highlights
    #+begin_src emacs-lisp
@@ -1497,9 +1501,11 @@
    #+begin_src emacs-lisp
      (use-package cnfonts
        :ensure t
+       :init
+       (setq cnfonts-profiles '("code1")
+	     cnfonts--profiles-steps '(("code1" . 1)))
        :config
-       (cnfonts-enable)
-       (setq cnfonts-use-face-font-rescale t))
+       (cnfonts-enable))
    #+end_src
 ** 主题
    #+begin_src emacs-lisp
@@ -1507,6 +1513,12 @@
        :ensure t
        :config
        (load-theme 'tear t))
+   #+end_src
+* 编辑相关
+** centered-cursor-mode
+   #+begin_src emacs-lisp
+     (use-package centered-cursor-mode
+       :ensure t)
    #+end_src
 * Org相关
 ** 基础设置
