@@ -286,6 +286,7 @@
        (add-to-list 'modalka-excluded-modes 'deft-mode)
        (add-to-list 'modalka-excluded-modes 'term-mode)
        (add-to-list 'modalka-excluded-modes 'blog-admin-mode)
+       (add-to-list 'modalka-excluded-modes 'org-brain-visualize-mode)
        (which-key-add-key-based-replacements
 	"M-m"     "Modalka prefix"
 	"M-m :"   "extended prefix"
@@ -1350,25 +1351,25 @@
 * 视觉相关
 ** Ascii-art-to-unicode
    #+begin_src emacs-lisp
-     (defun aa2u-org-brain-buffer ()
-       (let ((inhibit-read-only t))
-	 (make-local-variable 'face-remapping-alist)
-	 (add-to-list 'face-remapping-alist
-		      '(aa2u-face . org-brain-wires))
-	 (ignore-errors (aa2u (point-min) (point-max)))))
+     ;; (defun aa2u-org-brain-buffer ()
+     ;;   (let ((inhibit-read-only t))
+     ;;     (make-local-variable 'face-remapping-alist)
+     ;;     (add-to-list 'face-remapping-alist
+     ;; 		 '(aa2u-face . org-brain-wires))
+     ;;     (ignore-errors (aa2u (point-min) (point-max)))))
 
-     (use-package ascii-art-to-unicode
-       :ensure t
-       :commands (aa2u-1c)
-       :hook (org-brain-after-visualize . aa2u-org-brain-buffer))
+     ;; (use-package ascii-art-to-unicode
+     ;;   :ensure t
+     ;;   :commands (aa2u-1c)
+     ;;   :hook (org-brain-after-visualize . aa2u-org-brain-buffer))
 
-     (defface aa2u-face '((t . nil))
-       "Face for aa2u box drawing characters"
-       :group 'org-brain-visualize-mode)
+     ;; (defface aa2u-face '((t . nil))
+     ;;   "Face for aa2u box drawing characters"
+     ;;   :group 'org-brain-visualize-mode)
 
-     (advice-add #'aa2u-1c
-		 :filter-return
-		 (lambda (str) (propertize str 'face 'aa2u-face)))
+     ;; (advice-add #'aa2u-1c
+     ;; 	    :filter-return
+     ;; 	    (lambda (str) (propertize str 'face 'aa2u-face)))
    #+end_src
 ** Volatile highlights
    #+begin_src emacs-lisp
@@ -1523,46 +1524,47 @@
 * Org相关
 ** 基础设置
    #+begin_src emacs-lisp
-      (use-package org
-	:pin org
-	:ensure org-plus-contrib
-	:commands (org-insert-link
-		   org-store-link
-		   org-toggle-latex-fragment
-		   org-toggle-link-display
-		   org-toggle-inline-images
-		   org-cut-subtree
-		   org-reveal
-		   org-refile
-		   org-copy-subtree
-		   org-toggle-heading
-		   org-insert-heading-respect-content
-		   org-update-dblock
-		   org-update-all-dblocks
-		   org-narrow-to-subtree
-		   org-add-note
-		   org-set-effort
-		   org-date-from-calendar
-		   org-goto-calendar
-		   org-todo
-		   org-set-tags-command
-		   org-edit-special
-		   org-mark-subtree
-		   org-open-at-point)
-	:init
-	(setq org-directory "~/Notes"
-	      org-hide-emphasis-markers t
-	      org-image-actual-width '(300)
-	      org-src-fontify-natively t
-	      org-src-tab-acts-natively t
-	      org-export-backends '(beamer html latex md)))
+     (use-package org
+       :pin org
+       :ensure org-plus-contrib
+       :commands (org-insert-link
+		  org-store-link
+		  org-toggle-latex-fragment
+		  org-toggle-link-display
+		  org-toggle-inline-images
+		  org-cut-subtree
+		  org-reveal
+		  org-refile
+		  org-copy-subtree
+		  org-toggle-heading
+		  org-insert-heading-respect-content
+		  org-update-dblock
+		  org-update-all-dblocks
+		  org-narrow-to-subtree
+		  org-add-note
+		  org-set-effort
+		  org-date-from-calendar
+		  org-goto-calendar
+		  org-todo
+		  org-set-tags-command
+		  org-edit-special
+		  org-mark-subtree
+		  org-open-at-point)
+       :init
+       (setq org-directory "~/Notes"
+	     org-hide-emphasis-markers t
+	     org-image-actual-width '(300)
+	     org-src-fontify-natively t
+	     org-src-tab-acts-natively t
+	     org-export-backends '(beamer html latex md)))
 
-      (use-package ox
-	:pin org
-	:ensure org-plus-contrib
-	:init
-	(setq org-export-with-smart-quotes t))
+     (use-package ox
+       :pin org
+       :ensure org-plus-contrib
+       :init
+       (setq org-export-with-smart-quotes t))
    #+end_src
+
 ** Org bullets
    #+begin_src emacs-lisp
      (use-package org-bullets
@@ -1669,7 +1671,7 @@
      (defun st/deft-blog ()
        "Uses the st/deft function to search in the blog posts directory"
        (interactive)
-       (st/deft "~/Notes/blog"))
+       (st/deft "~/blog"))
 
      (defun st/deft-brain ()
        "Uses the st/deft function to search in the org-brain directory"
@@ -1704,7 +1706,7 @@
      (use-package org-download
        :ensure t)
    #+end_src
-** Org brain
+** org-brain
    #+begin_src emacs-lisp
      (use-package org-brain
        :ensure t
@@ -1714,8 +1716,9 @@
        (setq org-id-track-globally t)
        (setq org-id-locations-file "~/Notes/brain/.org-id-locations")
        (setq org-brain-data-file "~/Notes/brain/.org-brain-data.el")
+       (load org-brain-data-file)
        (setq org-brain-visualize-default-choices 'all)
-       (setq org-brain-title-max-length 24))
+       (setq org-brain-title-max-length 32))
    #+end_src
 ** 按键绑定
    #+begin_src emacs-lisp
@@ -2232,6 +2235,62 @@
 		    (set-window-start w2 s1)
 		    (setq i (1+ i))))))))
    #+end_src
+** 字数统计
+   修改自： [[http://kuanyui.github.io/2014/01/18/count-chinese-japanese-and-english-words-in-emacs/]]
+   #+begin_src emacs-lisp
+     (defvar wc-regexp-chinese-char-and-punc
+	   (rx (category chinese)))
+     (defvar wc-regexp-chinese-punc
+       "[。，！？；：「」『』（）、【】《》〈〉※—]")
+     (defvar wc-regexp-english-word
+       "[a-zA-Z0-9-]+")
+
+     (defun st/count-words ()
+       "「較精確地」統計中/日/英文字數。
+     - 文章中的註解不算在字數內。
+     - 平假名與片假名亦包含在「中日文字數」內，每個平/片假名都算單獨一個字（但片假
+       名不含連音「ー」）。
+     - 英文只計算「單字數」，不含標點。
+     - 韓文不包含在內。
+
+     ※計算標準太多種了，例如英文標點是否算入、以及可能有不太常用的標點符號沒算入等
+     。且中日文標點的計算標準要看 Emacs 如何定義特殊標點符號如ヴァランタン・アルカン
+     中間的點也被 Emacs 算為一個字而不是標點符號。"
+       (interactive)
+       (let* ((v-buffer-string
+	       (replace-regexp-in-string (format "^ *%s *.+" comment-start) ""
+					 (if (eq major-mode 'org-mode)
+					     (replace-regexp-in-string "^#\\+.+" ""
+								       (buffer-substring-no-properties (point-min) (point-max)))
+					   (buffer-substring-no-properties (point-min) (point-max)))))
+	      (chinese-char-and-punc 0)
+	      (chinese-punc 0)
+	      (english-word 0)
+	      (chinese-char 0))
+	 (with-temp-buffer
+	   (insert v-buffer-string)
+	   (goto-char (point-min))
+	   ;; 中文（含標點、片假名）
+	   (while (re-search-forward wc-regexp-chinese-char-and-punc nil :no-error)
+	     (setq chinese-char-and-punc (1+ chinese-char-and-punc)))
+	   ;; 中文標點符號
+	   (goto-char (point-min))
+	   (while (re-search-forward wc-regexp-chinese-punc nil :no-error)
+	     (setq chinese-punc (1+ chinese-punc)))
+	   ;; 英文字數（不含標點）
+	   (goto-char (point-min))
+	   (while (re-search-forward wc-regexp-english-word nil :no-error)
+	     (setq english-word (1+ english-word))))
+	 (setq chinese-char (- chinese-char-and-punc chinese-punc))
+	 (message
+	  (format "中日文字数（不含标点）：%s
+     中日文字数（包含标点）：%s
+     英文单词数（不含标点）：%s
+     =======================
+     中英文合计（不含标点）：%s"
+		  chinese-char chinese-char-and-punc english-word
+		  (+ chinese-char english-word)))))
+   #+end_src
 * 音乐播放
   #+begin_src emacs-lisp
     (use-package bongo
@@ -2241,6 +2300,12 @@
       (setq bongo-display-track-icons nil)
       (setq bongo-enabled-backends '(vlc)))
   #+end_src
+* 其它
+** 代码图片生成
+   #+begin_src emacs-lisp
+     (use-package carbon-now-sh
+       :ensure t)
+   #+end_src
 * 参考的配置（不完全）
   - [[https://sriramkswamy.github.io/dotemacs/][https://sriramkswamy.github.io/dotemacs/]]
   - [[http://huxiaoxing.com/setup/emacs.html][http://huxiaoxing.com/setup/emacs.html]]
