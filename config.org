@@ -18,6 +18,7 @@
                              ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
                              ("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
                              ("local" . ,local-archive)))
+
     (package-initialize)
     (unless (package-installed-p 'use-package)
       (package-refresh-contents)
@@ -81,23 +82,27 @@
    #+end_src
 ** 基础设置
    #+begin_src emacs-lisp
-	  (setq inhibit-startup-message t
-		inhibit-startup-screen t
-		echo-keystrokes 0.1
-		initial-scratch-message nil
-		sentence-end-double-space nil)
-	  (fset 'yes-or-no-p 'y-or-n-p)
-	  (setq-default truncate-lines t)
-	  (dolist (mode '(tool-bar-mode
-			  menu-bar-mode
-			  fringe-mode
-			  scroll-bar-mode
-			  tooltip-mode))
-	    (funcall mode 0))
-	  (dolist (mode '(column-number-mode
-			  subword-mode
-			  global-hl-line-mode))
-	    (funcall mode 1))
+     (setq inhibit-startup-message t
+	   inhibit-startup-screen t
+	   echo-keystrokes 0.1
+	   initial-scratch-message nil
+	   sentence-end-double-space nil)
+     (fset 'yes-or-no-p 'y-or-n-p)
+     (setq-default truncate-lines t)
+     (dolist (mode '(tool-bar-mode
+		     menu-bar-mode
+		     fringe-mode
+		     scroll-bar-mode
+		     tooltip-mode))
+       (funcall mode 0))
+     (dolist (mode '(column-number-mode
+		     subword-mode
+		     global-hl-line-mode))
+       (funcall mode 1))
+     ;; custom file
+     (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+     (when (file-exists-p custom-file)
+       (load custom-file))
    #+end_src
 ** 光标
    #+begin_src emacs-lisp
@@ -265,6 +270,16 @@
 ** 全屏切换
    #+begin_src emacs-lisp
      
+   #+end_src
+** 代码图片生成
+   #+begin_src emacs-lisp
+     (use-package carbon-now-sh
+       :ensure t)
+   #+end_src
+** 软件包试用（try）
+   #+begin_src emacs-lisp
+     (use-package try
+       :ensure t)
    #+end_src
 * Modal editing
 ** 初始化
@@ -1351,25 +1366,25 @@
 * 视觉相关
 ** Ascii-art-to-unicode
    #+begin_src emacs-lisp
-     ;; (defun aa2u-org-brain-buffer ()
-     ;;   (let ((inhibit-read-only t))
-     ;;     (make-local-variable 'face-remapping-alist)
-     ;;     (add-to-list 'face-remapping-alist
-     ;; 		 '(aa2u-face . org-brain-wires))
-     ;;     (ignore-errors (aa2u (point-min) (point-max)))))
+     (defun aa2u-org-brain-buffer ()
+       (let ((inhibit-read-only t))
+	 (make-local-variable 'face-remapping-alist)
+	 (add-to-list 'face-remapping-alist
+		      '(aa2u-face . org-brain-wires))
+	 (ignore-errors (aa2u (point-min) (point-max)))))
 
-     ;; (use-package ascii-art-to-unicode
-     ;;   :ensure t
-     ;;   :commands (aa2u-1c)
-     ;;   :hook (org-brain-after-visualize . aa2u-org-brain-buffer))
+     (use-package ascii-art-to-unicode
+       :ensure t
+       :commands (aa2u-1c)
+       :hook (org-brain-after-visualize . aa2u-org-brain-buffer))
 
-     ;; (defface aa2u-face '((t . nil))
-     ;;   "Face for aa2u box drawing characters"
-     ;;   :group 'org-brain-visualize-mode)
+     (defface aa2u-face '((t . nil))
+       "Face for aa2u box drawing characters"
+       :group 'org-brain-visualize-mode)
 
-     ;; (advice-add #'aa2u-1c
-     ;; 	    :filter-return
-     ;; 	    (lambda (str) (propertize str 'face 'aa2u-face)))
+     (advice-add #'aa2u-1c
+		 :filter-return
+		 (lambda (str) (propertize str 'face 'aa2u-face)))
    #+end_src
 ** Volatile highlights
    #+begin_src emacs-lisp
@@ -1510,10 +1525,14 @@
    #+end_src
 ** 主题
    #+begin_src emacs-lisp
-     (use-package tear-theme
+     (use-package doom-themes
        :ensure t
        :config
-       (load-theme 'tear t))
+       (load-theme 'doom-opera-light t))
+     ;; (use-package tear-theme
+     ;;   :ensure t
+     ;;   :config
+     ;;   (load-theme 'tear t))
    #+end_src
 * 编辑相关
 ** centered-cursor-mode
@@ -2300,12 +2319,6 @@
       (setq bongo-display-track-icons nil)
       (setq bongo-enabled-backends '(vlc)))
   #+end_src
-* 其它
-** 代码图片生成
-   #+begin_src emacs-lisp
-     (use-package carbon-now-sh
-       :ensure t)
-   #+end_src
 * 参考的配置（不完全）
   - [[https://sriramkswamy.github.io/dotemacs/][https://sriramkswamy.github.io/dotemacs/]]
   - [[http://huxiaoxing.com/setup/emacs.html][http://huxiaoxing.com/setup/emacs.html]]
