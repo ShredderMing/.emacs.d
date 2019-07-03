@@ -596,28 +596,6 @@
 		       hydra-show-hint
 		       hydra-set-transient-map))
    #+end_src
-* Yasnippet
-  #+begin_src emacs-lisp
-    (use-package yasnippet
-      :ensure t
-      :commands (yas-insert-snippet yas-new-snippet)
-      :bind (("C-o" . yas-insert-snippet))
-      :bind* (("C-="        . yas-new-snippet)
-	      ("C-<escape>" . yas-visit-snippet-file))
-      :diminish (yas-minor-mode . "γ")
-      :config
-      (setq yas-triggers-in-field t); Enable nested triggering of snippets
-      (setq yas-prompt-functions '(yas-completing-prompt))
-      (add-hook 'snippet-mode-hook '(lambda () (setq-local require-final-newline nil)))
-      (yas-global-mode))
-
-    (defun st/force-yasnippet-off ()
-      (yas-minor-mode -1)
-      (setq yas-dont-activate-functions t))
-    (add-hook 'term-mode-hook 'st/force-yasnippet-off)
-    (add-hook 'shell-mode-hook 'st/force-yasnippet-off)
-
-  #+end_src
 * 导航相关（Navigating）
 ** Flx
    #+begin_src emacs-lisp
@@ -1265,127 +1243,7 @@
       "SPC m" "make in project"
       "SPC M" "make in current dir")
   #+end_src
-* Smartparens
-  #+begin_src emacs-lisp
-    (use-package smartparens
-      :ensure t
-      :bind* (("M-m m j" . sp-down-sexp)
-	      ("M-m m k" . sp-backward-up-sexp)
-	      ("M-m m h" . sp-backward-down-sexp)
-	      ("M-m m l" . sp-up-sexp)
-	      ("M-m m f" . sp-forward-sexp)
-	      ("M-m m b" . sp-backward-sexp)
-	      ("M-m m a" . sp-beginning-of-sexp)
-	      ("M-m m e" . sp-end-of-sexp)
-	      ("M-m m n" . sp-next-sexp)
-	      ("M-m m p" . sp-previous-sexp)
-	      ("M-m m >" . sp-forward-barf-sexp)
-	      ("M-m m <" . sp-backward-barf-sexp)
-	      ("M-m m )" . sp-forward-slurp-sexp)
-	      ("M-m m (" . sp-backward-slurp-sexp)
-	      ("M-m m x" . sp-transpose-sexp)
-	      ("M-m m d" . sp-kill-sexp)
-	      ("M-m m y" . sp-copy-sexp)
-	      ("M-m m u" . sp-unwrap-sexp)
-	      ("M-m m U" . sp-backward-unwrap-sexp)
-	      ("M-m m C" . sp-convolute-sexp)
-	      ("M-m m r" . sp-raise-sexp)
-	      ("M-m m s" . sp-split-sexp)
-	      ("M-m m S" . sp-splice-sexp)
-	      ("M-m m F" . sp-splice-sexp-killing-forward)
-	      ("M-m m B" . sp-splice-sexp-killing-backward)
-	      ("M-m m A" . sp-splice-sexp-killing-around))
-      :diminish smartparens-mode
-      :diminish smartparens-strict-mode
-      :config
-      (require 'smartparens-config)
-      (smartparens-global-mode)
-      (smartparens-global-strict-mode)
-      (show-smartparens-global-mode)
-      (which-key-add-key-based-replacements
-	"M-m m" "move prefix"))
-
-    (modalka-define-kbd "m j" "M-m m j")
-    (modalka-define-kbd "m k" "M-m m k")
-    (modalka-define-kbd "m h" "M-m m h")
-    (modalka-define-kbd "m l" "M-m m l")
-    (modalka-define-kbd "m f" "M-m m f")
-    (modalka-define-kbd "m b" "M-m m b")
-    (modalka-define-kbd "m a" "M-m m a")
-    (modalka-define-kbd "m e" "M-m m e")
-    (modalka-define-kbd "m n" "M-m m n")
-    (modalka-define-kbd "m p" "M-m m p")
-    (modalka-define-kbd "m >" "M-m m >")
-    (modalka-define-kbd "m <" "M-m m <")
-    (modalka-define-kbd "m )" "M-m m )")
-    (modalka-define-kbd "m (" "M-m m (")
-    (modalka-define-kbd "m x" "M-m m x")
-    (modalka-define-kbd "m d" "M-m m d")
-    (modalka-define-kbd "m y" "M-m m y")
-    (modalka-define-kbd "m u" "M-m m u")
-    (modalka-define-kbd "m U" "M-m m U")
-    (modalka-define-kbd "m U" "M-m m U")
-    (modalka-define-kbd "m U" "M-m m U")
-    (modalka-define-kbd "m C" "M-m m C")
-    (modalka-define-kbd "m r" "M-m m r")
-    (modalka-define-kbd "m s" "M-m m s")
-    (modalka-define-kbd "m S" "M-m m S")
-    (modalka-define-kbd "m F" "M-m m F")
-    (modalka-define-kbd "m B" "M-m m B")
-    (modalka-define-kbd "m A" "M-m m A")
-
-    (which-key-add-key-based-replacements
-      "m" "move prefix"
-      "m j" "move down"
-      "m k" "move backward up"
-      "m h" "move backward down"
-      "m l" "move up"
-      "m f" "move forward"
-      "m b" "move backward"
-      "m a" "move beginning"
-      "m e" "move end"
-      "m n" "move next"
-      "m p" "move previous"
-      "m >" "expression forward barf"
-      "m <" "expression backward barf"
-      "m )" "expression forward slurp"
-      "m (" "expression backward slurp"
-      "m x" "smart transpose"
-      "m d" "smart delete"
-      "m y" "smart copy"
-      "m u" "selection unwrap"
-      "m U" "backward unwrap"
-      "m C" "convolute sexp"
-      "m r" "raise sexp"
-      "m s" "split sexp"
-      "m S" "splice sexp"
-      "m F" "splice forward"
-      "m B" "splice backward"
-      "m A" "splice around")
-  #+end_src
 * 视觉相关
-** Ascii-art-to-unicode
-   #+begin_src emacs-lisp
-     (defun aa2u-org-brain-buffer ()
-       (let ((inhibit-read-only t))
-	 (make-local-variable 'face-remapping-alist)
-	 (add-to-list 'face-remapping-alist
-		      '(aa2u-face . org-brain-wires))
-	 (ignore-errors (aa2u (point-min) (point-max)))))
-
-     (use-package ascii-art-to-unicode
-       :ensure t
-       :commands (aa2u-1c)
-       :hook (org-brain-after-visualize . aa2u-org-brain-buffer))
-
-     (defface aa2u-face '((t . nil))
-       "Face for aa2u box drawing characters"
-       :group 'org-brain-visualize-mode)
-
-     (advice-add #'aa2u-1c
-		 :filter-return
-		 (lambda (str) (propertize str 'face 'aa2u-face)))
-   #+end_src
 ** Volatile highlights
    #+begin_src emacs-lisp
      (use-package volatile-highlights
@@ -1535,10 +1393,380 @@
      ;;   (load-theme 'tear t))
    #+end_src
 * 编辑相关
-** centered-cursor-mode
+** 打字机模式
    #+begin_src emacs-lisp
      (use-package centered-cursor-mode
        :ensure t)
+   #+end_src
+** Expand region
+   #+begin_src emacs-lisp
+     (defun st/mark-inside-org-code ()
+       "Select inside an Org code block without the org specific syntax"
+       (interactive)
+       (er/mark-org-code-block)
+       (forward-line 1)
+       (exchange-point-and-mark)
+       (forward-line -1)
+       (end-of-line 1))
+
+     (defun st/mark-around-LaTeX-environment ()
+       "Select around a LaTeX environment with both the begin and end keywords"
+       (interactive)
+       (er/mark-LaTeX-inside-environment)
+       (forward-line -1)
+       (exchange-point-and-mark)
+       (forward-line 1)
+       (end-of-line 1))
+
+     (defun st/mark-around-word ()
+       "Mark the word and the adjacent whitespace"
+       (interactive)
+       (er/mark-word)
+       (exchange-point-and-mark)
+       (forward-char 1))
+
+     (defun st/mark-around-text-paragraph ()
+       "Mark the paragraph and the newline"
+       (interactive)
+       (er/mark-text-paragraph)
+       (exchange-point-and-mark)
+       (forward-line 1))
+
+     (defun st/mark-inside-LaTeX-math ()
+       "Mark inside the latex math"
+       (interactive)
+       (er/mark-LaTeX-math)
+       (forward-char 1)
+       (exchange-point-and-mark)
+       (backward-char 1))
+
+     (defun st/mark-inside-python-block ()
+       "Mark inside a python block"
+       (interactive)
+       (er/mark-python-block)
+       (forward-line 1))
+
+     (defun st/mark-inside-ruby-block ()
+       "Mark inside a ruby/julia block"
+       (interactive)
+       (er/mark-ruby-block-up)
+       (forward-line 1)
+       (exchange-point-and-mark)
+       (forward-line -1))
+
+     (defun st/mark-around-symbol ()
+       "Mark around a symbol including the nearby whitespace"
+       (interactive)
+       (er/mark-symbol)
+       (exchange-point-and-mark)
+       (forward-char 1))
+
+     (use-package expand-region
+       :ensure t
+       :commands (er/try-expand-list)
+       :bind* (("M-m a o" . er/mark-org-code-block)
+	       ("M-m a w" . st/mark-around-word)
+	       ("M-m a p" . st/mark-around-text-paragraph)
+	       ("M-m a f" . er/mark-defun)
+	       ("M-m a e" . st/mark-around-LaTeX-environment)
+	       ("M-m a t" . er/mark-LaTeX-math)
+	       ("M-m a m" . er/mark-python-block)
+	       ("M-m a j" . er/mark-ruby-block-up)
+	       ("M-m a q" . er/mark-outside-quotes)
+	       ("M-m a b" . er/mark-outside-pairs)
+	       ("M-m a u" . er/mark-url)
+	       ("M-m a c" . er/mark-comment)
+	       ("M-m a v" . st/mark-around-symbol)
+	       ("M-m i p" . er/mark-text-paragraph)
+	       ("M-m i f" . er/mark-defun)
+	       ("M-m i w" . er/mark-word)
+	       ("M-m i e" . er/mark-LaTeX-inside-environment)
+	       ("M-m i t" . st/mark-inside-LaTeX-math)
+	       ("M-m i u" . er/mark-url)
+	       ("M-m i c" . er/mark-comment)
+	       ("M-m i b" . er/mark-inside-pairs)
+	       ("M-m i q" . er/mark-inside-quotes)
+	       ("M-m i o" . st/mark-inside-org-code)
+	       ("M-m i m" . st/mark-inside-python-block)
+	       ("M-m i j" . st/mark-inside-ruby-block)
+	       ("M-m i v" . er/mark-symbol)))
+
+     (defun er/add-org-mode-expansions ()
+       (make-local-variable 'er/try-expand-list)
+       (setq er/try-expand-list (append
+				 er/try-expand-list
+				 '(mark-LaTeX-math))))
+     (add-hook 'org-mode-hook 'er/add-org-mode-expansions)
+
+     (modalka-define-kbd "a o" "M-m a o")
+     (modalka-define-kbd "a w" "M-m a w")
+     (modalka-define-kbd "a p" "M-m a p")
+     (modalka-define-kbd "a f" "M-m a f")
+     (modalka-define-kbd "a e" "M-m a e")
+     (modalka-define-kbd "a t" "M-m a t")
+     (modalka-define-kbd "a m" "M-m a m")
+     (modalka-define-kbd "a j" "M-m a j")
+     (modalka-define-kbd "a q" "M-m a q")
+     (modalka-define-kbd "a b" "M-m a b")
+     (modalka-define-kbd "a u" "M-m a u")
+     (modalka-define-kbd "a c" "M-m a c")
+     (modalka-define-kbd "a v" "M-m a v")
+     (modalka-define-kbd "i p" "M-m i p")
+     (modalka-define-kbd "i f" "M-m i f")
+     (modalka-define-kbd "i w" "M-m i w")
+     (modalka-define-kbd "i u" "M-m i u")
+     (modalka-define-kbd "i t" "M-m i t")
+     (modalka-define-kbd "i e" "M-m i e")
+     (modalka-define-kbd "i c" "M-m i c")
+     (modalka-define-kbd "i b" "M-m i b")
+     (modalka-define-kbd "i q" "M-m i q")
+     (modalka-define-kbd "i o" "M-m i o")
+     (modalka-define-kbd "i m" "M-m i m")
+     (modalka-define-kbd "i j" "M-m i j")
+     (modalka-define-kbd "i v" "M-m i v")
+
+     (which-key-add-key-based-replacements
+       "a"   "expand around prefix"
+       "a o" "expand an org block"
+       "a w" "expand a word"
+       "a p" "expand a para"
+       "a f" "expand a func"
+       "a e" "expand a latex env"
+       "a t" "expand a latex math"
+       "a m" "expand a python block"
+       "a j" "expand a julia block"
+       "a q" "expand a quote"
+       "a b" "expand a pair"
+       "a u" "expand a url"
+       "a c" "expand a comment"
+       "a v" "expand a variable"
+       "i"   "expand inside prefix"
+       "i p" "expand in para"
+       "i f" "expand in func"
+       "i w" "expand in word"
+       "i u" "expand in url"
+       "i e" "expand in latex env"
+       "i t" "expand in latex math"
+       "i c" "expand in comment"
+       "i b" "expand in pair"
+       "i q" "expand in quote"
+       "i o" "expand in org code"
+       "i m" "expand in python block"
+       "i j" "expand in julia block"
+       "i v" "expand in symbol")
+   #+end_src
+** 注释
+   #+begin_src emacs-lisp
+     (use-package comment-dwim-2
+       :ensure t
+       :bind* (("M-m g c" . comment-dwim-2)))
+
+     (modalka-define-kbd "g c" "M-m g c")
+
+     (which-key-add-key-based-replacements
+       "g c" "comment line/region")
+   #+end_src
+** Smartparens
+   #+begin_src emacs-lisp
+     (use-package smartparens
+       :ensure t
+       :bind* (("M-m m j" . sp-down-sexp)
+	       ("M-m m k" . sp-backward-up-sexp)
+	       ("M-m m h" . sp-backward-down-sexp)
+	       ("M-m m l" . sp-up-sexp)
+	       ("M-m m f" . sp-forward-sexp)
+	       ("M-m m b" . sp-backward-sexp)
+	       ("M-m m a" . sp-beginning-of-sexp)
+	       ("M-m m e" . sp-end-of-sexp)
+	       ("M-m m n" . sp-next-sexp)
+	       ("M-m m p" . sp-previous-sexp)
+	       ("M-m m >" . sp-forward-barf-sexp)
+	       ("M-m m <" . sp-backward-barf-sexp)
+	       ("M-m m )" . sp-forward-slurp-sexp)
+	       ("M-m m (" . sp-backward-slurp-sexp)
+	       ("M-m m x" . sp-transpose-sexp)
+	       ("M-m m d" . sp-kill-sexp)
+	       ("M-m m y" . sp-copy-sexp)
+	       ("M-m m u" . sp-unwrap-sexp)
+	       ("M-m m U" . sp-backward-unwrap-sexp)
+	       ("M-m m C" . sp-convolute-sexp)
+	       ("M-m m r" . sp-raise-sexp)
+	       ("M-m m s" . sp-split-sexp)
+	       ("M-m m S" . sp-splice-sexp)
+	       ("M-m m F" . sp-splice-sexp-killing-forward)
+	       ("M-m m B" . sp-splice-sexp-killing-backward)
+	       ("M-m m A" . sp-splice-sexp-killing-around))
+       :diminish smartparens-mode
+       :diminish smartparens-strict-mode
+       :config
+       (require 'smartparens-config)
+       (smartparens-global-mode)
+       (smartparens-global-strict-mode)
+       (show-smartparens-global-mode)
+       (which-key-add-key-based-replacements
+	 "M-m m" "move prefix"))
+
+     (modalka-define-kbd "m j" "M-m m j")
+     (modalka-define-kbd "m k" "M-m m k")
+     (modalka-define-kbd "m h" "M-m m h")
+     (modalka-define-kbd "m l" "M-m m l")
+     (modalka-define-kbd "m f" "M-m m f")
+     (modalka-define-kbd "m b" "M-m m b")
+     (modalka-define-kbd "m a" "M-m m a")
+     (modalka-define-kbd "m e" "M-m m e")
+     (modalka-define-kbd "m n" "M-m m n")
+     (modalka-define-kbd "m p" "M-m m p")
+     (modalka-define-kbd "m >" "M-m m >")
+     (modalka-define-kbd "m <" "M-m m <")
+     (modalka-define-kbd "m )" "M-m m )")
+     (modalka-define-kbd "m (" "M-m m (")
+     (modalka-define-kbd "m x" "M-m m x")
+     (modalka-define-kbd "m d" "M-m m d")
+     (modalka-define-kbd "m y" "M-m m y")
+     (modalka-define-kbd "m u" "M-m m u")
+     (modalka-define-kbd "m U" "M-m m U")
+     (modalka-define-kbd "m U" "M-m m U")
+     (modalka-define-kbd "m U" "M-m m U")
+     (modalka-define-kbd "m C" "M-m m C")
+     (modalka-define-kbd "m r" "M-m m r")
+     (modalka-define-kbd "m s" "M-m m s")
+     (modalka-define-kbd "m S" "M-m m S")
+     (modalka-define-kbd "m F" "M-m m F")
+     (modalka-define-kbd "m B" "M-m m B")
+     (modalka-define-kbd "m A" "M-m m A")
+
+     (which-key-add-key-based-replacements
+       "m" "move prefix"
+       "m j" "move down"
+       "m k" "move backward up"
+       "m h" "move backward down"
+       "m l" "move up"
+       "m f" "move forward"
+       "m b" "move backward"
+       "m a" "move beginning"
+       "m e" "move end"
+       "m n" "move next"
+       "m p" "move previous"
+       "m >" "expression forward barf"
+       "m <" "expression backward barf"
+       "m )" "expression forward slurp"
+       "m (" "expression backward slurp"
+       "m x" "smart transpose"
+       "m d" "smart delete"
+       "m y" "smart copy"
+       "m u" "selection unwrap"
+       "m U" "backward unwrap"
+       "m C" "convolute sexp"
+       "m r" "raise sexp"
+       "m s" "split sexp"
+       "m S" "splice sexp"
+       "m F" "splice forward"
+       "m B" "splice backward"
+       "m A" "splice around")
+   #+end_src
+** Interactive edit
+   #+begin_src emacs-lisp
+     (use-package iedit
+       :ensure t
+       :commands (iedit-mode)
+       :bind* (("M-m *" . iedit-mode)))
+
+     (modalka-define-kbd "*" "M-m *")
+
+     (which-key-add-key-based-replacements
+       "*" "multi edit all")
+   #+end_src
+** Multiple cursors
+   #+begin_src emacs-lisp
+     (use-package multiple-cursors
+       :ensure t
+       :bind* (("M-m ." . mc/edit-lines)
+	       ("M-m >" . mc/mark-next-line-this)
+	       ("M-m ," . mc/skip-to-next-like-this)
+	       ("M-m <" . mc/mark-previous-like-this)))
+
+     (use-package region-bindings-mode
+       :ensure t
+       :demand t
+       :bind (:map region-bindings-mode-map
+		   ("<" . mc/mark-previous-like-this)
+		   ("," . mc/skip-to-next-like-this)
+		   (">" . mc/mark-next-like-this)
+		   ("." . mc/edit-lines))
+       :diminish (region-bindings-mode . "ρ")
+       :config
+       (add-hook 'after-init-hook 'region-bindings-mode-enable))
+
+     (modalka-define-kbd "." "M-m .")
+     (modalka-define-kbd ">" "M-m >")
+     (modalka-define-kbd "," "M-m ,")
+     (modalka-define-kbd "<" "M-m <")
+
+     (which-key-add-key-based-replacements
+       ">" "multi cursor next"
+       "," "multi cursor skip"
+       "<" "multi cursor prev"
+       "." "multi edit lines")
+   #+end_src
+** Shrink white space
+   #+begin_src emacs-lisp
+     (use-package shrink-whitespace
+       :ensure t
+       :bind* (("M-m g SPC" . shrink-whitespace)))
+
+     (modalka-define-kbd "g SPC" "M-m g SPC")
+
+     (which-key-add-key-based-replacements
+       "g SPC" "shrink space")
+   #+end_src
+** Visual replace
+   #+begin_src emacs-lisp
+     (use-package visual-regexp
+       :ensure t
+       :commands (vr/query-replace)
+       :bind* (("M-m SPC SPC" . vr/query-replace))
+       :config
+       (use-package visual-regexp-steroids
+	 :ensure t
+	 :commands (vr/select-query-replace)))
+
+     (modalka-define-kbd "SPC SPC" "M-m SPC SPC")
+
+     (which-key-add-key-based-replacements
+       "SPC SPC" "replace word/expression")
+   #+end_src
+** Yasnippet
+   #+begin_src emacs-lisp
+     (use-package yasnippet
+       :ensure t
+       :commands (yas-insert-snippet yas-new-snippet yas-global-mode yas-minor-mode)
+       :bind (("C-o" . yas-insert-snippet))
+       :bind* (("C-="        . yas-new-snippet)
+	       ("C-<escape>" . yas-visit-snippet-file))
+       :diminish (yas-minor-mode . "γ")
+       :config
+       (setq yas-triggers-in-field t); Enable nested triggering of snippets
+       (setq yas-prompt-functions '(yas-completing-prompt))
+       (add-hook 'snippet-mode-hook '(lambda () (setq-local require-final-newline nil)))
+       (yas-global-mode))
+
+     (defun st/force-yasnippet-off ()
+       (yas-minor-mode -1)
+       (setq yas-dont-activate-functions t))
+     (add-hook 'term-mode-hook 'st/force-yasnippet-off)
+     (add-hook 'shell-mode-hook 'st/force-yasnippet-off)
+
+   #+end_src
+** Cycle quotes
+   #+begin_src emacs-lisp
+     (use-package cycle-quotes
+       :ensure t
+       :bind* (("M-m s q" . cycle-quotes)))
+
+     (modalka-define-kbd "s q" "M-m s q")
+
+     (which-key-add-key-based-replacements
+       "s q" "switch quotes")
    #+end_src
 * Org相关
 ** 基础设置
