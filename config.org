@@ -1768,6 +1768,13 @@
      (which-key-add-key-based-replacements
        "s q" "switch quotes")
    #+end_src
+* 阅读相关
+** epub阅读
+   #+begin_src emacs-lisp
+     (use-package nov
+       :ensure t
+       :mode ("\\.epub\\'" . nov-mode))
+   #+end_src
 * Org相关
 ** 基础设置
    #+begin_src emacs-lisp
