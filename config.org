@@ -167,6 +167,87 @@
 	       ("M-m g }" . eww-forward-url))
        :config
        (add-hook 'eww-mode-hook 'visual-line-mode))
+
+
+     (use-package language-detection
+       :ensure t)
+
+     (require 'cl-lib)
+
+     (defun eww-tag-pre (dom)
+       (let ((shr-folding-mode 'none)
+	     (shr-current-font 'default))
+	 (shr-ensure-newline)
+	 (insert (eww-fontify-pre dom))
+	 (shr-ensure-newline)))
+
+     (defun eww-fontify-pre (dom)
+       (with-temp-buffer
+	 (shr-generic dom)
+	 (let ((mode (eww-buffer-auto-detect-mode)))
+	   (when mode
+	     (eww-fontify-buffer mode)))
+	 (buffer-string)))
+
+     (defun eww-fontify-buffer (mode)
+       (delay-mode-hooks (funcall mode))
+       (font-lock-default-function mode)
+       (font-lock-default-fontify-region (point-min)
+					 (point-max)
+					 nil))
+
+     (defun eww-buffer-auto-detect-mode ()
+       (let* ((map '((ada ada-mode)
+		     (awk awk-mode)
+		     (c c-mode)
+		     (cpp c++-mode)
+		     (clojure clojure-mode lisp-mode)
+		     (csharp csharp-mode java-mode)
+		     (css css-mode)
+		     (dart dart-mode)
+		     (delphi delphi-mode)
+		     (emacslisp emacs-lisp-mode)
+		     (erlang erlang-mode)
+		     (fortran fortran-mode)
+		     (fsharp fsharp-mode)
+		     (go go-mode)
+		     (groovy groovy-mode)
+		     (haskell haskell-mode)
+		     (html html-mode)
+		     (java java-mode)
+		     (javascript javascript-mode)
+		     (json json-mode javascript-mode)
+		     (latex latex-mode)
+		     (lisp lisp-mode)
+		     (lua lua-mode)
+		     (matlab matlab-mode octave-mode)
+		     (objc objc-mode c-mode)
+		     (perl perl-mode)
+		     (php php-mode)
+		     (prolog prolog-mode)
+		     (python python-mode)
+		     (r r-mode)
+		     (ruby ruby-mode)
+		     (rust rust-mode)
+		     (scala scala-mode)
+		     (shell shell-script-mode)
+		     (smalltalk smalltalk-mode)
+		     (sql sql-mode)
+		     (swift swift-mode)
+		     (visualbasic visual-basic-mode)
+		     (xml sgml-mode)))
+	      (language (language-detection-string
+			 (buffer-substring-no-properties (point-min) (point-max))))
+	      (modes (cdr (assoc language map)))
+	      (mode (cl-loop for mode in modes
+			     when (fboundp mode)
+			     return mode)))
+	 (message (format "%s" language))
+	 (when (fboundp mode)
+	   mode)))
+
+     (setq shr-external-rendering-functions
+	   '((pre . eww-tag-pre)))
    #+end_src
 ** Info
    #+begin_src emacs-lisp
@@ -394,6 +475,7 @@
       (modalka-define-kbd "g q" "M-m g q")
       (modalka-define-kbd "g w" "C-x 3")
       (modalka-define-kbd "g W" "C-x 2")
+      (modalka-define-kbd "g x" "M-m g x")
       (modalka-define-kbd "g @" "M-m g @")
       (modalka-define-kbd "g ;" "M-m g ;")
       (modalka-define-kbd "g :" "M-m g :")
@@ -1244,6 +1326,11 @@
       "SPC M" "make in current dir")
   #+end_src
 * 视觉相关
+** 文字居中
+   #+begin_src emacs-lisp
+     (use-package centered-window
+       :ensure t)
+   #+end_src
 ** Volatile highlights
    #+begin_src emacs-lisp
      (use-package volatile-highlights
@@ -1771,39 +1858,9 @@
 * 阅读相关
 ** epub阅读
    #+begin_src emacs-lisp
-     (use-package justify-kp
-       :ensure t)
-
-     (defun my-nov-window-configuration-change-hook ()
-       (my-nov-post-html-render-hook)
-       (remove-hook 'window-configuration-change-hook
-		    'my-nov-window-configuration-change-hook
-		    t))
-
-     (defun my-nov-post-html-render-hook ()
-       (if (get-buffer-window)
-	   (let ((max-width (pj-line-width))
-		 buffer-read-only)
-	     (save-excursion
-	       (goto-char (point-min))
-	       (while (not (eobp))
-		 (when (not (looking-at "^[[:space:]]*$"))
-		   (goto-char (line-end-position))
-		   (when (> (shr-pixel-column) max-width)
-		     (goto-char (line-beginning-position))
-		     (pj-justify)))
-		 (forward-line 1))))
-	 (add-hook 'window-configuration-change-hook
-		   'my-nov-window-configuration-change-hook
-		   nil t)))
-
      (use-package nov
        :ensure t
-       :init
-       (setq nov-text-width most-positive-fixnum)
-       :mode ("\\.epub\\'" . nov-mode)
-       :config
-       (add-hook 'nov-post-html-render-hook 'my-nov-post-html-render-hook))
+       :mode ("\\.epub\\'" . nov-mode))
    #+end_src
 * Org相关
 ** 基础设置
@@ -1989,6 +2046,17 @@
    #+begin_src emacs-lisp
      (use-package org-download
        :ensure t)
+   #+end_src
+** Org reference
+   #+begin_src emacs-lisp
+     (use-package org-ref
+       :ensure t
+       :init
+       (setq org-ref-completion-library 'org-ref-ivy-bibtex)
+       (setq org-ref-notes-directory "~/Notes/references/notes"
+	     org-ref-bibliography-notes "~/Notes/references/articles.org"
+	     org-ref-default-bibliography '("~/Notes/references/pl.bib")
+	     org-ref-pdf-directory "~/Notes/references/pdfs"))
    #+end_src
 ** org-brain
    #+begin_src emacs-lisp
