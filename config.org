@@ -173,6 +173,7 @@
        :ensure t)
 
      (require 'cl-lib)
+     (require 'shr)
 
      (defun eww-tag-pre (dom)
        (let ((shr-folding-mode 'none)
@@ -1655,8 +1656,16 @@
    #+end_src
 ** Smartparens
    #+begin_src emacs-lisp
+     (defun st/create-newline-and-enter-sexp (&rest _ignored)
+       "Open a new brace or bracket expression, with relevant newlines and indent. "
+       (newline)
+       (indent-according-to-mode)
+       (forward-line -1)
+       (indent-according-to-mode))
+
      (use-package smartparens
        :ensure t
+       :commands (sp-local-pair)
        :bind* (("M-m m j" . sp-down-sexp)
 	       ("M-m m k" . sp-backward-up-sexp)
 	       ("M-m m h" . sp-backward-down-sexp)
@@ -1690,6 +1699,7 @@
        (smartparens-global-mode)
        (smartparens-global-strict-mode)
        (show-smartparens-global-mode)
+       (sp-local-pair 'prog-mode "{" nil :post-handlers '((st/create-newline-and-enter-sexp "RET")))
        (which-key-add-key-based-replacements
 	 "M-m m" "move prefix"))
 
