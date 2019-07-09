@@ -1699,7 +1699,7 @@
        (smartparens-global-mode)
        (smartparens-global-strict-mode)
        (show-smartparens-global-mode)
-       (sp-local-pair 'prog-mode "{" nil :post-handlers '((st/create-newline-and-enter-sexp "RET")))
+       (sp-local-pair 'prog-mode "{" "}" :post-handlers '((st/create-newline-and-enter-sexp "RET")))
        (which-key-add-key-based-replacements
 	 "M-m m" "move prefix"))
 
@@ -1952,6 +1952,7 @@
 ** Capture
    #+begin_src emacs-lisp
      (defvar org-agenda-file-inbox "~/Notes/brain/Inbox.org")
+     (defvar org-agenda-file-bookmarks "~/Notes/brain/Bookmarks.org")
      (setq-default org-directory "~/Notes/brain"
 		   org-default-notes-file "~/Notes/brain/Inbox.org")
      (setq-default org-capture-templates
@@ -1960,7 +1961,10 @@
 		     ("n" "note" entry (file org-agenda-file-inbox)
 		      "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
 		     ("b" "brain" plain (function org-brain-goto-end)
-		      "* %i%?" :empty-lines 1)))
+		      "* %i%?" :empty-lines 1)
+		     ("p" "Org Protocol")
+		     ("pb" "Protocol Bookmarks" entry (file+headline org-agenda-file-bookmarks "Bookmarks")
+		      "* %U - %:annotation %:initial" :immediate-finish t :kill-buffer t)))
      (setq-default org-refile-targets '((nil :maxlevel . 9)
 					(org-agenda-files :maxlevel . 9))
 	   org-refile-use-outline-path t
