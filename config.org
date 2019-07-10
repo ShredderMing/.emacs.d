@@ -1955,6 +1955,8 @@
      (defvar org-agenda-file-bookmarks "~/Notes/brain/Bookmarks.org")
      (setq-default org-directory "~/Notes/brain"
 		   org-default-notes-file "~/Notes/brain/Inbox.org")
+     (require 'org-protocol)
+     ;; [[https://github.com/toure00/org-capture-tag-bookmark]]
      (setq-default org-capture-templates
 		   '(("t" "todo" entry (file org-agenda-file-inbox)
 		      "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
@@ -1964,6 +1966,8 @@
 		      "* %i%?" :empty-lines 1)
 		     ("p" "Org Protocol")
 		     ("pb" "Protocol Bookmarks" entry (file+headline org-agenda-file-bookmarks "Bookmarks")
+		      "* %U - %:annotation %:initial" :immediate-finish t :kill-buffer t)
+		     ("pn" "Protocol Notes" entry (file org-agenda-file-inbox)
 		      "* %U - %:annotation %:initial" :immediate-finish t :kill-buffer t)))
      (setq-default org-refile-targets '((nil :maxlevel . 9)
 					(org-agenda-files :maxlevel . 9))
@@ -2665,6 +2669,11 @@
       (setq bongo-display-header-icons nil)
       (setq bongo-display-track-icons nil)
       (setq bongo-enabled-backends '(vlc)))
+  #+end_src
+* 启动emacs server
+  主要是为了org-protocol
+  #+begin_src emacs-lisp
+    (server-start)
   #+end_src
 * 参考的配置（不完全）
   - [[https://sriramkswamy.github.io/dotemacs/][https://sriramkswamy.github.io/dotemacs/]]
