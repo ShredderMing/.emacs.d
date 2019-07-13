@@ -2220,7 +2220,7 @@
 * 开发相关
 ** company
 #+begin_src emacs-lisp
-  (use-package company
+    (use-package company
       :ensure t
       :commands (company-mode
 		 company-complete
@@ -2231,7 +2231,6 @@
 		 company-ispell
 		 company-c-headers
 		 company-jedi
-		 company-tern
 		 company-web-html)
       :init
       (setq-default company-minimum-prefix-length 2
@@ -2250,13 +2249,13 @@
 	     ("C-c a" . company-dabbrev)
 	     ("C-c d" . company-ispell)
 	     :map company-active-map
-		  ("C-n"    . company-select-next)
-		  ("C-p"    . company-select-previous)
-		  ([return] . company-complete-selection)
-		  ([tab] . company-complete-selection)
-		  ("C-w"    . backward-kill-word)
-		  ("C-c"    . company-abort)
-		  ("C-c"    . company-search-abort))
+	     ("C-n"    . company-select-next)
+	     ("C-p"    . company-select-previous)
+	     ([return] . company-complete-selection)
+	     ([tab] . company-complete-selection)
+	     ("C-w"    . backward-kill-word)
+	     ("C-c"    . company-abort)
+	     ("C-c"    . company-search-abort))
       :diminish (company-mode . "ς")
       :config
       (global-company-mode)
@@ -2272,21 +2271,38 @@
 	:bind (("C-c j" . company-jedi))
 	:config
 	(add-to-list 'company-backends 'company-jedi))
-      ;; Tern for JS
-      (use-package company-tern
-	:ensure t
-	:bind (("C-c t" . company-tern))
-	:init
-	(setq company-tern-property-marker "")
-	(setq company-tern-meta-as-single-line t)
-	:config
-	(add-to-list 'company-backends 'company-tern))
       ;; HTML completion
       (use-package company-web
 	:ensure t
 	:bind (("C-c w" . company-web-html))
 	:config
-	(add-to-list 'company-backends 'company-web-html)))
+	(add-to-list 'company-backends 'company-web-html))
+      (use-package company-box
+	:ensure t
+	:hook (company-mode . company-box-mode)))
+   #+end_src
+** lsp
+   #+begin_src emacs-lisp
+     (use-package lsp-mode
+       :ensure t
+       :hook (js2-mode . lsp)
+       :commands lsp)
+
+     ;;optionally
+     (use-package lsp-ui
+       :ensure t
+       :init
+       (setq lsp-ui-sideline-enable nil)
+       :commands (lsp-ui-mode))
+     (use-package company-lsp
+       :ensure t
+       :commands company-lsp)
+     (use-package helm-lsp
+       :ensure t
+       :commands helm-lsp-workspace-symbol)
+     (use-package lsp-treemacs
+       :ensure t
+       :commands lsp-treemacs-errors-list)
    #+end_src
 ** 语法检查
    #+begin_src emacs-lisp
@@ -2357,13 +2373,7 @@
        :mode "\\.toml\\'")
    #+end_src
 ** Web
-*** tern
-    #+begin_src emacs-lisp
-      (use-package tern
-	:ensure t
-	:diminish tern-mode
-	:hook ((js2-mode react-mode). tern-mode))
-    #+end_src
+
 *** emmet-mode
     #+begin_src emacs-lisp
       (use-package emmet-mode
