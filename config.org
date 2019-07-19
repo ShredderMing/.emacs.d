@@ -2220,66 +2220,80 @@
 * 开发相关
 ** company
 #+begin_src emacs-lisp
-    (use-package company
+  (use-package company
+    :ensure t
+    :commands (company-mode
+	       company-complete
+	       company-complete-common
+	       company-complete-common-or-cycle
+	       company-files
+	       company-dabbrev
+	       company-ispell
+	       company-c-headers
+	       company-jedi
+	       company-web-html)
+    :init
+    (setq-default company-minimum-prefix-length 2
+		  company-require-match 0
+		  company-selection-wrap-around t
+		  company-dabbrev-downcase nil
+		  company-tooltip-limit 20                      ; bigger popup window
+		  company-tooltip-align-annotations 't          ; align annotations to the right tooltip border
+		  company-idle-delay .4                         ; decrease delay before autocompletion popup shows
+		  company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
+    (eval-after-load 'company
+      '(add-to-list 'company-backends '(company-files
+					company-capf)))
+    :bind (("M-t"   . company-complete)
+	   ("C-c f" . company-files)
+	   ("C-c a" . company-dabbrev)
+	   ("C-c d" . company-ispell)
+	   :map company-active-map
+	   ("C-n"    . company-select-next)
+	   ("C-p"    . company-select-previous)
+	   ([return] . company-complete-selection)
+	   ([tab] . company-complete-selection)
+	   ("C-w"    . backward-kill-word)
+	   ("C-c"    . company-abort)
+	   ("C-c"    . company-search-abort))
+    :diminish (company-mode . "ς")
+    :config
+    (global-company-mode)
+    ;; C++ header completion
+    (use-package company-c-headers
       :ensure t
-      :commands (company-mode
-		 company-complete
-		 company-complete-common
-		 company-complete-common-or-cycle
-		 company-files
-		 company-dabbrev
-		 company-ispell
-		 company-c-headers
-		 company-jedi
-		 company-web-html)
-      :init
-      (setq-default company-minimum-prefix-length 2
-		    company-require-match 0
-		    company-selection-wrap-around t
-		    company-dabbrev-downcase nil
-		    company-tooltip-limit 20                      ; bigger popup window
-		    company-tooltip-align-annotations 't          ; align annotations to the right tooltip border
-		    company-idle-delay .4                         ; decrease delay before autocompletion popup shows
-		    company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
-      (eval-after-load 'company
-	'(add-to-list 'company-backends '(company-files
-					  company-capf)))
-      :bind (("M-t"   . company-complete)
-	     ("C-c f" . company-files)
-	     ("C-c a" . company-dabbrev)
-	     ("C-c d" . company-ispell)
-	     :map company-active-map
-	     ("C-n"    . company-select-next)
-	     ("C-p"    . company-select-previous)
-	     ([return] . company-complete-selection)
-	     ([tab] . company-complete-selection)
-	     ("C-w"    . backward-kill-word)
-	     ("C-c"    . company-abort)
-	     ("C-c"    . company-search-abort))
-      :diminish (company-mode . "ς")
+      :bind (("C-c c" . company-c-headers))
       :config
-      (global-company-mode)
-      ;; C++ header completion
-      (use-package company-c-headers
-	:ensure t
-	:bind (("C-c c" . company-c-headers))
-	:config
-	(add-to-list 'company-backends 'company-c-headers))
-      ;; Python auto completion
-      (use-package company-jedi
-	:ensure t
-	:bind (("C-c j" . company-jedi))
-	:config
-	(add-to-list 'company-backends 'company-jedi))
-      ;; HTML completion
-      (use-package company-web
-	:ensure t
-	:bind (("C-c w" . company-web-html))
-	:config
-	(add-to-list 'company-backends 'company-web-html))
-      (use-package company-box
-	:ensure t
-	:hook (company-mode . company-box-mode)))
+      (add-to-list 'company-backends 'company-c-headers))
+    ;; Python auto completion
+    (use-package company-jedi
+      :ensure t
+      :bind (("C-c j" . company-jedi))
+      :config
+      (add-to-list 'company-backends 'company-jedi))
+    ;; HTML completion
+    (use-package company-web
+      :ensure t
+      :bind (("C-c w" . company-web-html))
+      :config
+      (add-to-list 'company-backends 'company-web-html))
+    (use-package company-box
+      :ensure t
+      :hook (company-mode . company-box-mode))
+    ;; A company-mode backend for TabNine
+    (use-package company-tabnine
+      :ensure t
+      :init
+      (setq company-idle-delay 0)
+      (setq company-show-numbers t)
+      :config
+      (company-tng-configure-default)
+      (setq company-frontends
+	    '(company-tng-frontend
+	      company-pseudo-tooltip-frontend
+	      company-echo-metadata-frontend))
+      (add-to-list 'company-backends #'company-tabnine)))
+
    #+end_src
 ** lsp
    #+begin_src emacs-lisp
