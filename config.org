@@ -363,6 +363,11 @@
      (use-package try
        :ensure t)
    #+end_src
+** Proxy
+   #+begin_src emacs-lisp
+     (use-package proxy-mode
+       :ensure t)
+   #+end_src
 * Modal editing
 ** 初始化
    #+begin_src emacs-lisp
@@ -2292,8 +2297,7 @@
 	    '(company-tng-frontend
 	      company-pseudo-tooltip-frontend
 	      company-echo-metadata-frontend))
-      (add-to-list 'company-backends #'company-tabnine)))
-
+      (add-to-list 'company-backends 'company-tabnine)))
    #+end_src
 ** lsp
    #+begin_src emacs-lisp
@@ -2391,6 +2395,8 @@
     #+begin_src emacs-lisp
       (use-package prettier-js
 	:ensure t
+	:init
+	(setq prettier-js-command "prettier-eslint")
 	:hook (js2-mode . prettier-js-mode))
     #+end_src
 *** emmet-mode
