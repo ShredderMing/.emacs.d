@@ -15,15 +15,17 @@
       "Location of the package archive.")
     (setq package-archive-upload-base local-archive)
     (setq package-archives `(("gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                             ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-                             ("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
-                             ("local" . ,local-archive)))
-
+			     ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+			     ("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
+			     ("local" . ,local-archive)))
+    (add-to-list 'load-path "~/.emacs.d/others")
     (package-initialize)
     (unless (package-installed-p 'use-package)
       (package-refresh-contents)
       (package-install 'use-package))
     (require 'use-package))
+
+
 #+end_src
 ** Auto tangle
    保存时，自动导出配置代码并编译，由于编译速度慢，用async包优化
@@ -1335,7 +1337,9 @@
 ** 文字居中
    #+begin_src emacs-lisp
      (use-package centered-window
-       :ensure t)
+       :ensure t
+       :init
+       (setq cwm-centered-window-width 120))
    #+end_src
 ** Volatile highlights
    #+begin_src emacs-lisp
@@ -2212,6 +2216,12 @@
        "a s"   "mark org subtree"
        "o RET" "org open link")
    #+end_src
+* Calibre Library
+  #+begin_src emacs-lisp
+    (require 'calibre-mode)
+    (setq sql-sqlite-program "/usr/bin/sqlite3"
+	  calibre-root-dir (expand-file-name "~/Calibre Library"))
+  #+end_src
 * Blog
   #+begin_src emacs-lisp
     (use-package blog-admin
