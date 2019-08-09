@@ -237,17 +237,6 @@
         ("v" "open with default viewer"
          (lambda (res)
            (calibre-open-with-default-opener (getattr res :file-path))))
-        ("x" "open with xournal"
-         (lambda (res)
-           (start-process "xournal-process" "*Messages*" "xournal"
-                          (let ((xoj-file-path (concat calibre-root-dir "/"
-                                                       (getattr res :book-dir)
-                                                       "/"
-                                                       (getattr res :book-name)
-                                                       ".xoj")))
-                            (if (file-exists-p xoj-file-path)
-                                xoj-file-path
-                              (getattr res :file-path))))))
         ("s" "insert calibre search string"
          (lambda (res) (mark-aware-copy-insert
                         (concat "title:\"" (getattr res :book-title) "\""))))
@@ -292,6 +281,10 @@
                            (concat (calibre-chomp (getattr res :author-sort))
                                    ", "
                                    (getattr res :book-title))))))
+	("l" "insert calibre link"
+	 (lambda (res)
+	   (insert (format "[[calibre:%s]]"
+			   (getattr res :book-title)))))
         ("j" "insert entry json"
          (lambda (res) (mark-aware-copy-insert (json-encode res))))
         ("X" "open as plaintext in new buffer (via pdftotext)"
