@@ -388,6 +388,27 @@
             (calibre-file-interaction-menu (car res-list))
           (calibre-format-selector-menu res-list))))))
 
+(defun calibre-find-epub (&optional custom-query)
+  (interactive)
+  (let* ((sql-query (if custom-query
+                        custom-query
+                      (calibre-build-default-query (calibre-read-query-filter-command))))
+         (query-result (calibre-query sql-query))
+         (line-list (split-string (calibre-chomp query-result) "\n"))
+	 (res-list (mapcar #'(lambda (line) (calibre-query-to-alist line)) line-list))
+	 (epub-list (seq-filter
+		     (lambda (item)
+		       (if (string= (getattr item :book-format) "epub") t nil))
+		     res-list))
+         (num-result (length epub-list)))
+    (if (= 0 num-result)
+        (progn
+          (message "nothing found.")
+          (deactivate-mark))
+      (if (= 1 (length epub-list))
+	  (calibre-file-interaction-menu (car epub-list))
+        (calibre-format-selector-menu epub-list)))))
+
 (global-set-key "\C-cK" 'calibre-open-citekey)
 
 ;; ORG MODE INTERACTION

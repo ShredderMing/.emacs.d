@@ -9,2700 +9,2998 @@
   (require 'package)
   (setq package-enable-at-startup nil)
   (require 'package-x)
+
+  ;; local文件夹可以存放自己写的包，然后通过use-package安装，但是如果修改的话需要重新安装
   (defvar local-archive
     (expand-file-name "local/" user-emacs-directory)
     "Location of the package archive.")
+
   (setq package-archive-upload-base local-archive)
+
   (setq package-archives `(("gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-			   ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-			   ("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
-			   ("local" . ,local-archive)))
-  (add-to-list 'load-path "~/.emacs.d/others")
+                           ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+                           ("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
+                           ("local" . ,local-archive)))
+
+  ;; 该文件夹存放一些代码片段，比如一些还没有形成包的代码。
+  (add-to-list 'load-path "~/.emacs.d/customs")
+
   (package-initialize)
+
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
-  (require 'use-package)
+
+  (eval-when-compile
+    (require 'use-package)
+    (setq use-package-always-ensure t))
+
+  (use-package diminish
+    :demand t
+    :diminish (visual-line-mode . " vl")
+    :diminish hs-minor-mode
+    :diminish abbrev-mode
+    :diminish auto-fill-function
+    :diminish subword-mode
+    :diminish eldoc-mode)
 #+end_src
 ** Auto tangle
-   保存时，自动导出配置代码并编译，由于编译速度慢，用async包优化
-   #+begin_src emacs-lisp
-     (use-package async
-       :ensure t
-       :commands (async-start))
-   #+end_src
-   保存时自动编译
-   #+begin_src emacs-lisp
-     (defun tangle-init ()
-       (when (equal (buffer-file-name)
-		    (expand-file-name (concat user-emacs-directory "config.org")))
-	 (message "Tangling...")
-	 (async-start
-	  (lambda ()
-	    (let ((prog-mode-hook nil)
-		  (src (expand-file-name "config.org" user-emacs-directory))
-		  (dest (expand-file-name "config.el" user-emacs-directory)))
-	      (require 'ob-tangle)
-	      (org-babel-tangle-file src dest)))
-	  (lambda (result)
-	    (message "Tangling completed: %s" result)))))
-     (add-hook 'after-save-hook 'tangle-init)
-   #+end_src
+保存时，自动导出配置代码并编译，由于编译速度慢，用async包优化
+#+begin_src emacs-lisp
+  (use-package async)
+#+end_src
+保存时自动编译
+#+begin_src emacs-lisp
+  (defun tangle-init ()
+    (when (equal (buffer-file-name)
+                 (expand-file-name (concat user-emacs-directory "config.org")))
+      (message "Tangling...")
+      (async-start
+       (lambda ()
+         (let ((prog-mode-hook nil)
+               (src (expand-file-name "config.org" user-emacs-directory))
+               (dest (expand-file-name "config.el" user-emacs-directory)))
+           (require 'ob-tangle)
+           (org-babel-tangle-file src dest)))
+       (lambda (result)
+         (message "Tangling completed: %s" result)))))
+  (add-hook 'after-save-hook 'tangle-init)
+#+end_src
 ** tools
-   #+begin_src emacs-lisp
-     (defun add-auto-mode (mode &rest patterns)
-       "Add entries to 'auto-mode-alist to use 'MODE' for all given file 'PATTERNS'."
-       (dolist (pattern patterns)
-'	 (add-to-list 'auto-mode-alist (cons pattern mode))))
+#+begin_src emacs-lisp
+  (defun add-auto-mode (mode &rest patterns)
+    "Add entries to 'auto-mode-alist to use 'MODE' for all given file 'PATTERNS'."
+    (dolist (pattern patterns)
+      '	 (add-to-list 'auto-mode-alist (cons pattern mode))))
 
-     (defun add-magic-mode (mode &rest patterns)
-       "Add entries to 'magic-mode-alist' to use 'MODE' for all given file 'PATTERNS'."
-       (dolist (pattern patterns)
-	 (add-to-list 'magic-mode-alist (cons pattern mode))))
-   #+end_src
+  (defun add-magic-mode (mode &rest patterns)
+    "Add entries to 'magic-mode-alist' to use 'MODE' for all given file 'PATTERNS'."
+    (dolist (pattern patterns)
+      (add-to-list 'magic-mode-alist (cons pattern mode))))
+#+end_src
 ** frame尺寸
-   #+begin_src emacs-lisp
-     (setq initial-frame-alist '((width . 102) (height . 54)))
-     (setq default-frame-alist '((width . 100) (height . 52)))
-   #+end_src
+#+begin_src emacs-lisp
+  (setq initial-frame-alist '((width . 102) (height . 54)))
+  (setq default-frame-alist '((width . 100) (height . 52)))
+#+end_src
 ** margin
-   #+begin_src emacs-lisp
-     (setq-default left-margin-width 1 right-margin-width 1)
-     (set-window-buffer nil (current-buffer))
-   #+end_src
+#+begin_src emacs-lisp
+  (setq-default left-margin-width 1 right-margin-width 1)
+  (set-window-buffer nil (current-buffer))
+#+end_src
 ** 编码
-   #+begin_src emacs-lisp
-     (prefer-coding-system 'utf-8)
-     (setq-default buffer-file-coding-system 'utf-8-auto-unix)
-   #+end_src
+#+begin_src emacs-lisp
+  (prefer-coding-system 'utf-8)
+  (setq-default buffer-file-coding-system 'utf-8-auto-unix)
+#+end_src
 ** 基础设置
-   #+begin_src emacs-lisp
-     (setq inhibit-startup-message t
-	   inhibit-startup-screen t
-	   echo-keystrokes 0.1
-	   initial-scratch-message nil
-	   sentence-end-double-space nil)
-     (fset 'yes-or-no-p 'y-or-n-p)
-     (setq-default truncate-lines t)
+#+begin_src emacs-lisp
+  (setq inhibit-startup-message t
+        inhibit-startup-screen t
+        echo-keystrokes 0.1
+        initial-scratch-message nil
+        sentence-end-double-space nil)
+  (fset 'yes-or-no-p 'y-or-n-p)
+  (setq-default truncate-lines t)
 
-     (tool-bar-mode 0)
-     (menu-bar-mode 0)
-     (fringe-mode 0)
-     (scroll-bar-mode 0)
-     (tooltip-mode 0)
+  (tool-bar-mode 0)
+  (menu-bar-mode 0)
+  (fringe-mode 0)
+  (scroll-bar-mode 0)
+  (tooltip-mode 0)
 
-     (column-number-mode 1)
-     (subword-mode 1)
-     (global-hl-line-mode 1)
+  (column-number-mode 1)
+  (subword-mode 1)
+  (global-hl-line-mode 1)
 
-     ;; custom file
-     (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-     (when (file-exists-p custom-file)
-       (load custom-file))
-   #+end_src
+  ;; custom file
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (when (file-exists-p custom-file)
+    (load custom-file))
+#+end_src
 ** 光标
-   #+begin_src emacs-lisp
-     (setq-default cursor-type '(bar . 1))
-     (setq cursor-in-non-selected-windows t)
-     (blink-cursor-mode 0)
-   #+end_src
+#+begin_src emacs-lisp
+  (setq-default cursor-type '(bar . 1))
+  (setq cursor-in-non-selected-windows t)
+  (blink-cursor-mode 0)
+#+end_src
 ** 备份以及自动保存
-   #+begin_src emacs-lisp
-     (setq backup-by-copying t
-	   backup-directory-alist
-	   '(("." . "~/.saves"))
-	   delete-old-versions t
-	   kept-new-versions 6
-	   kept-old-versions 2
-	   version-control t)
-     (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
-	   create-lockfiles nil)
-   #+end_src
+#+begin_src emacs-lisp
+  (setq backup-by-copying t
+        backup-directory-alist
+        '(("." . "~/.saves"))
+        delete-old-versions t
+        kept-new-versions 6
+        kept-old-versions 2
+        version-control t)
+  (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t))
+        create-lockfiles nil)
+#+end_src
 ** 大文件警告
-   #+begin_src emacs-lisp
-     (setq large-file-warning-threshold (* 15 1024 1024))
-   #+end_src
+#+begin_src emacs-lisp
+  (setq large-file-warning-threshold (* 15 1024 1024))
+#+end_src
 ** 远程编辑文件（tramp）
-   #+begin_src emacs-lisp
-     (use-package tramp
-       :config
-       (setq tramp-default-method "ssh"
-	     tramp-backup-directory-alist backup-directory-alist))
-     (use-package tramp-sh
-       :config
-       (setq tramp-ssh-controlmaster-options "ssh"))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package tramp
+    :config
+    (setq tramp-default-method "ssh"
+          tramp-backup-directory-alist backup-directory-alist))
+#+end_src
 ** 最近打开的文件
-   #+begin_src emacs-lisp
-     (use-package recentf
-       :config
-       (setq recentf-max-saved-items 1000
-	     recentf-exclude '("/tmp/" "/ssh:"))
-       (recentf-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package recentf
+    :config
+    (setq recentf-max-saved-items 1000
+          recentf-exclude '("/tmp/" "/ssh:"))
+    (recentf-mode))
+#+end_src
 ** 文件浏览（dired）
-   #+begin_src emacs-lisp
-     (use-package dired
-       :bind (:map dired-mode-map
-		   ("C-c C-e" . wdired-change-to-wdired-mode))
-       :init
-       (setq dired-dwim-target t
-	     dired-recursive-copies 'top
-	     dired-recursive-deletes 'top
-	     dired-listing-switches "-alh")
-       :config
-       (add-hook 'dired-mode-hook 'dired-hide-details-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil
+    :bind (:map dired-mode-map
+                ("C-c C-e" . wdired-change-to-wdired-mode))
+    :init
+    (setq dired-dwim-target t
+          dired-recursive-copies 'top
+          dired-recursive-deletes 'top
+          dired-listing-switches "-alh")
+    :config
+    (add-hook 'dired-mode-hook 'dired-hide-details-mode))
+#+end_src
 ** 内置浏览器（eww）
-   #+begin_src emacs-lisp
-	  (use-package eww
-	    :bind* (("M-m g x" . eww)
-		    ("M-m g :" . eww-browse-with-external-browser)
-		    ("M-m g #" . eww-list-histories)
-		    ("M-m g {" . eww-back-url)
-		    ("M-m g }" . eww-forward-url))
-	    :config
-	    (add-hook 'eww-mode-hook 'visual-line-mode))
+#+begin_src emacs-lisp
+  (use-package eww
+    :init (setq eww-search-prefix "https://dogedoge.com/results?q=")
+    :bind* (("M-m g x" . eww)
+            ("M-m g :" . eww-browse-with-external-browser)
+            ("M-m g #" . eww-list-histories)
+            ("M-m g {" . eww-back-url)
+            ("M-m g }" . eww-forward-url))
+    :config
+    (add-hook 'eww-mode-hook 'visual-line-mode))
 
-	  (use-package language-detection
-	    :ensure t
-	    :commands (language-detection-string))
-
-	  (require 'cl-lib)
-	  (require 'shr)
-
-	  (defun eww-tag-pre (dom)
-	    (let ((shr-folding-mode 'none)
-		  (shr-current-font 'default))
-	      (shr-ensure-newline)
-	      (insert (eww-fontify-pre dom))
-	      (shr-ensure-newline)))
-
-	  (defun eww-fontify-pre (dom)
-	    (with-temp-buffer
-	      (shr-generic dom)
-	      (let ((mode (eww-buffer-auto-detect-mode)))
-		(when mode
-		  (eww-fontify-buffer mode)))
-	      (buffer-string)))
-
-	  (defun eww-fontify-buffer (mode)
-	    (delay-mode-hooks (funcall mode))
-	    (font-lock-default-function mode)
-	    (font-lock-default-fontify-region (point-min)
-					      (point-max)
-					      nil))
-
-	  (defun eww-buffer-auto-detect-mode ()
-	    (let* ((map '((ada ada-mode)
-			  (awk awk-mode)
-			  (c c-mode)
-			  (cpp c++-mode)
-			  (clojure clojure-mode lisp-mode)
-			  (csharp csharp-mode java-mode)
-			  (css css-mode)
-			  (dart dart-mode)
-			  (delphi delphi-mode)
-			  (emacslisp emacs-lisp-mode)
-			  (erlang erlang-mode)
-			  (fortran fortran-mode)
-			  (fsharp fsharp-mode)
-			  (go go-mode)
-			  (groovy groovy-mode)
-			  (haskell haskell-mode)
-			  (html html-mode)
-			  (java java-mode)
-			  (javascript javascript-mode)
-			  (json json-mode javascript-mode)
-			  (latex latex-mode)
-			  (lisp lisp-mode)
-			  (lua lua-mode)
-			  (matlab matlab-mode octave-mode)
-			  (objc objc-mode c-mode)
-			  (perl perl-mode)
-			  (php php-mode)
-			  (prolog prolog-mode)
-			  (python python-mode)
-			  (r r-mode)
-			  (ruby ruby-mode)
-			  (rust rust-mode)
-			  (scala scala-mode)
-			  (shell shell-script-mode)
-			  (smalltalk smalltalk-mode)
-			  (sql sql-mode)
-			  (swift swift-mode)
-			  (visualbasic visual-basic-mode)
-			  (xml sgml-mode)))
-		   (language (language-detection-string
-			      (buffer-substring-no-properties (point-min) (point-max))))
-		   (modes (cdr (assoc language map)))
-		   (mode (cl-loop for mode in modes
-				  when (fboundp mode)
-				  return mode)))
-	      (message (format "%s" language))
-	      (when (fboundp mode)
-		mode)))
-
-	  (setq shr-external-rendering-functions
-		'((pre . eww-tag-pre)))
-   #+end_src
-** Info
-   #+begin_src emacs-lisp
-     (use-package info
-       :bind* (("M-m g (" . Info-prev)
-	       ("M-m g )" . Info-next)
-	       ("M-m ^" . Info-up)
-	       ("M-m &" . Info-goto-node)))
-   #+end_src
+  (use-package shr-tag-pre-highlight
+    :ensure t
+    :after shr
+    :config
+    (add-to-list 'shr-external-rendering-functions
+                 '(pre . shr-tag-pre-highlight)))
+#+end_src
 ** doc
-   #+begin_src emacs-lisp
-     (use-package doc-view
-       :commands (doc-view-next-page doc-view-previous-page)
-       :config
-       (setq doc-view-continuous t))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package doc-view
+    :config
+    (setq doc-view-continuous t))
+#+end_src
 ** winner-mode
-   #+begin_src emacs-lisp
-     (use-package winner
-       :commands (winner-undo winner-redo)
-       :config
-       (winner-mode 1))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package winner
+    :config
+    (winner-mode 1))
+#+end_src
+** display line number
+#+begin_src emacs-lisp
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+#+end_src
 ** 按键绑定
-   #+begin_src emacs-lisp
-     (bind-keys*
-       ("C-r"       . dabbrev-expand)
-       ("M-/"       . hippie-expand)
-       ("C-S-d"     . kill-whole-line)
-       ("M-m SPC c" . load-theme)
-       ("M-m SPC R" . locate)
-       ("M-m W"     . winner-undo)
-       ("M-m g m"   . make-frame)
-       ("M-m g M"   . delete-frame)
-       ("M-m g n"   . select-frame-by-name)
-       ("M-m g N"   . set-frame-name)
-       ("M-m B"     . mode-line-other-buffer)
-       ("M-m ="     . indent-region)
-       ("M-m g f"   . find-file-at-point)
-       ("M-m g u"   . downcase-region)
-       ("M-m g U"   . upcase-region)
-       ("M-m g C"   . capitalize-region)
-       ("M-m g F"   . follow-mode)
-       ("M-m R"     . overwrite-mode)
-       ("M-m g j"   . doc-view-next-page)
-       ("M-m g k"   . doc-view-previous-page)
-       ("M-m : t"   . emacs-init-time)
-       ("M-m g q"   . fill-paragraph)
-       ("M-m g @"   . compose-mail)
-       ("M-m SPC ?" . describe-bindings))
-   #+end_src
+#+begin_src emacs-lisp
+  (bind-keys*
+   ("C-r"       . dabbrev-expand)
+   ("M-/"       . hippie-expand)
+   ("C-S-d"     . kill-whole-line)
+   ("M-m SPC c" . load-theme)
+   ("M-m SPC R" . locate)
+   ("M-m W"     . winner-undo)
+   ("M-m g m"   . make-frame)
+   ("M-m g M"   . delete-frame)
+   ("M-m g n"   . select-frame-by-name)
+   ("M-m g N"   . set-frame-name)
+   ("M-m B"     . mode-line-other-buffer)
+   ("M-m ="     . indent-region)
+   ("M-m g ("   . Info-prev)
+   ("M-m g )"   . Info-next)
+   ("M-m ^"     . Info-up)
+   ("M-m &"     . Info-goto-node)
+   ("M-m g f"   . find-file-at-point)
+   ("M-m g u"   . downcase-region)
+   ("M-m g U"   . upcase-region)
+   ("M-m g C"   . capitalize-region)
+   ("M-m g F"   . follow-mode)
+   ("M-m R"     . overwrite-mode)
+   ("M-m : t"   . emacs-init-time)
+   ("M-m g q"   . fill-paragraph)
+   ("M-m g @"   . compose-mail)
+   ("M-m SPC ?" . describe-bindings))
+#+end_src
 * 扩展配置
 ** 环境变量
-   #+begin_src emacs-lisp
-     (use-package exec-path-from-shell
-       :ensure t
-       :demand t
-       :init
-       (setq exec-path-from-shell-check-startup-files nil)
-       :config
-       (when (memq window-system '(mac ns x))
-	 (exec-path-from-shell-initialize)))
-   #+end_src
-** 图标
-   #+begin_src emacs-lisp
-     (use-package all-the-icons
-       :ensure t
-       :config (unless (member "all-the-icons" (font-family-list))
-		 (all-the-icons-install-fonts t)))
-   #+end_src
-** 快捷键提示（which key）
-   #+begin_src emacs-lisp
-     (use-package which-key
-       :ensure t
-       :defer t
-       :init
-       (setq which-key-sort-order 'which-key-key-order-alpha)
-       :bind* (("M-m ?" . which-key-show-top-level))
-       :config
-       (which-key-mode)
-       (which-key-add-key-based-replacements
-	"M-m ?" "top level bindings"))
-   #+end_src
-** 词典
-   #+begin_src emacs-lisp
-     (use-package youdao-dictionary
-       :ensure t
-       :bind (("C-c y" . youdao-dictionary-search-at-point))
-       :config
-       (setq url-automatic-caching t))
-   #+end_src
-** 重启emacs
-   #+begin_src emacs-lisp
-     (use-package restart-emacs
-       :ensure t
-       :bind* (("C-x M-c" . restart-emacs)))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
 
-** 全屏切换
-   #+begin_src emacs-lisp
-     
-   #+end_src
+    :demand t
+    :init
+    (setq exec-path-from-shell-check-startup-files nil)
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)))
+#+end_src
+** 图标
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+
+    :config
+    (unless (member "all-the-icons" (font-family-list))
+      (all-the-icons-install-fonts t)))
+#+end_src
+** Emoji
+#+begin_src emacs-lisp
+  (use-package emojify
+
+    :hook
+    (after-init . global-emojify-mode))
+#+end_src
+** Dashboard
+#+begin_src emacs-lisp
+  ;; (use-package dashboard
+
+  ;;   :init
+  ;;   (setq
+  ;;    dashboard-startup-banner "~/.emacs.d/logo.png"
+  ;;    dashboard-banner-logo-title "Try your best, and you can be the best!"
+  ;;    dashboard-center-content t
+  ;;    dashboard-page-separator "\n\n"
+  ;;    dashboard-set-heading-icons t
+  ;;    dashboard-set-file-icons t
+  ;;    dashboard-items '((recents . 5)
+  ;;                      (projects . 5)
+  ;;                      (agenda . 5))
+  ;;    )
+  ;;   :config
+  ;;   (dashboard-setup-startup-hook))
+#+end_src
+** 快捷键提示（which key）
+#+begin_src emacs-lisp
+  (use-package which-key
+
+    :defer t
+    :diminish which-key-mode
+    :init
+    (setq which-key-sort-order 'which-key-key-order-alpha)
+    :bind* (("M-m ?" . which-key-show-top-level))
+    :config
+    (which-key-mode)
+    (which-key-add-key-based-replacements
+      "M-m ?" "top level bindings"))
+#+end_src
+** 词典
+#+begin_src emacs-lisp
+  (use-package youdao-dictionary
+
+    :init
+    (setq url-automatic-caching t
+          youdao-dictionary-search-history-file "~/.emacs.d/.youdao"
+          x-gtk-use-system-tooltips t)
+    :bind (("C-c y" . youdao-dictionary-search-at-point-tooltip)
+           ("C-c v" . youdao-dictionary-play-voice-at-point)))
+#+end_src
+** 重启emacs
+#+begin_src emacs-lisp
+  (use-package restart-emacs
+
+    :bind* (("C-x M-c" . restart-emacs)))
+#+end_src
 ** 代码图片生成
-   #+begin_src emacs-lisp
-     (use-package carbon-now-sh
-       :ensure t)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package carbon-now-sh
+    )
+#+end_src
 ** 软件包试用（try）
-   #+begin_src emacs-lisp
-     (use-package try
-       :ensure t)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package try
+    )
+#+end_src
 ** Proxy
-   #+begin_src emacs-lisp
-     (use-package proxy-mode
-       :ensure t)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package proxy-mode
+    )
+#+end_src
+** pyim
+#+begin_src emacs-lisp
+  (use-package pyim
+
+    :config
+    ;; 激活 basedict 拼音词库
+    (use-package pyim-basedict
+
+      :config (pyim-basedict-enable))
+
+    ;; posframe
+    (use-package posframe
+      )
+
+    (setq default-input-method "pyim")
+
+    ;; 我使用全拼
+    (setq pyim-default-scheme 'quanpin)
+
+    ;; 设置 pyim 探针设置，这是 pyim 高级功能设置，可以实现 *无痛* 中英文切换 :-)
+    ;; 我自己使用的中英文动态切换规则是：
+    ;; 1. 光标只有在注释里面时，才可以输入中文。
+    ;; 2. 光标前是汉字字符时，才能输入中文。
+    ;; 3. 使用 M-j 快捷键，强制将光标前的拼音字符串转换为中文。
+    (setq-default pyim-english-input-switch-functions
+                  '(pyim-probe-dynamic-english
+                    pyim-probe-isearch-mode
+                    pyim-probe-program-mode
+                    pyim-probe-org-structure-template))
+
+    (setq-default pyim-punctuation-half-width-functions
+                  '(pyim-probe-punctuation-line-beginning
+                    pyim-probe-punctuation-after-punctuation))
+
+    ;; 开启拼音搜索功能
+    (pyim-isearch-mode 1)
+
+    ;; 使用 pupup-el 来绘制选词框
+    (setq pyim-page-tooltip 'posframe)
+
+    ;; 选词框显示5个候选词
+    (setq pyim-page-length 5)
+
+    ;; 让 Emacs 启动时自动加载 pyim 词库
+    (add-hook 'emacs-startup-hook
+              #'(lambda () (pyim-restart-1 t)))
+    :bind
+    (("M-j" . pyim-convert-code-at-point)))
+#+end_src
 * Modal editing
 ** 初始化
-   #+begin_src emacs-lisp
-     (use-package modalka
-       :ensure t
-       :demand t
-       :bind* (("C-z" . modalka-mode))
-       :diminish (modalka-mode . "μ")
-       :init
-       (setq modalka-cursor-type 'box)
-       :config
-       (global-set-key (kbd "<escape>") #'modalka-mode)
-       (modalka-global-mode 1)
-       (add-to-list 'modalka-excluded-modes 'magit-status-mode)
-       (add-to-list 'modalka-excluded-modes 'magit-popup-mode)
-       (add-to-list 'modalka-excluded-modes 'eshell-mode)
-       (add-to-list 'modalka-excluded-modes 'deft-mode)
-       (add-to-list 'modalka-excluded-modes 'term-mode)
-       (add-to-list 'modalka-excluded-modes 'blog-admin-mode)
-       (add-to-list 'modalka-excluded-modes 'org-brain-visualize-mode)
-       (which-key-add-key-based-replacements
-	"M-m"     "Modalka prefix"
-	"M-m :"   "extended prefix"
-	"M-m m"   "move prefix"
-	"M-m s"   "send code prefix"
-	"M-m SPC" "user prefix"
-	"M-m g"   "global prefix"
-	"M-m o"   "org prefix"
-	"M-m a"   "expand around prefix"
-	"M-m i"   "expand inside prefix"
-	"M-m ["   "prev nav prefix"
-	"M-m ]"   "next nav prefix"))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package modalka
+
+    :demand t
+    :bind* (("C-z" . modalka-mode))
+    :diminish modalka-mode
+    :init
+    (setq modalka-cursor-type 'box)
+    :config
+    (global-set-key (kbd "<escape>") #'modalka-mode)
+    (modalka-global-mode 1)
+    (add-to-list 'modalka-excluded-modes 'magit-status-mode)
+    (add-to-list 'modalka-excluded-modes 'magit-popup-mode)
+    (add-to-list 'modalka-excluded-modes 'eshell-mode)
+    (add-to-list 'modalka-excluded-modes 'deft-mode)
+    (add-to-list 'modalka-excluded-modes 'term-mode)
+    (add-to-list 'modalka-excluded-modes 'blog-admin-mode)
+    (add-to-list 'modalka-excluded-modes 'org-brain-visualize-mode)
+    (add-to-list 'modalka-excluded-modes 'nov-mode)
+    (add-to-list 'modalka-excluded-modes 'pdf-view-mode))
+
+  (which-key-add-key-based-replacements
+    "M-m"     "Modalka prefix"
+    "M-m :"   "extended prefix"
+    "M-m m"   "move prefix"
+    "M-m s"   "send code prefix"
+    "M-m SPC" "user prefix"
+    "M-m g"   "global prefix"
+    "M-m o"   "org prefix"
+    "M-m a"   "expand around prefix"
+    "M-m i"   "expand inside prefix"
+    "M-m ["   "prev nav prefix"
+    "M-m ]"   "next nav prefix")
+#+end_src
 ** 按键绑定
 *** Numbers
-    #+begin_src emacs-lisp
-      (modalka-define-kbd "0" "C-0")
-      (modalka-define-kbd "1" "C-1")
-      (modalka-define-kbd "2" "C-2")
-      (modalka-define-kbd "3" "C-3")
-      (modalka-define-kbd "4" "C-4")
-      (modalka-define-kbd "5" "C-5")
-      (modalka-define-kbd "6" "C-6")
-      (modalka-define-kbd "7" "C-7")
-      (modalka-define-kbd "8" "C-8")
-      (modalka-define-kbd "9" "C-9")
-    #+end_src
+#+begin_src emacs-lisp
+  (modalka-define-kbd "0" "C-0")
+  (modalka-define-kbd "1" "C-1")
+  (modalka-define-kbd "2" "C-2")
+  (modalka-define-kbd "3" "C-3")
+  (modalka-define-kbd "4" "C-4")
+  (modalka-define-kbd "5" "C-5")
+  (modalka-define-kbd "6" "C-6")
+  (modalka-define-kbd "7" "C-7")
+  (modalka-define-kbd "8" "C-8")
+  (modalka-define-kbd "9" "C-9")
+#+end_src
 *** Movement and one key presses
-    #+begin_src emacs-lisp
-      (modalka-define-kbd "h" "C-b")
-      (modalka-define-kbd "j" "C-n")
-      (modalka-define-kbd "k" "C-p")
-      (modalka-define-kbd "l" "C-f")
-      (modalka-define-kbd "e" "M-f")
-      (modalka-define-kbd "b" "M-b")
-      (modalka-define-kbd "n" "M-n")
-      (modalka-define-kbd "N" "M-p")
-      (modalka-define-kbd "{" "M-{")
-      (modalka-define-kbd "}" "M-}")
-      (modalka-define-kbd "0" "C-a")
-      (modalka-define-kbd "$" "C-e")
-      (modalka-define-kbd "G" "M->")
-      (modalka-define-kbd "y" "M-w")
-      (modalka-define-kbd "p" "C-y")
-      (modalka-define-kbd "P" "M-y")
-      (modalka-define-kbd "x" "C-d")
-      (modalka-define-kbd "D" "C-k")
-      (modalka-define-kbd "z" "C-l")
-      (modalka-define-kbd "!" "M-&")
-      (modalka-define-kbd "J" "C-v")
-      (modalka-define-kbd "K" "M-v")
-      (modalka-define-kbd "M" "C-u")
-      (modalka-define-kbd "(" "M-a")
-      (modalka-define-kbd ")" "M-e")
-      (modalka-define-kbd "/" "C-s")
-      (modalka-define-kbd "E" "C-g")
-      (modalka-define-kbd "d" "C-w")
-      (modalka-define-kbd "w" "C-x o")
-      (modalka-define-kbd "W" "M-m W")
-      (modalka-define-kbd "B" "M-m B")
-      (modalka-define-kbd "H" "C-x >")
-      (modalka-define-kbd "L" "C-x <")
-      (modalka-define-kbd "Z" "C-x 1")
-      (modalka-define-kbd "q" "C-x (")
-      (modalka-define-kbd "Q" "C-x )")
-      (modalka-define-kbd "." "M-m .")
-      (modalka-define-kbd "?" "M-m ?")
-      (modalka-define-kbd "v" "C-SPC")
-      (modalka-define-kbd "V" "M-m V")
-      (modalka-define-kbd "=" "M-m =")
-      (modalka-define-kbd "R" "M-m R")
-      (modalka-define-kbd "X" "C-x C-x")
-      (modalka-define-kbd "+" "C-x r m")
-      (modalka-define-kbd "'" "C-x r b")
-      (modalka-define-kbd "\\" "C-c C-c")
-    #+end_src
+#+begin_src emacs-lisp
+  (modalka-define-kbd "h" "C-b")
+  (modalka-define-kbd "j" "C-n")
+  (modalka-define-kbd "k" "C-p")
+  (modalka-define-kbd "l" "C-f")
+  (modalka-define-kbd "e" "M-f")
+  (modalka-define-kbd "b" "M-b")
+  (modalka-define-kbd "n" "M-n")
+  (modalka-define-kbd "N" "M-p")
+  (modalka-define-kbd "{" "M-{")
+  (modalka-define-kbd "}" "M-}")
+  (modalka-define-kbd "0" "C-a")
+  (modalka-define-kbd "$" "C-e")
+  (modalka-define-kbd "G" "M->")
+  (modalka-define-kbd "y" "M-w")
+  (modalka-define-kbd "p" "C-y")
+  (modalka-define-kbd "P" "M-y")
+  (modalka-define-kbd "x" "C-d")
+  (modalka-define-kbd "D" "C-k")
+  (modalka-define-kbd "z" "C-l")
+  (modalka-define-kbd "!" "M-&")
+  (modalka-define-kbd "J" "C-v")
+  (modalka-define-kbd "K" "M-v")
+  (modalka-define-kbd "M" "C-u")
+  (modalka-define-kbd "(" "M-a")
+  (modalka-define-kbd ")" "M-e")
+  (modalka-define-kbd "/" "C-s")
+  (modalka-define-kbd "E" "C-g")
+  (modalka-define-kbd "d" "C-w")
+  (modalka-define-kbd "w" "C-x o")
+  (modalka-define-kbd "W" "M-m W")
+  (modalka-define-kbd "B" "M-m B")
+  (modalka-define-kbd "H" "C-x >")
+  (modalka-define-kbd "L" "C-x <")
+  (modalka-define-kbd "Z" "C-x 1")
+  (modalka-define-kbd "." "M-m .")
+  (modalka-define-kbd "?" "M-m ?")
+  (modalka-define-kbd "v" "C-SPC")
+  (modalka-define-kbd "V" "M-m V")
+  (modalka-define-kbd "=" "M-m =")
+  (modalka-define-kbd "R" "M-m R")
+  (modalka-define-kbd "X" "C-x C-x")
+  (modalka-define-kbd "+" "C-x r m")
+  (modalka-define-kbd "'" "C-x r b")
+  (modalka-define-kbd "\\" "C-c C-c")
+#+end_src
 *** Global prefixed keys
-    #+begin_src emacs-lisp
-      (modalka-define-kbd "g g" "M-<")
-      (modalka-define-kbd "g o" "C-x C-e")
-      (modalka-define-kbd "g O" "C-M-x")
-      (modalka-define-kbd "g m" "M-m g m")
-      (modalka-define-kbd "g M" "M-m g M")
-      (modalka-define-kbd "g n" "M-m g n")
-      (modalka-define-kbd "g N" "M-m g N")
-      (modalka-define-kbd "g f" "M-m g f")
-      (modalka-define-kbd "g F" "M-m g F")
-      (modalka-define-kbd "g j" "M-m g j")
-      (modalka-define-kbd "g k" "M-m g k")
-      (modalka-define-kbd "g q" "M-m g q")
-      (modalka-define-kbd "g w" "C-x 3")
-      (modalka-define-kbd "g W" "C-x 2")
-      (modalka-define-kbd "g x" "M-m g x")
-      (modalka-define-kbd "g @" "M-m g @")
-      (modalka-define-kbd "g ;" "M-m g ;")
-      (modalka-define-kbd "g :" "M-m g :")
-      (modalka-define-kbd "g #" "M-m g #")
-      (modalka-define-kbd "g {" "M-m g {")
-      (modalka-define-kbd "g }" "M-m g }")
-      (modalka-define-kbd "g (" "M-m g (")
-      (modalka-define-kbd "g )" "M-m g )")
-      (modalka-define-kbd "^" "M-m ^")
-      (modalka-define-kbd "&" "M-m &")
-      (modalka-define-kbd "g S" "C-j")
-      (modalka-define-kbd "g ?" "C-h k")
-    #+end_src
+#+begin_src emacs-lisp
+  (modalka-define-kbd "g g" "M-<")
+  (modalka-define-kbd "g o" "C-x C-e")
+  (modalka-define-kbd "g O" "C-M-x")
+  (modalka-define-kbd "g m" "M-m g m")
+  (modalka-define-kbd "g M" "M-m g M")
+  (modalka-define-kbd "g n" "M-m g n")
+  (modalka-define-kbd "g N" "M-m g N")
+  (modalka-define-kbd "g f" "M-m g f")
+  (modalka-define-kbd "g F" "M-m g F")
+  (modalka-define-kbd "g q" "M-m g q")
+  (modalka-define-kbd "g w" "C-x 3")
+  (modalka-define-kbd "g W" "C-x 2")
+  (modalka-define-kbd "g x" "M-m g x")
+  (modalka-define-kbd "g @" "M-m g @")
+  (modalka-define-kbd "g ;" "M-m g ;")
+  (modalka-define-kbd "g :" "M-m g :")
+  (modalka-define-kbd "g #" "M-m g #")
+  (modalka-define-kbd "g {" "M-m g {")
+  (modalka-define-kbd "g }" "M-m g }")
+  (modalka-define-kbd "g (" "M-m g (")
+  (modalka-define-kbd "g )" "M-m g )")
+  (modalka-define-kbd "^" "M-m ^")
+  (modalka-define-kbd "&" "M-m &")
+  (modalka-define-kbd "g S" "C-j")
+  (modalka-define-kbd "g ?" "C-h k")
+#+end_src
 *** Select region prefixed keys
-    #+begin_src emacs-lisp
-      (modalka-define-kbd "i a" "C-x h")
-    #+end_src
+#+begin_src emacs-lisp
+  (modalka-define-kbd "i a" "C-x h")
+#+end_src
 *** Forward navigation prefixed keys
-    #+begin_src emacs-lisp
-      (modalka-define-kbd "] ]" "C-x n n")
-      (modalka-define-kbd "] s" "M-m ] s")
-    #+end_src
+#+begin_src emacs-lisp
+  (modalka-define-kbd "] ]" "C-x n n")
+  (modalka-define-kbd "] s" "M-m ] s")
+#+end_src
 *** Backward navigation prefixed keys
-    #+begin_src emacs-lisp
-      (modalka-define-kbd "[ [" "C-x n w")
-    #+end_src
+#+begin_src emacs-lisp
+  (modalka-define-kbd "[ [" "C-x n w")
+#+end_src
 *** Extended prefix to quit/restart and time
-    #+begin_src emacs-lisp
-      (modalka-define-kbd ": q" "C-x C-c")
-      (modalka-define-kbd ": r" "C-x M-c")
-      (modalka-define-kbd ": t" "M-m : t")
-    #+end_src
+#+begin_src emacs-lisp
+  (modalka-define-kbd ": q" "C-x C-c")
+  (modalka-define-kbd ": r" "C-x M-c")
+  (modalka-define-kbd ": t" "M-m : t")
+#+end_src
 *** User prefix for common functions
-    #+begin_src emacs-lisp
-      (modalka-define-kbd "g U" "C-c C-k")
-      (modalka-define-kbd "SPC j" "M-x")
-      (modalka-define-kbd "SPC a" "C-x b")
-      (modalka-define-kbd "SPC k" "C-x k")
-      (modalka-define-kbd "SPC g" "M-g g")
-      (modalka-define-kbd "SPC d" "C-x d")
-      (modalka-define-kbd "SPC q" "C-x 0")
-      (modalka-define-kbd "SPC f" "C-x C-f")
-      (modalka-define-kbd "SPC w" "C-x C-s")
-      (modalka-define-kbd "SPC c" "M-m SPC c")
-      (modalka-define-kbd "SPC R" "M-m SPC R")
-      (modalka-define-kbd "SPC ?" "M-m SPC ?")
-    #+end_src
+#+begin_src emacs-lisp
+  (modalka-define-kbd "g U" "C-c C-k")
+  (modalka-define-kbd "SPC j" "M-x")
+  (modalka-define-kbd "SPC a" "C-x b")
+  (modalka-define-kbd "SPC k" "C-x k")
+  (modalka-define-kbd "SPC g" "M-g g")
+  (modalka-define-kbd "SPC d" "C-x d")
+  (modalka-define-kbd "SPC q" "C-x 0")
+  (modalka-define-kbd "SPC f" "C-x C-f")
+  (modalka-define-kbd "SPC w" "C-x C-s")
+  (modalka-define-kbd "SPC c" "M-m SPC c")
+  (modalka-define-kbd "SPC R" "M-m SPC R")
+  (modalka-define-kbd "SPC ?" "M-m SPC ?")
+#+end_src
 ** which-key
 *** Number
-    #+begin_src emacs-lisp
-      (which-key-add-key-based-replacements
-	"0" "0"
-	"1" "1"
-	"2" "2"
-	"3" "3"
-	"4" "4"
-	"5" "5"
-	"6" "6"
-	"7" "7"
-	"8" "8"
-	"9" "9")
-    #+end_src
+#+begin_src emacs-lisp
+  (which-key-add-key-based-replacements
+    "0" "0"
+    "1" "1"
+    "2" "2"
+    "3" "3"
+    "4" "4"
+    "5" "5"
+    "6" "6"
+    "7" "7"
+    "8" "8"
+    "9" "9")
+#+end_src
 *** Movement and one key presses
-    #+begin_src emacs-lisp
-      (which-key-add-key-based-replacements
-	"ESC" "toggle mode"
-	"DEL" "smart del"
-	"TAB" "smart tab"
-	"RET" "smart enter"
-	"h"   "prev char"
-	"j"   "next line"
-	"k"   "prev line"
-	"l"   "next char"
-	"e"   "next word"
-	"b"   "prev word"
-	"n"   "next history item"
-	"N"   "prev history item"
-	"{"   "next para"
-	"}"   "prev para"
-	"0"   "start of line"
-	"$"   "end of line"
-	"("   "start of sentence"
-	")"   "end of sentence"
-	"/" "search"
-	"E"   "exit anything"
-	"B"   "previous buffer"
-	"W"   "winner undo"
-	"w"   "other window"
-	"G"   "end of file"
-	"d"   "delete selection"
-	"y"   "copy selection"
-	"p"   "paste"
-	"P"   "paste history"
-	"x"   "delete char"
-	"D"   "delete rest of line"
-	"M"   "modify argument"
-	"z"   "scroll center/top/bot"
-	"Z"   "zoom into window"
-	"H"   "scroll left"
-	"J"   "scroll down"
-	"K"   "scroll up"
-	"L"   "scroll right"
-	"'"   "org edit separately"
-	"q"   "start macro"
-	"Q"   "end macro"
-	"?"   "top level bindings"
-	"v"   "start selection"
-	"R"   "overwrite mode"
-	"X"   "exchange point and mark"
-	"+"   "set bookmark"
-	"'"   "jump to bookmark"
-	"="   "indent region"
-	"\\"  "C-c C-c"
-	"!"   "async shell command"
-	"&"   "shell command")
+#+begin_src emacs-lisp
+  (which-key-add-key-based-replacements
+    "ESC" "toggle mode"
+    "DEL" "smart del"
+    "TAB" "smart tab"
+    "RET" "smart enter"
+    "h"   "prev char"
+    "j"   "next line"
+    "k"   "prev line"
+    "l"   "next char"
+    "e"   "next word"
+    "b"   "prev word"
+    "n"   "next history item"
+    "N"   "prev history item"
+    "{"   "next para"
+    "}"   "prev para"
+    "0"   "start of line"
+    "$"   "end of line"
+    "("   "start of sentence"
+    ")"   "end of sentence"
+    "/" "search"
+    "E"   "exit anything"
+    "B"   "previous buffer"
+    "W"   "winner undo"
+    "w"   "other window"
+    "G"   "end of file"
+    "d"   "delete selection"
+    "y"   "copy selection"
+    "p"   "paste"
+    "P"   "paste history"
+    "x"   "delete char"
+    "D"   "delete rest of line"
+    "M"   "modify argument"
+    "z"   "scroll center/top/bot"
+    "Z"   "zoom into window"
+    "H"   "scroll left"
+    "J"   "scroll down"
+    "K"   "scroll up"
+    "L"   "scroll right"
+    "'"   "org edit separately"
+    "?"   "top level bindings"
+    "v"   "start selection"
+    "R"   "overwrite mode"
+    "X"   "exchange point and mark"
+    "+"   "set bookmark"
+    "'"   "jump to bookmark"
+    "="   "indent region"
+    "\\"  "C-c C-c"
+    "!"   "async shell command"
+    "&"   "shell command")
 
-    #+end_src
+#+end_src
 *** Global prefixed keys
-    #+begin_src emacs-lisp
-      (which-key-add-key-based-replacements
-	"g"   "global prefix"
-	"g g" "start of file"
-	"g m" "make frame"
-	"g M" "delete frame"
-	"g n" "select frame by name"
-	"g N" "name frame"
-	"g j" "next pdf page"
-	"g k" "previous pdf page"
-	"g f" "file/url at cursor"
-	"g F" "enable follow mode"
-	"g o" "eval emacs-lisp"
-	"g O" "eval defun"
-	"g w" "vertical split win"
-	"g W" "horizontal split win"
-	"g S" "split line"
-	"g @" "compose mail"
-	"g #" "list eww histories"
-	"g x" "browse with eww"
-	"g :" "browse with external browser"
-	"g {" "eww back"
-	"g }" "eww forward"
-	"g (" "info previous"
-	"g )" "info next"
-	"^"   "info up"
-	"&"   "info goto"
-	"g q" "format para"
-	"g ?" "find command bound to key")
-    #+end_src
+#+begin_src emacs-lisp
+  (which-key-add-key-based-replacements
+    "g"   "global prefix"
+    "g g" "start of file"
+    "g m" "make frame"
+    "g M" "delete frame"
+    "g n" "select frame by name"
+    "g N" "name frame"
+    "g f" "file/url at cursor"
+    "g F" "enable follow mode"
+    "g o" "eval emacs-lisp"
+    "g O" "eval defun"
+    "g w" "vertical split win"
+    "g W" "horizontal split win"
+    "g S" "split line"
+    "g @" "compose mail"
+    "g #" "list eww histories"
+    "g x" "browse with eww"
+    "g :" "browse with external browser"
+    "g {" "eww back"
+    "g }" "eww forward"
+    "g (" "info previous"
+    "g )" "info next"
+    "^"   "info up"
+    "&"   "info goto"
+    "g q" "format para"
+    "g ?" "find command bound to key")
+#+end_src
 *** Select region prefixed keys
-    #+begin_src emacs-lisp
-      (which-key-add-key-based-replacements
-       "i" "expand prefix"
-       "i a" "expand entire buffer")
-    #+end_src
+#+begin_src emacs-lisp
+  (which-key-add-key-based-replacements
+    "i" "expand prefix"
+    "i a" "expand entire buffer")
+#+end_src
 *** Forward navigation prefixed keys
-    #+begin_src emacs-lisp
-      (which-key-add-key-based-replacements
-	"]"   "forward nav/edit"
-	"] ]" "narrow region"
-	"] s" "next spell error")
-    #+end_src
+#+begin_src emacs-lisp
+  (which-key-add-key-based-replacements
+    "]"   "forward nav/edit"
+    "] ]" "narrow region"
+    "] s" "next spell error")
+#+end_src
 *** Backward navigation prefixed keys
-    #+begin_src emacs-lisp
-      (which-key-add-key-based-replacements
-	"["   "backward nav/edit"
-	"[ [" "widen region")
-    #+end_src
+#+begin_src emacs-lisp
+  (which-key-add-key-based-replacements
+    "["   "backward nav/edit"
+    "[ [" "widen region")
+#+end_src
 *** Extended prefix to quit/restart and time
-    #+begin_src emacs-lisp
-      (which-key-add-key-based-replacements
-	":"   "extended prefix"
-	": q" "quit emacs"
-	": r" "restart emacs"
-	": t" "initiliazation time")
-    #+end_src
+#+begin_src emacs-lisp
+  (which-key-add-key-based-replacements
+    ":"   "extended prefix"
+    ": q" "quit emacs"
+    ": r" "restart emacs"
+    ": t" "initiliazation time")
+#+end_src
 *** User prefix for common functions
-    #+begin_src emacs-lisp
-      (which-key-add-key-based-replacements
-	"SPC"   "custom prefix"
-	"SPC ?" "describe bindings"
-	"SPC j" "jump to cmd"
-	"SPC f" "find file"
-	"SPC a" "switch buffers"
-	"SPC g" "goto line"
-	"SPC d" "dired"
-	"SPC k" "close buffer"
-	"SPC w" "save buffer"
-	"SPC c" "load theme"
-	"SPC R" "locate"
-	"SPC q" "quit window"
-	"g U"   "simulate C-c C-k")
-    #+end_src
+#+begin_src emacs-lisp
+  (which-key-add-key-based-replacements
+    "SPC"   "custom prefix"
+    "SPC ?" "describe bindings"
+    "SPC j" "jump to cmd"
+    "SPC f" "find file"
+    "SPC a" "switch buffers"
+    "SPC g" "goto line"
+    "SPC d" "dired"
+    "SPC k" "close buffer"
+    "SPC w" "save buffer"
+    "SPC c" "load theme"
+    "SPC R" "locate"
+    "SPC q" "quit window"
+    "g U"   "simulate C-c C-k")
+#+end_src
 ** Hydras
-   #+begin_src emacs-lisp
-     (use-package hydra
-       :ensure t)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package hydra
+    )
+#+end_src
 * 导航相关（Navigating）
 ** Flx
-   #+begin_src emacs-lisp
-     (use-package flx-ido
-       :ensure t)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package flx-ido)
+#+end_src
 ** Smex
-   #+begin_src emacs-lisp
-     (use-package smex
-       :ensure t
-       :config
-       (smex-initialize))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package smex
+    :config
+    (smex-initialize))
+#+end_src
 ** Undo tree
-   #+begin_src emacs-lisp
-     (use-package undo-tree
-       :ensure t
-       :diminish undo-tree-mode
-       :bind* (("M-m u" . undo-tree-undo)
-	       ("M-m r" . undo-tree-redo)
-	       ("M-m U" . undo-tree-visualize))
-       :config
-       (global-undo-tree-mode 1))
-   #+end_src
-   - Modal binding
-    #+begin_src emacs-lisp
-      (modalka-define-kbd "u" "M-m u")
-      (modalka-define-kbd "U" "M-m U")
-      (modalka-define-kbd "r" "M-m r")
-    #+end_src
-   - Which key
+#+begin_src emacs-lisp
+  (use-package undo-tree
+    :diminish undo-tree-mode
+    :bind* (("M-m u" . undo-tree-undo)
+            ("M-m r" . undo-tree-redo)
+            ("M-m U" . undo-tree-visualize))
+    :config
+    (global-undo-tree-mode 1))
+#+end_src
+- Modal binding
+  #+begin_src emacs-lisp
+    (modalka-define-kbd "u" "M-m u")
+    (modalka-define-kbd "U" "M-m U")
+    (modalka-define-kbd "r" "M-m r")
+  #+end_src
+- Which key
+  #+begin_src emacs-lisp
+    (which-key-add-key-based-replacements
+      "u" "undo"
+      "r" "redo"
+      "U" "undo tree")
+  #+end_src
+** 导航到最后修改位置
+#+begin_src emacs-lisp
+  (use-package goto-chg
+    :bind* (("M-m g ;" . goto-last-change)
+            ("M-m g ," . goto-last-change-reverse)))
+#+end_src
+- Modal binding
+  #+begin_src emacs-lisp
+    (modalka-define-kbd "g ;" "M-m g ;")
+    (modalka-define-kbd "g ," "M-m g ,")
+  #+end_src
+- Whick key
+  #+begin_src emacs-lisp
+    (which-key-add-key-based-replacements
+      "g ;" "goto last change"
+      "g ," "goto last change reverse")
+  #+end_src
+** Avy
+#+begin_src emacs-lisp
+  (use-package avy
+    :init
+    (setq avy-keys-alist
+          `((avy-goto-char-timer . (?j ?k ?l ?f ?s ?d ?e ?r ?u ?i))
+            (avy-goto-line . (?j ?k ?l ?f ?s ?d ?e ?r ?u ?i))))
+    (setq avy-style 'pre)
+    :bind* (("M-m f" . avy-goto-char-timer)
+            ("M-m F" . avy-goto-line)))
+#+end_src
+- Modal binding
+  #+begin_src emacs-lisp
+    (modalka-define-kbd "f" "M-m f")
+    (modalka-define-kbd "F" "M-m F")
+  #+end_src
+- Which key
+  #+begin_src emacs-lisp
+    (which-key-add-key-based-replacements
+      "f" "find on-screen"
+      "F" "find line")
+  #+end_src
+** Highlight symbol
+#+begin_src emacs-lisp
+  (use-package highlight-symbol
+    :bind (("M-n" . highlight-symbol-next)
+           ("M-p" . highlight-symbol-prev))
+    :config
+    (highlight-symbol-nav-mode))
+#+end_src
+** Projectile
+#+begin_src emacs-lisp
+  (use-package projectile
+    :init
+    (setq projectile-file-exists-remote-cache-expire (* 10 60))
+    :bind* (("M-m SPC d" . projectile-find-file)
+            ("M-m SPC D" . projectile-switch-project)
+            ("M-m SPC TAB" . projectile-find-other-file))
+    :diminish projectile-mode
+    :config
+    (projectile-mode))
+#+end_src
+- Modal binding
+  #+begin_src emacs-lisp
+    (modalka-define-kbd "SPC d" "M-m SPC d")
+    (modalka-define-kbd "SPC D" "M-m SPC D")
+    (modalka-define-kbd "SPC TAB" "M-m SPC TAB")
+  #+end_src
+  - which key
     #+begin_src emacs-lisp
       (which-key-add-key-based-replacements
-       "u" "undo"
-       "r" "redo"
-       "U" "undo tree")
+        "SPC d" "project files"
+        "SPC D" "project switch"
+        "SPC TAB" "alternate file")
     #+end_src
-** 导航到最后修改位置
-   #+begin_src emacs-lisp
-     (use-package goto-chg
-       :ensure t
-       :bind* (("M-m g ;" . goto-last-change)
-	       ("M-m g ," . goto-last-change-reverse)))
-   #+end_src 
-   - Modal binding
-     #+begin_src emacs-lisp
-       (modalka-define-kbd "g ;" "M-m g ;")
-       (modalka-define-kbd "g ," "M-m g ,")
-     #+end_src
-   - Whick key
-     #+begin_src emacs-lisp
-       (which-key-add-key-based-replacements
-	"g ;" "goto last change"
-	"g ," "goto last change reverse")
-     #+end_src
-** Avy
-   #+begin_src emacs-lisp
-     (use-package avy
-       :ensure t
-       :init
-       (setq avy-keys-alist
-	     `((avy-goto-char-timer . (?j ?k ?l ?f ?s ?d ?e ?r ?u ?i))
-	       (avy-goto-line . (?j ?k ?l ?f ?s ?d ?e ?r ?u ?i))))
-       (setq avy-style 'pre)
-       :bind* (("M-m f" . avy-goto-char-timer)
-	       ("M-m F" . avy-goto-line)))
-   #+end_src
-   - Modal binding
-     #+begin_src emacs-lisp
-       (modalka-define-kbd "f" "M-m f")
-       (modalka-define-kbd "F" "M-m F")
-     #+end_src
-   - Which key
-     #+begin_src emacs-lisp
-       (which-key-add-key-based-replacements
-	"f" "find on-screen"
-	"F" "find line")
-     #+end_src
-** Highlight symbol
-   #+begin_src emacs-lisp
-     (use-package highlight-symbol
-       :ensure t
-       :bind (("M-n" . highlight-symbol-next)
-	      ("M-p" . highlight-symbol-prev))
-       :config
-       (highlight-symbol-nav-mode))
-   #+end_src
-** Projectile
-   #+begin_src emacs-lisp
-     (use-package projectile
-       :ensure t
-       :init
-       (setq projectile-file-exists-remote-cache-expire (* 10 60))
-       :commands (projectile-find-file
-		  projectile-switch-project
-		  projectile-find-other-file
-		  projectile-mode)
-       :bind* (("M-m SPC d" . projectile-find-file)
-	       ("M-m SPC D" . projectile-switch-project)
-	       ("M-m SPC TAB" . projectile-find-other-file))
-       :diminish projectile-mode
-       :config
-       (projectile-mode))
-   #+end_src
-   - Modal binding
-     #+begin_src emacs-lisp
-       (modalka-define-kbd "SPC d" "M-m SPC d")
-       (modalka-define-kbd "SPC D" "M-m SPC D")
-       (modalka-define-kbd "SPC TAB" "M-m SPC TAB")
-     #+end_src
-    - which key
-      #+begin_src emacs-lisp
-	(which-key-add-key-based-replacements
-	  "SPC d" "project files"
-	  "SPC D" "project switch"
-	  "SPC TAB" "alternate file")
-      #+end_src
 ** Ztree
-   #+begin_src emacs-lisp
-     (use-package ztree
-       :ensure t
-       :bind* (("M-m g v" . ztree-dir)
-	       ("M-m g V" . ztree-diff))
-       :init
-       (setq ztree-dir-move-focus t))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package ztree
+    :bind* (("M-m g v" . ztree-dir)
+            ("M-m g V" . ztree-diff))
+    :init
+    (setq ztree-dir-move-focus t))
+#+end_src
+- Modal binding
+  #+begin_src emacs-lisp
+    (modalka-define-kbd "g v" "M-m g v")
+    (modalka-define-kbd "g V" "M-m g V")
+  #+end_src
+- which key
+  #+begin_src emacs-lisp
+    (which-key-add-key-based-replacements
+    "g v" "tree directory"
+    "g V" "diff directories")
+  #+end_src
 ** Neotree
-   #+begin_src emacs-lisp
-     (use-package neotree
-       :ensure t
-       :bind* (("M-m SPC n" . neotree-toggle))
-       :init
-       (setq neo-window-width 32
-	     neo-create-file-auto-open t
-	     neo-banner-message nil
-	     neo-mode-line-type 'neotree
-	     neo-smart-open t
-	     neo-show-hidden-files t
-	     neo-mode-line-type 'none
-	     neo-auto-indent-point t
-	     neo-theme (if (display-graphic-p) 'icons 'arrow)))
-   #+end_src
-   - Modal binding
-     #+begin_src emacs-lisp
-       (modalka-define-kbd "SPC n" "M-m SPC n")
-     #+end_src
-   - which key
-     #+begin_src emacs-lisp
-       (which-key-add-key-based-replacements
-	 "SPC n" "directory tree")
-     #+end_src
+#+begin_src emacs-lisp
+  (use-package neotree
+    :bind* (("M-m SPC n" . neotree-toggle))
+    :init
+    (setq neo-window-width 32
+          neo-create-file-auto-open t
+          neo-banner-message nil
+          neo-mode-line-type 'neotree
+          neo-smart-open t
+          neo-show-hidden-files t
+          neo-mode-line-type 'none
+          neo-auto-indent-point t
+          neo-theme (if (display-graphic-p) 'icons 'arrow)))
+#+end_src
+- Modal binding
+  #+begin_src emacs-lisp
+    (modalka-define-kbd "SPC n" "M-m SPC n")
+  #+end_src
+- which key
+  #+begin_src emacs-lisp
+    (which-key-add-key-based-replacements
+      "SPC n" "directory tree")
+  #+end_src
 ** Tags based navigation
-   #+begin_src emacs-lisp
-     (use-package ggtags
-       :ensure t
-       :diminish ggtags-mode
-       :bind* (("M-m T" . ggtags-find-tag-regexp)
-	       ("M-m g t" . ggtags-create-tags)
-	       ("M-m g T" . ggtags-update-tags))
-       :init
-       (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
-       :config
-       (add-hook 'prog-mode-hook 'ggtags-mode))
-   #+end_src
-   - Modal binding
-     #+begin_src emacs-lisp
-       (modalka-define-kbd "T" "M-m T")
-       (modalka-define-kbd "g t" "M-m g t")
-       (modalka-define-kbd "g T" "M-m g T")
-     #+end_src
-   - which key
-     #+begin_src emacs-lisp
-       (which-key-add-key-based-replacements
-	 "g t" "create tags"
-	 "g T" "update tags"
-	 "T" "global tags search")
-     #+end_src
+#+begin_src emacs-lisp
+  (use-package ggtags
+    :diminish ggtags-mode
+    :bind* (("M-m T" . ggtags-find-tag-regexp)
+            ("M-m g t" . ggtags-create-tags)
+            ("M-m g T" . ggtags-update-tags))
+    :init
+    (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
+    :config
+    (add-hook 'prog-mode-hook 'ggtags-mode))
+#+end_src
+- Modal binding
+  #+begin_src emacs-lisp
+    (modalka-define-kbd "T" "M-m T")
+    (modalka-define-kbd "g t" "M-m g t")
+    (modalka-define-kbd "g T" "M-m g T")
+  #+end_src
+- which key
+  #+begin_src emacs-lisp
+    (which-key-add-key-based-replacements
+      "g t" "create tags"
+      "g T" "update tags"
+      "T" "global tags search")
+  #+end_src
 ** Dumb jump
-   #+begin_src emacs-lisp
-     (use-package dumb-jump
-       :ensure t
-       :bind (("C-c S" . dumb-jump-go))
-       :config
-       (dumb-jump-mode))
+#+begin_src emacs-lisp
+  (use-package dumb-jump
+    :bind (("C-c S" . dumb-jump-go))
+    :config
+    (dumb-jump-mode))
 
-     (modalka-define-kbd "S" "C-c S")
+  (modalka-define-kbd "S" "C-c S")
 
-     (which-key-add-key-based-replacements
-       "S" "src at point")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "S" "src at point")
+#+end_src
 ** Perspective
-   #+begin_src emacs-lisp
-     ;; (use-package perspective
-     ;;   :ensure t
-     ;;   :commands (persp-mode)
-     ;;   :bind* (("M-m SPC p" . persp-switch)
-     ;; 	  ("M-m SPC P" . persp-kill)
-     ;; 	  ("M-m SPC A" . persp-switch-to-buffer)
-     ;; 	  ("M-m g r" . persp-rename))
-     ;;   :config
-     ;;   (persp-mode 1))
-   #+end_src
-   - Modal binding
-     #+begin_src emacs-lisp
-       ;; (modalka-define-kbd "SPC p" "M-m SPC p")
-       ;; (modalka-define-kbd "SPC P" "M-m SPC P")
-       ;; (modalka-define-kbd "SPC A" "M-m SPC A")
-       ;; (modalka-define-kbd "g r" "M-m g r")
-     #+end_src
-   - which key
-     #+begin_src emacs-lisp
-       ;; (which-key-add-key-based-replacements
-       ;;   "SPC p" "perspective switch"
-       ;;   "SPC P" "perspective kill"
-       ;;   "SPC A" "perspective buffer switch"
-       ;;   "g r" "perspective rename")
-     #+end_src
+#+begin_src emacs-lisp
+  ;; (use-package perspective
+  ;;
+  ;;   :bind* (("M-m SPC p" . persp-switch)
+  ;; 	  ("M-m SPC P" . persp-kill)
+  ;; 	  ("M-m SPC A" . persp-switch-to-buffer)
+  ;; 	  ("M-m g r" . persp-rename))
+  ;;   :config
+  ;;   (persp-mode 1))
+#+end_src
+- Modal binding
+  #+begin_src emacs-lisp
+    ;; (modalka-define-kbd "SPC p" "M-m SPC p")
+    ;; (modalka-define-kbd "SPC P" "M-m SPC P")
+    ;; (modalka-define-kbd "SPC A" "M-m SPC A")
+    ;; (modalka-define-kbd "g r" "M-m g r")
+  #+end_src
+- which key
+  #+begin_src emacs-lisp
+    ;; (which-key-add-key-based-replacements
+    ;;   "SPC p" "perspective switch"
+    ;;   "SPC P" "perspective kill"
+    ;;   "SPC A" "perspective buffer switch"
+    ;;   "g r" "perspective rename")
+  #+end_src
 ** Toggle zoom
-   #+begin_src emacs-lisp
-     (use-package zoom-window
-       :ensure t
-       :bind* (("M-m Z" . zoom-window-zoom)))
+#+begin_src emacs-lisp
+  (use-package zoom-window
+    :bind* (("M-m Z" . zoom-window-zoom)))
 
-     (modalka-define-kbd "Z" "M-m Z")
+  (modalka-define-kbd "Z" "M-m Z")
 
-     (which-key-add-key-based-replacements
-       "Z" "zoom window")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "Z" "zoom window")
+#+end_src
 ** Code documentation
-   #+begin_src emacs-lisp
-     (use-package dash-at-point
-       :ensure t
-       :bind (("C-c I" . dash-at-point))
-       :bind* (("M-m SPC i" . dash-at-point-with-docset)
-	       ("M-m SPC I" . dash-at-point)))
+#+begin_src emacs-lisp
+  (use-package dash-at-point
+    :bind (("C-c I" . dash-at-point))
+    :bind* (("M-m SPC i" . dash-at-point-with-docset)
+            ("M-m SPC I" . dash-at-point)))
 
-     (modalka-define-kbd "SPC i" "M-m SPC i")
-     (modalka-define-kbd "SPC I" "M-m SPC I")
-     (modalka-define-kbd "I" "C-c I")
+  (modalka-define-kbd "SPC i" "M-m SPC i")
+  (modalka-define-kbd "SPC I" "M-m SPC I")
+  (modalka-define-kbd "I" "C-c I")
 
-     (which-key-add-key-based-replacements
-       "I" "info at point"
-       "SPC i" "documentation prompt"
-       "SPC I" "documentation at point")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "I" "info at point"
+    "SPC i" "documentation prompt"
+    "SPC I" "documentation at point")
+#+end_src
 ** Hydras
 *** 窗口导航
-    #+begin_src emacs-lisp
-      (defhydra st/hydra-of-windows (:color red
-				     :hint nil)
-	"
-       ^Move^    ^Size^    ^Change^                    ^Split^           ^Text^
-       ^^^^^^^^^^^------------------------------------------------------------------
-       ^ ^ _k_ ^ ^   ^ ^ _K_ ^ ^   _u_: winner-undo _o_: rotate  _v_: vertical     _+_: zoom in
-       _h_ ^+^ _l_   _H_ ^+^ _L_   _r_: winner-redo            _s_: horizontal   _-_: zoom out
-       ^ ^ _j_ ^ ^   ^ ^ _J_ ^ ^   _c_: close                  _z_: zoom         _q_: quit
-      "
-	("h" windmove-left)
-	("j" windmove-down)
-	("k" windmove-up)
-	("l" windmove-right)
-	("H" shrink-window-horizontally)
-	("K" shrink-window)
-	("J" enlarge-window)
-	("L" enlarge-window-horizontally)
-	("v" utils/split-right-and-move)
-	("s" utils/split-below-and-move)
-	("c" delete-window)
-	("f" toggle-frame-fullscreen :color blue)
-	("o" utils/rotate-windows)
-	("z" delete-other-windows)
-	("u" (progn
-	       (winner-undo)
-	       (setq this-command 'winner-undo)))
-	("r" winner-redo)
-	("+" text-scale-increase)
-	("-" text-scale-decrease)
-	("q" nil :color blue))
+#+begin_src emacs-lisp
+  (defhydra st/hydra-of-windows (:color red
+                                        :hint nil)
+    "
+   ^Move^    ^Size^    ^Change^                    ^Split^           ^Text^
+   ^^^^^^^^^^^------------------------------------------------------------------
+   ^ ^ _k_ ^ ^   ^ ^ _K_ ^ ^   _u_: winner-undo _o_: rotate  _v_: vertical     _+_: zoom in
+   _h_ ^+^ _l_   _H_ ^+^ _L_   _r_: winner-redo            _s_: horizontal   _-_: zoom out
+   ^ ^ _j_ ^ ^   ^ ^ _J_ ^ ^   _c_: close                  _z_: zoom         _q_: quit
+  "
+    ("h" windmove-left)
+    ("j" windmove-down)
+    ("k" windmove-up)
+    ("l" windmove-right)
+    ("H" shrink-window-horizontally)
+    ("K" shrink-window)
+    ("J" enlarge-window)
+    ("L" enlarge-window-horizontally)
+    ("v" utils/split-right-and-move)
+    ("s" utils/split-below-and-move)
+    ("c" delete-window)
+    ("f" toggle-frame-fullscreen :color blue)
+    ("o" utils/rotate-windows)
+    ("z" delete-other-windows)
+    ("u" (progn
+           (winner-undo)
+           (setq this-command 'winner-undo)))
+    ("r" winner-redo)
+    ("+" text-scale-increase)
+    ("-" text-scale-decrease)
+    ("q" nil :color blue))
 
-      (bind-keys*
-       ("M-m SPC u" . st/hydra-of-windows/body))
+  (bind-keys*
+   ("M-m SPC u" . st/hydra-of-windows/body))
 
-      (modalka-define-kbd "SPC u" "M-m SPC u")
+  (modalka-define-kbd "SPC u" "M-m SPC u")
 
-      (which-key-add-key-based-replacements
-	"SPC u" "window menu")
-    #+end_src
+  (which-key-add-key-based-replacements
+    "SPC u" "window menu")
+#+end_src
 *** 书签导航
-    #+begin_src emacs-lisp
-      (defhydra st/hydra-bookmarks (:color blue
-				    :hint nil)
-	"
-       _s_: set  _b_: bookmark   _j_: jump   _d_: delete   _q_: quit
-	"
-	("s" bookmark-set)
-	("b" bookmark-save)
-	("j" bookmark-jump)
-	("d" bookmark-delete)
-	("q" nil :color blue))
+#+begin_src emacs-lisp
+  (defhydra st/hydra-bookmarks (:color blue :hint nil)
+    "
+   _s_: set  _b_: bookmark   _j_: jump   _d_: delete   _q_: quit
+    "
+    ("s" bookmark-set)
+    ("b" bookmark-save)
+    ("j" bookmark-jump)
+    ("d" bookmark-delete)
+    ("q" nil :color blue))
 
-      (bind-keys*
-       ("M-m `" . st/hydra-bookmarks/body))
+  (bind-keys*
+   ("M-m `" . st/hydra-bookmarks/body))
 
-      (modalka-define-kbd "`" "M-m `")
+  (modalka-define-kbd "`" "M-m `")
 
-      (which-key-add-key-based-replacements
-	"`" "bookmark menu")
-    #+end_src
+  (which-key-add-key-based-replacements
+    "`" "bookmark menu")
+#+end_src
 * Helm
-  #+begin_src emacs-lisp
-    (use-package helm
-      :ensure t
-      :diminish helm-mode
-      :bind (("M-x"     . helm-M-x)
-	     ("M-y"     . helm-show-kill-ring)
-	     ("C-x C-f" . helm-find-files)
-	     ("C-x 8"   . helm-ucs))
-      :bind* (("M-m SPC h r" . helm-resume)
-	      ("M-m SPC r"   . helm-for-files)
-	      ("M-m SPC x"   . helm-apropos)
-	      ("M-m SPC C" . helm-colors)
-	      ("M-m SPC h R" . helm-regexp)
-	      ("M-m SPC h u" . helm-surfraw)
-	      ("M-m SPC h t" . helm-top)
-	      ("M-m SPC h p" . helm-list-emacs-process)
-	      ("M-m SPC F"   . helm-find)
-	      ("M-m SPC h k" . helm-calcul-expression)
-	      ("M-m SPC h i" . helm-info-at-point)
-	      ("M-m SPC h d" . helm-man-woman)
-	      ("M-m SPC h h" . helm-documentation)
-	      ("M-m SPC h e" . helm-run-external-command)
-	      ("M-m ;"       . helm-all-mark-rings)
-	      ("M-m SPC h x" . helm-select-xfont)
-	      ("M-m t"       . helm-semantic-or-imenu))
-      :bind (:map helm-map
-		  ("<return>"   . helm-maybe-exit-minibuffer)
-		  ("RET"        . helm-maybe-exit-minibuffer)
-		  ("C-i"        . helm-select-action)
-		  ("S-<return>" . helm-maybe-exit-minibuffer)
-		  ("S-RET"      . helm-maybe-exit-minibuffer)
-		  ("C-S-m"      . helm-maybe-exit-minibuffer))
-      :bind (:map helm-find-files-map
-		  ("<return>"    . helm-execute-persistent-action)
-		  ("<tab>"       . helm-execute-persistent-action)
-		  ("C-i"         . helm-select-action)
-		  ("S-<return>"  . helm-maybe-exit-minibuffer)
-		  ("S-RET"       . helm-maybe-exit-minibuffer)
-		  ("C-S-m"       . helm-maybe-exit-minibuffer))
-      :bind (:map helm-read-file-map
-		  ("<return>"    . helm-execute-persistent-action)
-		  ("RET"         . helm-execute-persistent-action)
-		  ("<tab>"       . helm-execute-persistent-action)
-		  ("C-i"         . helm-select-action)
-		  ("S-<return>"  . helm-maybe-exit-minibuffer)
-		  ("S-RET"       . helm-maybe-exit-minibuffer)
-		  ("C-S-m"       . helm-maybe-exit-minibuffer))
-      :commands (helm-mode
-		 helm-M-x
-		 helm-smex
-		 helm-find-files
-		 helm-buffers
-		 helm-recentf
-		 helm-autoresize-mode
-		 helm-buffer-get
-		 helm-get-selection
-		 bottom-buffers-show-mode-line
-		 bottom-buffers-init
-		 bottom-buffers-hide-mode-line
-		 helm-keyboard-quit-advice
-		 dwim-helm-find-files-navigate-forward)
+#+begin_src emacs-lisp
+  (use-package helm
+    :diminish helm-mode
+    :bind (("M-x"     . helm-M-x)
+           ("M-y"     . helm-show-kill-ring)
+           ("C-x C-f" . helm-find-files)
+           ("C-x 8"   . helm-ucs))
+    :bind* (("M-m SPC h r" . helm-resume)
+            ("M-m SPC r"   . helm-for-files)
+            ("M-m SPC x"   . helm-apropos)
+            ("M-m SPC C" . helm-colors)
+            ("M-m SPC h R" . helm-regexp)
+            ("M-m SPC h u" . helm-surfraw)
+            ("M-m SPC h t" . helm-top)
+            ("M-m SPC h p" . helm-list-emacs-process)
+            ("M-m SPC F"   . helm-find)
+            ("M-m SPC h k" . helm-calcul-expression)
+            ("M-m SPC h i" . helm-info-at-point)
+            ("M-m SPC h d" . helm-man-woman)
+            ("M-m SPC h h" . helm-documentation)
+            ("M-m SPC h e" . helm-run-external-command)
+            ("M-m ;"       . helm-all-mark-rings)
+            ("M-m SPC h x" . helm-select-xfont)
+            ("M-m t"       . helm-semantic-or-imenu))
+    :bind (:map helm-map
+                ("<return>"   . helm-maybe-exit-minibuffer)
+                ("RET"        . helm-maybe-exit-minibuffer)
+                ("C-i"        . helm-select-action)
+                ("S-<return>" . helm-maybe-exit-minibuffer)
+                ("S-RET"      . helm-maybe-exit-minibuffer)
+                ("C-S-m"      . helm-maybe-exit-minibuffer))
+    :bind (:map helm-find-files-map
+                ("<return>"    . helm-execute-persistent-action)
+                ("<tab>"       . helm-execute-persistent-action)
+                ("C-i"         . helm-select-action)
+                ("S-<return>"  . helm-maybe-exit-minibuffer)
+                ("S-RET"       . helm-maybe-exit-minibuffer)
+                ("C-S-m"       . helm-maybe-exit-minibuffer))
+    :bind (:map helm-read-file-map
+                ("<return>"    . helm-execute-persistent-action)
+                ("RET"         . helm-execute-persistent-action)
+                ("<tab>"       . helm-execute-persistent-action)
+                ("C-i"         . helm-select-action)
+                ("S-<return>"  . helm-maybe-exit-minibuffer)
+                ("S-RET"       . helm-maybe-exit-minibuffer)
+                ("C-S-m"       . helm-maybe-exit-minibuffer))
+    :config
+    ;; require basic config
+    (require 'helm-config)
+    (helm-mode 1)
+
+    ;; use silver searcher when available
+    (when (executable-find "ag-grep")
+      (setq helm-grep-default-command "ag-grep -Hn --no-group --no-color %e %p %f"
+            helm-grep-default-recurse-command "ag-grep -H --no-group --no-color %e %p %f"))
+
+    ;; Fuzzy matching for everything
+    (setq-default helm-M-x-fuzzy-match t
+                  helm-recentf-fuzzy-match t
+                  helm-buffers-fuzzy-matching t
+                  helm-locate-fuzzy-match nil
+                  helm-mode-fuzzy-match t)
+
+    ;; set height and stuff
+    (helm-autoresize-mode 1)
+    (setq helm-autoresize-max-height 20
+          helm-autoresize-min-height 20)
+
+    ;; Make sure helm always pops up in bottom
+    (setq helm-split-window-inside-p t)
+
+    (add-to-list 'display-buffer-alist
+                 '("\\`\\*helm.*\\*\\'"
+                   (display-buffer-in-side-window)
+                   (inhibit-same-window . t)
+                   (window-height . 0.2)))
+
+    ;; provide input in the header line and hide the mode lines above
+    (setq helm-echo-input-in-header-line t)
+
+    (defvar bottom-buffers nil
+      "List of bottom buffers before helm session.
+        Its element is a pair of `buffer-name' and `mode-line-format'.")
+
+    (defun bottom-buffers-init ()
+      (setq-local mode-line-format (default-value 'mode-line-format))
+      (setq bottom-buffers
+            (cl-loop for w in (window-list)
+                     when (window-at-side-p w 'bottom)
+                     collect (with-current-buffer (window-buffer w)
+                               (cons (buffer-name) mode-line-format)))))
+
+    (defun bottom-buffers-hide-mode-line ()
+      (setq-default cursor-in-non-selected-windows nil)
+      (mapc (lambda (elt)
+              (with-current-buffer (car elt)
+                (setq-local mode-line-format nil)))
+            bottom-buffers))
+
+    (defun bottom-buffers-show-mode-line ()
+      (setq-default cursor-in-non-selected-windows t)
+      (when bottom-buffers
+        (mapc (lambda (elt)
+                (with-current-buffer (car elt)
+                  (setq-local mode-line-format (cdr elt))))
+              bottom-buffers)
+        (setq bottom-buffers nil)))
+
+    (defun helm-keyboard-quit-advice (orig-func &rest args)
+      (bottom-buffers-show-mode-line)
+      (apply orig-func args))
+
+    (add-hook 'helm-before-initialize-hook #'bottom-buffers-init)
+    (add-hook 'helm-after-initialize-hook #'bottom-buffers-hide-mode-line)
+    (add-hook 'helm-exit-minibuffer-hook #'bottom-buffers-show-mode-line)
+    (add-hook 'helm-cleanup-hook #'bottom-buffers-show-mode-line)
+    (advice-add 'helm-keyboard-quit :around #'helm-keyboard-quit-advice)
+
+    ;; remove header lines if only a single source
+    (setq helm-display-header-line nil)
+
+    (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
+    (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
+    (defvar helm-source-header-default-box (face-attribute 'helm-source-header :box))
+
+    (defun helm-toggle-header-line ()
+      (if (> (length helm-sources) 1)
+          (set-face-attribute 'helm-source-header
+                              nil
+                              :foreground helm-source-header-default-foreground
+                              :background helm-source-header-default-background
+                              :box helm-source-header-default-box
+                              :height 1.0)
+        (set-face-attribute 'helm-source-header
+                            nil
+                            :foreground (face-attribute 'helm-selection :background)
+                            :background (face-attribute 'helm-selection :background)
+                            :box nil
+                            :height 0.1)))
+
+    (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line)
+
+    ;; hide the minibuffer when helm is active
+    (defun helm-hide-minibuffer-maybe ()
+      (when (with-helm-buffer helm-echo-input-in-header-line)
+        (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
+          (overlay-put ov 'window (selected-window))
+          (overlay-put ov 'face (let ((bg-color (face-background 'default nil)))
+                                  `(:background ,bg-color :foreground ,bg-color)))
+          (setq-local cursor-type nil))))
+
+    (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
+
+    ;; Proper find file behavior
+    (defun dwim-helm-find-files-up-one-level-maybe ()
+      (interactive)
+      (if (looking-back "/" 1)
+          (call-interactively 'helm-find-files-up-one-level)
+        (delete-char 1)))
+
+    (defun dwim-helm-find-files-navigate-forward (orig-fun &rest args)
+      "Adjust how helm-execute-persistent actions behaves, depending on context"
+      (if (file-directory-p (helm-get-selection))
+          (apply orig-fun args)
+        (helm-maybe-exit-minibuffer)))
+
+    (advice-add 'helm-execute-persistent-action :around #'dwim-helm-find-files-navigate-forward)
+
+    ;; better smex integration
+    (use-package helm-smex
+      :bind* (("M-x" . helm-smex)
+              ("M-X" . helm-smex-major-mode-commands)))
+
+    ;; Make helm fuzzier
+    (use-package helm-fuzzier
       :config
-      ;; require basic config
-      (require 'helm-config)
-      (helm-mode 1)
+      (helm-fuzzier-mode 1))
 
-      ;; use silver searcher when available
-      (when (executable-find "ag-grep")
-	(setq helm-grep-default-command "ag-grep -Hn --no-group --no-color %e %p %f"
-	      helm-grep-default-recurse-command "ag-grep -H --no-group --no-color %e %p %f"))
+    ;; Add support for flx
+    (use-package helm-flx
+      :config
+      (helm-flx-mode 1))
 
-      ;; Fuzzy matching for everything
-      (setq-default helm-M-x-fuzzy-match t
-		    helm-recentf-fuzzy-match t
-		    helm-buffers-fuzzy-matching t
-		    helm-locate-fuzzy-match nil
-		    helm-mode-fuzzy-match t)
+    ;; to search in projects - the silver searcher
+    (use-package helm-ag
+      :bind* (("M-m g s" . helm-do-ag-project-root)
+              ("M-m g e" . helm-do-ag)))
 
-      ;; set height and stuff
-      (helm-autoresize-mode 1)
-      (setq helm-autoresize-max-height 20
-	    helm-autoresize-min-height 20)
+    ;; to search in files
+    (use-package helm-swoop
+      :bind (("C-s" . helm-swoop-without-pre-input))
+      :bind* (("M-m #"   . helm-swoop)
+              ("M-m g /" . helm-multi-swoop)
+              ("M-m o /" . helm-multi-swoop-org)
+              ("M-m g E" . helm-multi-swoop-all))
+      :init
+      (setq helm-swoop-split-with-multiple-windows nil
+            helm-swoop-split-direction 'split-window-vertically
+            helm-swoop-split-window-function 'helm-default-display-buffer))
 
-      ;; Make sure helm always pops up in bottom
-      (setq helm-split-window-inside-p t)
+    ;; to help with projectile
+    (use-package helm-projectile
+      :bind* (("M-m SPC d" . helm-projectile))
+      :init
+      (setq projectile-completion-system 'helm))
 
-      (add-to-list 'display-buffer-alist
-		   '("\\`\\*helm.*\\*\\'"
-		     (display-buffer-in-side-window)
-		     (inhibit-same-window . t)
-		     (window-height . 0.2)))
+    ;; to describe bindings
+    (use-package helm-descbinds
+      :bind* (("M-m SPC ?" . helm-descbinds)))
 
-      ;; provide input in the header line and hide the mode lines above
-      (setq helm-echo-input-in-header-line t)
+    ;; Control AWS via helm
+    (use-package helm-aws
+      :bind* (("M-m SPC h w" . helm-aws)))
 
-      (defvar bottom-buffers nil
-	"List of bottom buffers before helm session.
-	  Its element is a pair of `buffer-name' and `mode-line-format'.")
+    ;; List errors with helm
+    (use-package helm-flycheck
+      :bind* (("M-m SPC l" . helm-flycheck)))
 
-      (defun bottom-buffers-init ()
-	(setq-local mode-line-format (default-value 'mode-line-format))
-	(setq bottom-buffers
-	      (cl-loop for w in (window-list)
-		       when (window-at-side-p w 'bottom)
-		       collect (with-current-buffer (window-buffer w)
-				 (cons (buffer-name) mode-line-format)))))
+    ;; Select snippets with helm
+    (use-package helm-c-yasnippet
+      :bind (("C-o" . helm-yas-complete))
+      :bind* (("C-,"        . helm-yas-create-snippet-on-region)
+              ("C-<escape>" . helm-yas-visit-snippet-file)))
 
-      (defun bottom-buffers-hide-mode-line ()
-	(setq-default cursor-in-non-selected-windows nil)
-	(mapc (lambda (elt)
-		(with-current-buffer (car elt)
-		  (setq-local mode-line-format nil)))
-	      bottom-buffers))
+    ;; Helm integration with make
+    (use-package helm-make
+      :init
+      (setq helm-make-build-dir "build")
+      :bind* (("M-m SPC m" . helm-make-projectile)
+              ("M-m SPC M" . helm-make))))
 
-      (defun bottom-buffers-show-mode-line ()
-	(setq-default cursor-in-non-selected-windows t)
-	(when bottom-buffers
-	  (mapc (lambda (elt)
-		  (with-current-buffer (car elt)
-		    (setq-local mode-line-format (cdr elt))))
-		bottom-buffers)
-	  (setq bottom-buffers nil)))
+  (modalka-define-kbd "t" "M-m t")
+  (modalka-define-kbd "#" "M-m #")
+  (modalka-define-kbd ";" "M-m ;")
+  (modalka-define-kbd "SPC J" "M-X")
+  (modalka-define-kbd "g E" "M-m g E")
+  (modalka-define-kbd "g s" "M-m g s")
+  (modalka-define-kbd "g /" "M-m g /")
+  (modalka-define-kbd "o /" "M-m o /")
+  (modalka-define-kbd "g e" "M-m g e")
+  (modalka-define-kbd "g u" "C-c C-e")
+  (modalka-define-kbd "SPC r" "M-m SPC r")
+  (modalka-define-kbd "SPC b" "M-m SPC b")
+  (modalka-define-kbd "SPC x" "M-m SPC x")
+  (modalka-define-kbd "SPC F" "M-m SPC F")
+  (modalka-define-kbd "SPC C" "M-m SPC C")
+  (modalka-define-kbd "SPC m" "M-m SPC m")
+  (modalka-define-kbd "SPC M" "M-m SPC M")
+  (modalka-define-kbd "SPC h r" "M-m SPC h r")
+  (modalka-define-kbd "SPC h e" "M-m SPC h e")
+  (modalka-define-kbd "SPC h w" "M-m SPC h w")
+  (modalka-define-kbd "SPC h i" "M-m SPC h i")
+  (modalka-define-kbd "SPC h R" "M-m SPC h R")
+  (modalka-define-kbd "SPC h u" "M-m SPC h u")
+  (modalka-define-kbd "SPC h t" "M-m SPC h t")
+  (modalka-define-kbd "SPC h p" "M-m SPC h p")
+  (modalka-define-kbd "SPC h k" "M-m SPC h k")
+  (modalka-define-kbd "SPC h d" "M-m SPC h d")
+  (modalka-define-kbd "SPC h h" "M-m SPC h h")
+  (modalka-define-kbd "SPC h x" "M-m SPC h x")
+  (modalka-define-kbd "SPC h j" "M-m SPC h j")
+  (modalka-define-kbd "SPC h J" "M-m SPC h J")
+  (modalka-define-kbd "SPC h s" "M-m SPC h s")
 
-      (defun helm-keyboard-quit-advice (orig-func &rest args)
-	(bottom-buffers-show-mode-line)
-	(apply orig-func args))
-
-      (add-hook 'helm-before-initialize-hook #'bottom-buffers-init)
-      (add-hook 'helm-after-initialize-hook #'bottom-buffers-hide-mode-line)
-      (add-hook 'helm-exit-minibuffer-hook #'bottom-buffers-show-mode-line)
-      (add-hook 'helm-cleanup-hook #'bottom-buffers-show-mode-line)
-      (advice-add 'helm-keyboard-quit :around #'helm-keyboard-quit-advice)
-
-      ;; remove header lines if only a single source
-      (setq helm-display-header-line nil)
-
-      (defvar helm-source-header-default-background (face-attribute 'helm-source-header :background))
-      (defvar helm-source-header-default-foreground (face-attribute 'helm-source-header :foreground))
-      (defvar helm-source-header-default-box (face-attribute 'helm-source-header :box))
-
-      (defun helm-toggle-header-line ()
-	(if (> (length helm-sources) 1)
-	    (set-face-attribute 'helm-source-header
-				nil
-				:foreground helm-source-header-default-foreground
-				:background helm-source-header-default-background
-				:box helm-source-header-default-box
-				:height 1.0)
-	  (set-face-attribute 'helm-source-header
-			      nil
-			      :foreground (face-attribute 'helm-selection :background)
-			      :background (face-attribute 'helm-selection :background)
-			      :box nil
-			      :height 0.1)))
-
-      (add-hook 'helm-before-initialize-hook 'helm-toggle-header-line)
-
-      ;; hide the minibuffer when helm is active
-      (defun helm-hide-minibuffer-maybe ()
-	(when (with-helm-buffer helm-echo-input-in-header-line)
-	  (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
-	    (overlay-put ov 'window (selected-window))
-	    (overlay-put ov 'face (let ((bg-color (face-background 'default nil)))
-				    `(:background ,bg-color :foreground ,bg-color)))
-	    (setq-local cursor-type nil))))
-
-      (add-hook 'helm-minibuffer-set-up-hook 'helm-hide-minibuffer-maybe)
-
-      ;; Proper find file behavior
-      (defun dwim-helm-find-files-up-one-level-maybe ()
-	(interactive)
-	(if (looking-back "/" 1)
-	    (call-interactively 'helm-find-files-up-one-level)
-	  (delete-char 1)))
-
-      (defun dwim-helm-find-files-navigate-forward (orig-fun &rest args)
-	"Adjust how helm-execute-persistent actions behaves, depending on context"
-	(if (file-directory-p (helm-get-selection))
-	    (apply orig-fun args)
-	  (helm-maybe-exit-minibuffer)))
-
-      (advice-add 'helm-execute-persistent-action :around #'dwim-helm-find-files-navigate-forward)
-
-      ;; better smex integration
-      (use-package helm-smex
-	:ensure t
-	:bind* (("M-x" . helm-smex)
-		("M-X" . helm-smex-major-mode-commands)))
-
-      ;; Make helm fuzzier
-      (use-package helm-fuzzier
-	:ensure t
-	:commands (helm-fuzzier-mode)
-	:config
-	(helm-fuzzier-mode 1))
-
-      ;; Add support for flx
-      (use-package helm-flx
-	:ensure t
-	:commands (helm-flx-mode)
-	:config
-	(helm-flx-mode 1))
-
-      ;; to search in projects - the silver searcher
-      (use-package helm-ag
-	:ensure t
-	:bind* (("M-m g s" . helm-do-ag-project-root)
-		("M-m g e" . helm-do-ag)))
-
-      ;; to search in files
-      (use-package helm-swoop
-	:ensure t
-	:bind (("C-s" . helm-swoop-without-pre-input))
-	:bind* (("M-m #"   . helm-swoop)
-		("M-m g /" . helm-multi-swoop)
-		("M-m o /" . helm-multi-swoop-org)
-		("M-m g E" . helm-multi-swoop-all))
-	:init
-	(setq helm-swoop-split-with-multiple-windows nil
-	      helm-swoop-split-direction 'split-window-vertically
-	      helm-swoop-split-window-function 'helm-default-display-buffer))
-
-      ;; to help with projectile
-      (use-package helm-projectile
-	:ensure t
-	:bind* (("M-m SPC d" . helm-projectile))
-	:init
-	(setq projectile-completion-system 'helm))
-
-      ;; to describe bindings
-      (use-package helm-descbinds
-	:ensure t
-	:bind* (("M-m SPC ?" . helm-descbinds)))
-
-      ;; Control AWS via helm
-      (use-package helm-aws
-	:ensure t
-	:bind* (("M-m SPC h w" . helm-aws)))
-
-      ;; List errors with helm
-      (use-package helm-flycheck
-	:ensure t
-	:bind* (("M-m SPC l" . helm-flycheck)))
-
-      ;; Select snippets with helm
-      (use-package helm-c-yasnippet
-	:ensure t
-	:bind (("C-o" . helm-yas-complete))
-	:bind* (("C-,"        . helm-yas-create-snippet-on-region)
-		("C-<escape>" . helm-yas-visit-snippet-file)))
-
-      ;; Helm integration with make
-      (use-package helm-make
-	:ensure t
-	:init
-	(setq helm-make-build-dir "build")
-	:bind* (("M-m SPC m" . helm-make-projectile)
-		("M-m SPC M" . helm-make))))
-
-
-    (modalka-define-kbd "t" "M-m t")
-    (modalka-define-kbd "#" "M-m #")
-    (modalka-define-kbd ";" "M-m ;")
-    (modalka-define-kbd "SPC J" "M-X")
-    (modalka-define-kbd "g E" "M-m g E")
-    (modalka-define-kbd "g s" "M-m g s")
-    (modalka-define-kbd "g /" "M-m g /")
-    (modalka-define-kbd "o /" "M-m o /")
-    (modalka-define-kbd "g e" "M-m g e")
-    (modalka-define-kbd "g u" "C-c C-e")
-    (modalka-define-kbd "SPC r" "M-m SPC r")
-    (modalka-define-kbd "SPC b" "M-m SPC b")
-    (modalka-define-kbd "SPC x" "M-m SPC x")
-    (modalka-define-kbd "SPC F" "M-m SPC F")
-    (modalka-define-kbd "SPC C" "M-m SPC C")
-    (modalka-define-kbd "SPC m" "M-m SPC m")
-    (modalka-define-kbd "SPC M" "M-m SPC M")
-    (modalka-define-kbd "SPC h r" "M-m SPC h r")
-    (modalka-define-kbd "SPC h e" "M-m SPC h e")
-    (modalka-define-kbd "SPC h w" "M-m SPC h w")
-    (modalka-define-kbd "SPC h i" "M-m SPC h i")
-    (modalka-define-kbd "SPC h R" "M-m SPC h R")
-    (modalka-define-kbd "SPC h u" "M-m SPC h u")
-    (modalka-define-kbd "SPC h t" "M-m SPC h t")
-    (modalka-define-kbd "SPC h p" "M-m SPC h p")
-    (modalka-define-kbd "SPC h k" "M-m SPC h k")
-    (modalka-define-kbd "SPC h d" "M-m SPC h d")
-    (modalka-define-kbd "SPC h h" "M-m SPC h h")
-    (modalka-define-kbd "SPC h x" "M-m SPC h x")
-    (modalka-define-kbd "SPC h j" "M-m SPC h j")
-    (modalka-define-kbd "SPC h J" "M-m SPC h J")
-    (modalka-define-kbd "SPC h s" "M-m SPC h s")
-
-    (which-key-add-key-based-replacements
-      "t"       "tags/func in buffer"
-      "#"       "swoop at point"
-      ";"       "previous edit points"
-      "g E"     "extract word from buffers"
-      "g s"     "search project"
-      "g /"     "multi file search"
-      "o /"     "org swoop"
-      "g e"     "extract word from dir"
-      "SPC r"   "find any file"
-      "SPC C"   "color picker"
-      "g u"     "simulate C-c C-e"
-      "SPC b"   "bibliography"
-      "SPC x"   "helm apropos"
-      "SPC J"   "helm major mode cmds"
-      "SPC F"   "find command"
-      "SPC h"   "helm prefix"
-      "SPC h r" "resume last helm "
-      "SPC h e" "external command"
-      "SPC h w" "AWS instances"
-      "SPC h i" "information at point"
-      "SPC h R" "build regexp"
-      "SPC h u" "surfraw"
-      "SPC h t" "system processes"
-      "SPC h p" "emacs processes"
-      "SPC h k" "calc expression"
-      "SPC h d" "manual docs"
-      "SPC h h" "helm docs"
-      "SPC h x" "select font"
-      "SPC h j" "circe chat"
-      "SPC h J" "circe new activity"
-      "SPC h s" "helm spelling"
-      "SPC m" "make in project"
-      "SPC M" "make in current dir")
-  #+end_src
+  (which-key-add-key-based-replacements
+    "t"       "tags/func in buffer"
+    "#"       "swoop at point"
+    ";"       "previous edit points"
+    "g E"     "extract word from buffers"
+    "g s"     "search project"
+    "g /"     "multi file search"
+    "o /"     "org swoop"
+    "g e"     "extract word from dir"
+    "SPC r"   "find any file"
+    "SPC C"   "color picker"
+    "g u"     "simulate C-c C-e"
+    "SPC b"   "bibliography"
+    "SPC x"   "helm apropos"
+    "SPC J"   "helm major mode cmds"
+    "SPC F"   "find command"
+    "SPC h"   "helm prefix"
+    "SPC h r" "resume last helm "
+    "SPC h e" "external command"
+    "SPC h w" "AWS instances"
+    "SPC h i" "information at point"
+    "SPC h R" "build regexp"
+    "SPC h u" "surfraw"
+    "SPC h t" "system processes"
+    "SPC h p" "emacs processes"
+    "SPC h k" "calc expression"
+    "SPC h d" "manual docs"
+    "SPC h h" "helm docs"
+    "SPC h x" "select font"
+    "SPC h j" "circe chat"
+    "SPC h J" "circe new activity"
+    "SPC h s" "helm spelling"
+    "SPC m" "make in project"
+    "SPC M" "make in current dir")
+#+end_src
 * 视觉相关
 ** 文字居中
-   #+begin_src emacs-lisp
-     (use-package centered-window
-       :ensure t
-       :init
-       (setq cwm-centered-window-width 120))
-   #+end_src
+*** darkroom
+#+begin_src emacs-lisp
+  (use-package darkroom
+    :init
+    (setq darkroom-text-scale-increase 1))
+#+end_src
 ** Volatile highlights
-   #+begin_src emacs-lisp
-     (use-package volatile-highlights
-       :ensure t
-       :diminish volatile-highlights-mode
-       :config
-       (volatile-highlights-mode t))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package volatile-highlights
+    :diminish volatile-highlights-mode
+    :config
+    (volatile-highlights-mode t))
+#+end_src
 ** Hight thing
-   #+begin_src emacs-lisp
-     (use-package highlight-thing
-       :ensure t
-       :diminish highlight-thing-mode
-       :bind* (("M-m g *" . highlight-thing-mode)))
+#+begin_src emacs-lisp
+  (use-package highlight-thing
+    :diminish highlight-thing-mode
+    :bind* (("M-m g *" . highlight-thing-mode)))
 
-     (modalka-define-kbd "g *" "M-m g *")
+  (modalka-define-kbd "g *" "M-m g *")
 
-     (which-key-add-key-based-replacements
-       "g *" "highlight symbol")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "g *" "highlight symbol")
+#+end_src
 ** Column enforce mode
-   #+begin_src emacs-lisp
-     (use-package column-enforce-mode
-       :ensure t
-       :init
-       (setq column-enforce-column 99)
-       :hook (prog-mode . column-enforce-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package column-enforce-mode
+    :init
+    (setq column-enforce-column 99)
+    :diminish column-enforce-mode
+    :hook (prog-mode . column-enforce-mode))
+#+end_src
 ** Highlight indentation
-   #+begin_src emacs-lisp
-     (use-package highlight-indentation
-       :ensure t)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package highlight-indentation)
+#+end_src
 ** Fill column indicator
-   #+begin_src emacs-lisp
-     (use-package fill-column-indicator
-       :ensure t
-       :init
-       (setq fci-rule-width 5
-	     fci-rule-column 79))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package fill-column-indicator
+    :init
+    (setq fci-rule-width 5
+          fci-rule-column 79))
+#+end_src
 ** White space butler
-   #+begin_src emacs-lisp
-     (use-package ws-butler
-       :ensure t
-       :diminish ws-butler-mode
-       :config
-       (ws-butler-global-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package ws-butler
+    :diminish ws-butler-mode
+    :config
+    (ws-butler-global-mode))
+#+end_src
 ** Region state
-   #+begin_src emacs-lisp
-     (use-package region-state
-       :ensure t
-       :config
-       (region-state-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package region-state
+    :config
+    (region-state-mode))
+#+end_src
 ** Mode line
-   #+begin_src emacs-lisp
-     (use-package spaceline
-       :ensure t
-       :defer 1
-       :init
-       (setq powerline-default-separator 'arrow-fade)
-       :config
-       (require 'spaceline-config)
-       (spaceline-spacemacs-theme)
-       (spaceline-helm-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  ;; (use-package spaceline
+  ;;
+  ;;   :demand t
+  ;;   :init
+  ;;   (setq powerline-default-separator 'arrow-fade)
+  ;;   :config
+  ;;   (require 'spaceline-config)
+  ;;   (spaceline-spacemacs-theme)
+  ;;   (spaceline-helm-mode))
+#+end_src
 ** Fancy battery
-   #+begin_src emacs-lisp
-     (use-package fancy-battery
-       :ensure t
-       :init
-       (setq fancy-battery-show-percentage t)
-       :config
-       (fancy-battery-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package fancy-battery
+    :init
+    (setq fancy-battery-show-percentage t)
+    :config
+    (fancy-battery-mode))
+#+end_src
 ** Origami
-   #+begin_src emacs-lisp
-     (use-package origami
-       :ensure t
-       :bind* (("M-m -" . orgiami-toggle-node)))
+#+begin_src emacs-lisp
+  (use-package origami
+    :bind* (("M-m -" . orgiami-toggle-node)))
 
-     (modalka-define-kbd "-" "M-m -")
+  (modalka-define-kbd "-" "M-m -")
 
-     (which-key-add-key-based-replacements
-       "-" "syntax-based fold toggle")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "-" "syntax-based fold toggle")
+#+end_src
 ** Vimish fold
-   #+begin_src emacs-lisp
-	  (use-package vimish-fold
-	    :ensure t)
+#+begin_src emacs-lisp
+  (use-package vimish-fold)
 
-	  (defhydra st/hydra-vimish-fold (:color red
-					  :hint nil)
-	    "
-	   _f_: fold  _u_: unfold  _r_: refold  _t_: toggle  _d_: delete    _n_: next      _q_: quit
-		    _U_: Unfold  _R_: Refold  _T_: Toggle  _D_: Delete    _p_: previous
-	    "
-	    ("f" vimish-fold)
-	    ("u" vimish-fold-unfold)
-	    ("r" vimish-fold-refold)
-	    ("t" vimish-fold-toggle)
-	    ("d" vimish-fold-delete)
-	    ("U" vimish-fold-unfold-all)
-	    ("R" vimish-fold-refold-all)
-	    ("T" vimish-fold-toggle-all)
-	    ("D" vimish-fold-delete-all)
-	    ("n" vimish-fold-next-fold)
-	    ("p" vimish-fold-previous-fold)
-	    ("q" nil :color blue))
+  (defhydra st/hydra-vimish-fold (:color red
+                                         :hint nil)
+    "
+   _f_: fold  _u_: unfold  _r_: refold  _t_: toggle  _d_: delete    _n_: next      _q_: quit
+            _U_: Unfold  _R_: Refold  _T_: Toggle  _D_: Delete    _p_: previous
+    "
+    ("f" vimish-fold)
+    ("u" vimish-fold-unfold)
+    ("r" vimish-fold-refold)
+    ("t" vimish-fold-toggle)
+    ("d" vimish-fold-delete)
+    ("U" vimish-fold-unfold-all)
+    ("R" vimish-fold-refold-all)
+    ("T" vimish-fold-toggle-all)
+    ("D" vimish-fold-delete-all)
+    ("n" vimish-fold-next-fold)
+    ("p" vimish-fold-previous-fold)
+    ("q" nil :color blue))
 
-	  (bind-keys*
-	    ("M-m _" . vimish-fold-toggle)
-	    ("M-m |" . st/hydra-vimish-fold/body))
+  (bind-keys*
+   ("M-m _" . vimish-fold-toggle)
+   ("M-m |" . st/hydra-vimish-fold/body))
 
-	  (modalka-define-kbd "_" "M-m _")
-	  (modalka-define-kbd "|" "M-m |")
+  (modalka-define-kbd "_" "M-m _")
+  (modalka-define-kbd "|" "M-m |")
 
-	  (which-key-add-key-based-replacements
-	    "_" "sel-based fold toggle"
-	    "|" "sel-based fold menu")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "_" "sel-based fold toggle"
+    "|" "sel-based fold menu")
+#+end_src
 ** 字体设置
-   #+begin_src emacs-lisp
-     (use-package cnfonts
-       :ensure t
-       :init
-       (setq cnfonts-profiles '("code1")
-	     cnfonts--profiles-steps '(("code1" . 1)))
-       :config
-       (cnfonts-enable))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package cnfonts
+    :init
+    (setq cnfonts-profiles '("program" "org-mode" "read-book")
+          cnfonts--profiles-steps '(("program" . 2)))
+    :config
+    (cnfonts-enable))
+
+  (defun st/reset-font ()
+    "init font"
+    (interactive)
+    (set-face-attribute
+     'default nil
+     :font (font-spec :name "-APPL-Monaco-normal-normal-normal-*-32-*-*-*-*-0-iso10646-1"
+                      :weight 'normal
+                      :slant 'normal
+                      :size 8.0))
+    (dolist (charset '(kana han symbol cjk-misc bopomofo))
+      (set-fontset-font
+       (frame-parameter nil 'font)
+       charset
+       (font-spec :name "-????-等距更纱黑体 SC-normal-normal-normal-*-32-*-*-*-*-0-iso10646-1"
+                  :weight 'normal
+                  :slant 'normal
+                  :size 10.0))))
+
+  ;;(st/reset-font)
+
+  (defun st/font-monaco ()
+    (interactive)
+    (set-face-attribute 'default nil :font "Monaco"))
+
+  (defun st/font-courier ()
+    (interactive)
+    (set-face-attribute 'default nil :font "Courier Prime"))
+
+  ;; Font types
+  (defun st/small-type ()
+    (interactive)
+    (set-face-attribute 'default nil  :height 95)
+    (set-frame-width (selected-frame) 89))
+
+  (defun st/medium-type ()
+    (interactive)
+    (set-face-attribute 'default nil  :height 107)
+    (set-frame-width (selected-frame) 89))
+
+  (defun st/large-type ()
+    (interactive)
+    (set-face-attribute 'default nil  :height 175)
+    (set-frame-width (selected-frame) 68))
+#+end_src
 ** 主题
-   #+begin_src emacs-lisp
-     (use-package doom-themes
-       :ensure t
-       :config
-       (load-theme 'dichromacy t))
-     ;; (use-package tear-theme
-     ;;   :ensure t
-     ;;   :config
-     ;;   (load-theme 'tear t))
-   #+end_src
+#+begin_src emacs-lisp
+  ;; (use-package color-theme-sanityinc-tomorrow
+  ;;
+  ;;   :config
+  ;;   (load-theme 'sanityinc-tomorrow-day t))
+  ;; (use-package doom-themes
+  ;;
+  ;;   :config
+  ;;   (load-theme 'whiteboard t)
+  ;;   (require 'tear-theme)
+  ;;   (load-theme 'tear t)
+  ;;   )
+  ;;(require 'tear-theme)
+  ;;(load-theme 'tear t)
+  ;; (use-package tear-theme
+  ;;
+  ;;   :config
+  ;;   (load-theme 'tear t))
+  (require 'tear-theme)
+  (load-theme 'tear t)
+  ;; (use-package zenburn-theme
+  ;;   :config
+  ;;   (load-theme 'zenburn t))
+  ;; (use-package solarized-theme
+  ;;   :config
+  ;;   (load-theme 'solarized-light t))
+#+end_src
 * 编辑相关
 ** 打字机模式
-   #+begin_src emacs-lisp
-     (use-package centered-cursor-mode
-       :ensure t)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package centered-cursor-mode)
+#+end_src
 ** Expand region
-   #+begin_src emacs-lisp
-     (defun st/mark-inside-org-code ()
-       "Select inside an Org code block without the org specific syntax"
-       (interactive)
-       (er/mark-org-code-block)
-       (forward-line 1)
-       (exchange-point-and-mark)
-       (forward-line -1)
-       (end-of-line 1))
+#+begin_src emacs-lisp
+  (defun st/mark-inside-org-code ()
+    "Select inside an Org code block without the org specific syntax"
+    (interactive)
+    (er/mark-org-code-block)
+    (forward-line 1)
+    (exchange-point-and-mark)
+    (forward-line -1)
+    (end-of-line 1))
 
-     (defun st/mark-around-LaTeX-environment ()
-       "Select around a LaTeX environment with both the begin and end keywords"
-       (interactive)
-       (er/mark-LaTeX-inside-environment)
-       (forward-line -1)
-       (exchange-point-and-mark)
-       (forward-line 1)
-       (end-of-line 1))
+  (defun st/mark-around-LaTeX-environment ()
+    "Select around a LaTeX environment with both the begin and end keywords"
+    (interactive)
+    (er/mark-LaTeX-inside-environment)
+    (forward-line -1)
+    (exchange-point-and-mark)
+    (forward-line 1)
+    (end-of-line 1))
 
-     (defun st/mark-around-word ()
-       "Mark the word and the adjacent whitespace"
-       (interactive)
-       (er/mark-word)
-       (exchange-point-and-mark)
-       (forward-char 1))
+  (defun st/mark-around-word ()
+    "Mark the word and the adjacent whitespace"
+    (interactive)
+    (er/mark-word)
+    (exchange-point-and-mark)
+    (forward-char 1))
 
-     (defun st/mark-around-text-paragraph ()
-       "Mark the paragraph and the newline"
-       (interactive)
-       (er/mark-text-paragraph)
-       (exchange-point-and-mark)
-       (forward-line 1))
+  (defun st/mark-around-text-paragraph ()
+    "Mark the paragraph and the newline"
+    (interactive)
+    (er/mark-text-paragraph)
+    (exchange-point-and-mark)
+    (forward-line 1))
 
-     (defun st/mark-inside-LaTeX-math ()
-       "Mark inside the latex math"
-       (interactive)
-       (er/mark-LaTeX-math)
-       (forward-char 1)
-       (exchange-point-and-mark)
-       (backward-char 1))
+  (defun st/mark-inside-LaTeX-math ()
+    "Mark inside the latex math"
+    (interactive)
+    (er/mark-LaTeX-math)
+    (forward-char 1)
+    (exchange-point-and-mark)
+    (backward-char 1))
 
-     (defun st/mark-inside-python-block ()
-       "Mark inside a python block"
-       (interactive)
-       (er/mark-python-block)
-       (forward-line 1))
+  (defun st/mark-inside-python-block ()
+    "Mark inside a python block"
+    (interactive)
+    (er/mark-python-block)
+    (forward-line 1))
 
-     (defun st/mark-inside-ruby-block ()
-       "Mark inside a ruby/julia block"
-       (interactive)
-       (er/mark-ruby-block-up)
-       (forward-line 1)
-       (exchange-point-and-mark)
-       (forward-line -1))
+  (defun st/mark-inside-ruby-block ()
+    "Mark inside a ruby/julia block"
+    (interactive)
+    (er/mark-ruby-block-up)
+    (forward-line 1)
+    (exchange-point-and-mark)
+    (forward-line -1))
 
-     (defun st/mark-around-symbol ()
-       "Mark around a symbol including the nearby whitespace"
-       (interactive)
-       (er/mark-symbol)
-       (exchange-point-and-mark)
-       (forward-char 1))
+  (defun st/mark-around-symbol ()
+    "Mark around a symbol including the nearby whitespace"
+    (interactive)
+    (er/mark-symbol)
+    (exchange-point-and-mark)
+    (forward-char 1))
 
-     (use-package expand-region
-       :ensure t
-       :commands (er/try-expand-list)
-       :bind* (("M-m a o" . er/mark-org-code-block)
-	       ("M-m a w" . st/mark-around-word)
-	       ("M-m a p" . st/mark-around-text-paragraph)
-	       ("M-m a f" . er/mark-defun)
-	       ("M-m a e" . st/mark-around-LaTeX-environment)
-	       ("M-m a t" . er/mark-LaTeX-math)
-	       ("M-m a m" . er/mark-python-block)
-	       ("M-m a j" . er/mark-ruby-block-up)
-	       ("M-m a q" . er/mark-outside-quotes)
-	       ("M-m a b" . er/mark-outside-pairs)
-	       ("M-m a u" . er/mark-url)
-	       ("M-m a c" . er/mark-comment)
-	       ("M-m a v" . st/mark-around-symbol)
-	       ("M-m i p" . er/mark-text-paragraph)
-	       ("M-m i f" . er/mark-defun)
-	       ("M-m i w" . er/mark-word)
-	       ("M-m i e" . er/mark-LaTeX-inside-environment)
-	       ("M-m i t" . st/mark-inside-LaTeX-math)
-	       ("M-m i u" . er/mark-url)
-	       ("M-m i c" . er/mark-comment)
-	       ("M-m i b" . er/mark-inside-pairs)
-	       ("M-m i q" . er/mark-inside-quotes)
-	       ("M-m i o" . st/mark-inside-org-code)
-	       ("M-m i m" . st/mark-inside-python-block)
-	       ("M-m i j" . st/mark-inside-ruby-block)
-	       ("M-m i v" . er/mark-symbol)))
+  (use-package expand-region
 
-     (defun er/add-org-mode-expansions ()
-       (make-local-variable 'er/try-expand-list)
-       (setq er/try-expand-list (append
-				 er/try-expand-list
-				 '(mark-LaTeX-math))))
-     (add-hook 'org-mode-hook 'er/add-org-mode-expansions)
+    :bind* (("M-m a o" . er/mark-org-code-block)
+            ("M-m a w" . st/mark-around-word)
+            ("M-m a p" . st/mark-around-text-paragraph)
+            ("M-m a f" . er/mark-defun)
+            ("M-m a e" . st/mark-around-LaTeX-environment)
+            ("M-m a t" . er/mark-LaTeX-math)
+            ("M-m a m" . er/mark-python-block)
+            ("M-m a j" . er/mark-ruby-block-up)
+            ("M-m a q" . er/mark-outside-quotes)
+            ("M-m a b" . er/mark-outside-pairs)
+            ("M-m a u" . er/mark-url)
+            ("M-m a c" . er/mark-comment)
+            ("M-m a v" . st/mark-around-symbol)
+            ("M-m i p" . er/mark-text-paragraph)
+            ("M-m i f" . er/mark-defun)
+            ("M-m i w" . er/mark-word)
+            ("M-m i e" . er/mark-LaTeX-inside-environment)
+            ("M-m i t" . st/mark-inside-LaTeX-math)
+            ("M-m i u" . er/mark-url)
+            ("M-m i c" . er/mark-comment)
+            ("M-m i b" . er/mark-inside-pairs)
+            ("M-m i q" . er/mark-inside-quotes)
+            ("M-m i o" . st/mark-inside-org-code)
+            ("M-m i m" . st/mark-inside-python-block)
+            ("M-m i j" . st/mark-inside-ruby-block)
+            ("M-m i v" . er/mark-symbol)))
 
-     (modalka-define-kbd "a o" "M-m a o")
-     (modalka-define-kbd "a w" "M-m a w")
-     (modalka-define-kbd "a p" "M-m a p")
-     (modalka-define-kbd "a f" "M-m a f")
-     (modalka-define-kbd "a e" "M-m a e")
-     (modalka-define-kbd "a t" "M-m a t")
-     (modalka-define-kbd "a m" "M-m a m")
-     (modalka-define-kbd "a j" "M-m a j")
-     (modalka-define-kbd "a q" "M-m a q")
-     (modalka-define-kbd "a b" "M-m a b")
-     (modalka-define-kbd "a u" "M-m a u")
-     (modalka-define-kbd "a c" "M-m a c")
-     (modalka-define-kbd "a v" "M-m a v")
-     (modalka-define-kbd "i p" "M-m i p")
-     (modalka-define-kbd "i f" "M-m i f")
-     (modalka-define-kbd "i w" "M-m i w")
-     (modalka-define-kbd "i u" "M-m i u")
-     (modalka-define-kbd "i t" "M-m i t")
-     (modalka-define-kbd "i e" "M-m i e")
-     (modalka-define-kbd "i c" "M-m i c")
-     (modalka-define-kbd "i b" "M-m i b")
-     (modalka-define-kbd "i q" "M-m i q")
-     (modalka-define-kbd "i o" "M-m i o")
-     (modalka-define-kbd "i m" "M-m i m")
-     (modalka-define-kbd "i j" "M-m i j")
-     (modalka-define-kbd "i v" "M-m i v")
+  (defun er/add-org-mode-expansions ()
+    (make-variable-buffer-local 'er/try-expand-list)
+    (setq er/try-expand-list (append
+                              er/try-expand-list
+                              '(mark-LaTeX-math))))
+  (add-hook 'org-mode-hook 'er/add-org-mode-expansions)
 
-     (which-key-add-key-based-replacements
-       "a"   "expand around prefix"
-       "a o" "expand an org block"
-       "a w" "expand a word"
-       "a p" "expand a para"
-       "a f" "expand a func"
-       "a e" "expand a latex env"
-       "a t" "expand a latex math"
-       "a m" "expand a python block"
-       "a j" "expand a julia block"
-       "a q" "expand a quote"
-       "a b" "expand a pair"
-       "a u" "expand a url"
-       "a c" "expand a comment"
-       "a v" "expand a variable"
-       "i"   "expand inside prefix"
-       "i p" "expand in para"
-       "i f" "expand in func"
-       "i w" "expand in word"
-       "i u" "expand in url"
-       "i e" "expand in latex env"
-       "i t" "expand in latex math"
-       "i c" "expand in comment"
-       "i b" "expand in pair"
-       "i q" "expand in quote"
-       "i o" "expand in org code"
-       "i m" "expand in python block"
-       "i j" "expand in julia block"
-       "i v" "expand in symbol")
-   #+end_src
+  (modalka-define-kbd "a o" "M-m a o")
+  (modalka-define-kbd "a w" "M-m a w")
+  (modalka-define-kbd "a p" "M-m a p")
+  (modalka-define-kbd "a f" "M-m a f")
+  (modalka-define-kbd "a e" "M-m a e")
+  (modalka-define-kbd "a t" "M-m a t")
+  (modalka-define-kbd "a m" "M-m a m")
+  (modalka-define-kbd "a j" "M-m a j")
+  (modalka-define-kbd "a q" "M-m a q")
+  (modalka-define-kbd "a b" "M-m a b")
+  (modalka-define-kbd "a u" "M-m a u")
+  (modalka-define-kbd "a c" "M-m a c")
+  (modalka-define-kbd "a v" "M-m a v")
+  (modalka-define-kbd "i p" "M-m i p")
+  (modalka-define-kbd "i f" "M-m i f")
+  (modalka-define-kbd "i w" "M-m i w")
+  (modalka-define-kbd "i u" "M-m i u")
+  (modalka-define-kbd "i t" "M-m i t")
+  (modalka-define-kbd "i e" "M-m i e")
+  (modalka-define-kbd "i c" "M-m i c")
+  (modalka-define-kbd "i b" "M-m i b")
+  (modalka-define-kbd "i q" "M-m i q")
+  (modalka-define-kbd "i o" "M-m i o")
+  (modalka-define-kbd "i m" "M-m i m")
+  (modalka-define-kbd "i j" "M-m i j")
+  (modalka-define-kbd "i v" "M-m i v")
+
+  (which-key-add-key-based-replacements
+    "a"   "expand around prefix"
+    "a o" "expand an org block"
+    "a w" "expand a word"
+    "a p" "expand a para"
+    "a f" "expand a func"
+    "a e" "expand a latex env"
+    "a t" "expand a latex math"
+    "a m" "expand a python block"
+    "a j" "expand a julia block"
+    "a q" "expand a quote"
+    "a b" "expand a pair"
+    "a u" "expand a url"
+    "a c" "expand a comment"
+    "a v" "expand a variable"
+    "i"   "expand inside prefix"
+    "i p" "expand in para"
+    "i f" "expand in func"
+    "i w" "expand in word"
+    "i u" "expand in url"
+    "i e" "expand in latex env"
+    "i t" "expand in latex math"
+    "i c" "expand in comment"
+    "i b" "expand in pair"
+    "i q" "expand in quote"
+    "i o" "expand in org code"
+    "i m" "expand in python block"
+    "i j" "expand in julia block"
+    "i v" "expand in symbol")
+#+end_src
 ** 注释
-   #+begin_src emacs-lisp
-     (use-package comment-dwim-2
-       :ensure t
-       :bind* (("M-m g c" . comment-dwim-2)))
+#+begin_src emacs-lisp
+  (use-package comment-dwim-2
+    :bind* (("M-m g c" . comment-dwim-2)))
 
-     (modalka-define-kbd "g c" "M-m g c")
+  (modalka-define-kbd "g c" "M-m g c")
 
-     (which-key-add-key-based-replacements
-       "g c" "comment line/region")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "g c" "comment line/region")
+#+end_src
 ** Pair
-   #+begin_src emacs-lisp
-     (use-package paredit
-       :ensure t
-       :hook ((emacs-lisp-mode
-	       scheme-mode) . enable-paredit-mode))
-     (add-hook 'c-mode-hook 'electric-pair-mode)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package paredit
+    :diminish (paredit-mode . "Pe")
+    :hook ((emacs-lisp-mode
+            scheme-mode) . enable-paredit-mode))
+  (add-hook 'c-mode-hook 'electric-pair-mode)
+  (add-hook 'js2-mode-hook 'electric-pair-mode)
+#+end_src
 ** Interactive edit
-   #+begin_src emacs-lisp
-     (use-package iedit
-       :ensure t
-       :bind* (("M-m *" . iedit-mode)))
+#+begin_src emacs-lisp
+  (use-package iedit
+    :bind* (("M-m *" . iedit-mode)))
 
-     (modalka-define-kbd "*" "M-m *")
+  (modalka-define-kbd "*" "M-m *")
 
-     (which-key-add-key-based-replacements
-       "*" "multi edit all")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "*" "multi edit all")
+#+end_src
 ** Multiple cursors
-   #+begin_src emacs-lisp
-     (use-package multiple-cursors
-       :ensure t
-       :bind* (("M-m ." . mc/edit-lines)
-	       ("M-m >" . mc/mark-next-line-this)
-	       ("M-m ," . mc/skip-to-next-like-this)
-	       ("M-m <" . mc/mark-previous-like-this)))
+#+begin_src emacs-lisp
+  (use-package multiple-cursors
+    :bind* (("M-m ." . mc/edit-lines)
+            ("M-m >" . mc/mark-next-line-this)
+            ("M-m ," . mc/skip-to-next-like-this)
+            ("M-m <" . mc/mark-previous-like-this)))
 
-     (use-package region-bindings-mode
-       :ensure t
-       :demand t
-       :bind (:map region-bindings-mode-map
-		   ("<" . mc/mark-previous-like-this)
-		   ("," . mc/skip-to-next-like-this)
-		   (">" . mc/mark-next-like-this)
-		   ("." . mc/edit-lines))
-       :diminish (region-bindings-mode . "ρ")
-       :config
-       (add-hook 'after-init-hook 'region-bindings-mode-enable))
+  (use-package region-bindings-mode
+    :demand t
+    :bind (:map region-bindings-mode-map
+                ("<" . mc/mark-previous-like-this)
+                ("," . mc/skip-to-next-like-this)
+                (">" . mc/mark-next-like-this)
+                ("." . mc/edit-lines))
+    :diminish (region-bindings-mode . " rb")
+    :config
+    (add-hook 'after-init-hook 'region-bindings-mode-enable))
 
-     (modalka-define-kbd "." "M-m .")
-     (modalka-define-kbd ">" "M-m >")
-     (modalka-define-kbd "," "M-m ,")
-     (modalka-define-kbd "<" "M-m <")
+  (modalka-define-kbd "." "M-m .")
+  (modalka-define-kbd ">" "M-m >")
+  (modalka-define-kbd "," "M-m ,")
+  (modalka-define-kbd "<" "M-m <")
 
-     (which-key-add-key-based-replacements
-       ">" "multi cursor next"
-       "," "multi cursor skip"
-       "<" "multi cursor prev"
-       "." "multi edit lines")
-   #+end_src
+  (which-key-add-key-based-replacements
+    ">" "multi cursor next"
+    "," "multi cursor skip"
+    "<" "multi cursor prev"
+    "." "multi edit lines")
+#+end_src
 ** Shrink white space
-   #+begin_src emacs-lisp
-     (use-package shrink-whitespace
-       :ensure t
-       :bind* (("M-m g SPC" . shrink-whitespace)))
+#+begin_src emacs-lisp
+  (use-package shrink-whitespace
+    :bind* (("M-m g SPC" . shrink-whitespace)))
 
-     (modalka-define-kbd "g SPC" "M-m g SPC")
+  (modalka-define-kbd "g SPC" "M-m g SPC")
 
-     (which-key-add-key-based-replacements
-       "g SPC" "shrink space")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "g SPC" "shrink space")
+#+end_src
 ** Visual replace
-   #+begin_src emacs-lisp
-     (use-package visual-regexp
-       :ensure t
-       :bind* (("M-m SPC SPC" . vr/query-replace))
-       :config
-       (use-package visual-regexp-steroids
-	 :ensure t
-	 :commands (vr/select-query-replace)))
+#+begin_src emacs-lisp
+  (use-package visual-regexp
+    :bind* (("M-m SPC SPC" . vr/query-replace))
+    :config
+    (use-package visual-regexp-steroids
+      ))
 
-     (modalka-define-kbd "SPC SPC" "M-m SPC SPC")
+  (modalka-define-kbd "SPC SPC" "M-m SPC SPC")
 
-     (which-key-add-key-based-replacements
-       "SPC SPC" "replace word/expression")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "SPC SPC" "replace word/expression")
+#+end_src
 ** Yasnippet
-   #+begin_src emacs-lisp
-     (use-package yasnippet
-       :ensure t
-       :bind (("C-o" . yas-insert-snippet))
-       :bind* (("C-="        . yas-new-snippet)
-	       ("C-<escape>" . yas-visit-snippet-file))
-       :diminish (yas-minor-mode . "γ")
-       :config
-       (setq yas-triggers-in-field t); Enable nested triggering of snippets
-       (setq yas-prompt-functions '(yas-completing-prompt))
-       (add-hook 'snippet-mode-hook '(lambda () (setq-local require-final-newline nil)))
-       (yas-global-mode))
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :bind (("C-o" . yas-insert-snippet))
+    :bind* (("C-="        . yas-new-snippet)
+            ("C-<escape>" . yas-visit-snippet-file))
+    :diminish (yas-minor-mode . " yas")
+    :config
+    (setq yas-triggers-in-field t); Enable nested triggering of snippets
+    (setq yas-prompt-functions '(yas-completing-prompt))
+    (add-hook 'snippet-mode-hook '(lambda () (setq-local require-final-newline nil)))
+    (yas-global-mode))
 
-     (defun st/force-yasnippet-off ()
-       (yas-minor-mode -1)
-       (setq yas-dont-activate-functions t))
-     (add-hook 'term-mode-hook 'st/force-yasnippet-off)
-     (add-hook 'shell-mode-hook 'st/force-yasnippet-off)
+  (use-package yasnippet-snippets
+    )
 
-   #+end_src
+  (defun st/force-yasnippet-off ()
+    (yas-minor-mode -1)
+    (setq yas-dont-activate-functions t))
+  (add-hook 'term-mode-hook 'st/force-yasnippet-off)
+  (add-hook 'shell-mode-hook 'st/force-yasnippet-off)
+
+#+end_src
 ** Cycle quotes
-   #+begin_src emacs-lisp
-     (use-package cycle-quotes
-       :ensure t
-       :bind* (("M-m s q" . cycle-quotes)))
+#+begin_src emacs-lisp
+  (use-package cycle-quotes
+    :bind* (("M-m s q" . cycle-quotes)))
 
-     (modalka-define-kbd "s q" "M-m s q")
+  (modalka-define-kbd "s q" "M-m s q")
 
-     (which-key-add-key-based-replacements
-       "s q" "switch quotes")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "s q" "switch quotes")
+#+end_src
 * 阅读相关
+** pdf阅读
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :config
+    (pdf-tools-install)
+    (setq-default pdf-view-display-size 'fit-page)
+    (bind-keys :map pdf-view-mode-map
+               ("\\" . hydra-pdftools/body)
+               ("<s-spc>" . pdf-view-scroll-down-or-next-page)
+               ("g" . pdf-view-first-page)
+               ("G" . pdf-view-last-page)
+               ("l" . image-forward-hscroll)
+               ("h" . image-backward-hscroll)
+               ("j" . pdf-view-next-line-or-next-page)
+               ("k" . pdf-view-previous-line-or-previous-page)
+               ("e" . pdf-view-goto-page)
+               ("u" . pdf-view-revert-buffer)
+               ("al" . pdf-annot-list-annotations)
+               ("ad" . pdf-annot-delete)
+               ("aa" . pdf-annot-attachment-dired)
+               ("am" . pdf-annot-add-markup-annotation)
+               ("at" . pdf-annot-add-text-annotation)
+               ("y" . pdf-view-kill-ring-save)
+               ("i" . pdf-misc-display-metadata)
+               ("s" . pdf-occur)
+               ("b" . pdf-view-set-slice-from-bounding-box)
+               ("r" . pdf-view-reset-slice))
+    (use-package org-pdfview
+      ))
+
+  (defhydra hydra-pdftools (:color blue :hint nil)
+    "
+                                                                        ╭───────────┐
+         Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+     ╭──────────────────────────────────────────────────────────────────┴───────────╯
+           ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+           ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+           ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+           ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+      _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+           ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+           ^^_n_^^      ^ ^  _r_eset slice box
+           ^^^↓^^^
+           ^^_G_^^
+     --------------------------------------------------------------------------------
+          "
+    ("\\" hydra-master/body "back")
+    ("al" pdf-annot-list-annotations)
+    ("ad" pdf-annot-delete)
+    ("aa" pdf-annot-attachment-dired)
+    ("am" pdf-annot-add-markup-annotation)
+    ("at" pdf-annot-add-text-annotation)
+    ("y"  pdf-view-kill-ring-save)
+    ("+" pdf-view-enlarge :color red)
+    ("-" pdf-view-shrink :color red)
+    ("0" pdf-view-scale-reset)
+    ("H" pdf-view-fit-height-to-window)
+    ("W" pdf-view-fit-width-to-window)
+    ("P" pdf-view-fit-page-to-window)
+    ("n" pdf-view-next-page-command :color red)
+    ("p" pdf-view-previous-page-command :color red)
+    ("d" pdf-view-dark-minor-mode)
+    ("b" pdf-view-set-slice-from-bounding-box)
+    ("r" pdf-view-reset-slice)
+    ("g" pdf-view-first-page)
+    ("G" pdf-view-last-page)
+    ("e" pdf-view-goto-page)
+    ("o" pdf-outline)
+    ("s" pdf-occur)
+    ("i" pdf-misc-display-metadata)
+    ("u" pdf-view-revert-buffer)
+    ("F" pdf-links-action-perfom)
+    ("f" pdf-links-isearch-link)
+    ("B" pdf-history-backward :color red)
+    ("N" pdf-history-forward :color red)
+    ("l" image-forward-hscroll :color red)
+    ("h" image-backward-hscroll :color red))
+#+end_src
 ** epub阅读
-   #+begin_src emacs-lisp
-     (use-package nov
-       :ensure t
-       :mode ("\\.epub\\'" . nov-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package nov
+    :mode ("\\.epub\\'" . nov-mode)
+    :bind (:map nov-mode-map
+                ("j" . next-line)
+                ("k" . previous-line)))
+#+end_src
 * Org相关
 ** 基础设置
-   #+begin_src emacs-lisp
-     (use-package org
-       :pin org
-       :ensure org-plus-contrib
-       :init
-       (setq org-directory "~/Notes"
-	     org-hide-emphasis-markers t
-	     org-image-actual-width '(300)
-	     org-src-fontify-natively t
-	     org-src-tab-acts-natively t
-	     org-export-backends '(beamer html latex md)))
+#+begin_src emacs-lisp
+  (use-package org
+    :pin org
+    :ensure org-plus-contrib
+    :init
+    (setq org-directory "~/Notes"
+          org-hide-emphasis-markers t
+          org-startup-indented t
+          org-hide-leading-stars t
+          org-image-actual-width '(300)
+          org-src-fontify-natively t
+          org-src-tab-acts-natively t
+          org-export-backends '(beamer html latex md)))
 
-     (use-package ox
-       :pin org
-       :ensure org-plus-contrib
-       :init
-       (setq org-export-with-smart-quotes t))
-   #+end_src
-
-** Org bullets
-   #+begin_src emacs-lisp
-     (use-package org-bullets
-       :ensure t
-       :hook (org-mode . org-bullets-mode))
-   #+end_src
+  (use-package ox
+    :pin org
+    :ensure org-plus-contrib
+    :init
+    (setq org-export-with-smart-quotes t
+          org-export-backends '(beamer html latex md)))
+#+end_src
 ** 模板定义
-   #+begin_src emacs-lisp
-     (use-package org-tempo
-       :pin org
-       :ensure org-plus-contrib
-       :init
-       (setq org-structure-template-alist '(("s" . "src")
-					    ("el" . "src emacs-lisp")
-					    ("js" . "src javascript")
-					    ("py" . "src python"))
-	     org-tempo-keywords-alist '(("a" . "AUTHOR")
-					("t" . "TITLE"))))
-
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package org-tempo
+    :pin org
+    :ensure org-plus-contrib
+    :init
+    (setq org-structure-template-alist '(("s" . "src")
+                                         ("el" . "src emacs-lisp")
+                                         ("js" . "src javascript")
+                                         ("py" . "src python"))
+          org-tempo-keywords-alist '(("a" . "AUTHOR")
+                                     ("t" . "TITLE"))))
+#+end_src
 ** 任务管理
-   #+begin_src emacs-lisp
-     (setq org-todo-keywords
-	   '((sequence "TODO(t)" "IN-PROGRESS(i)" "|" "DONE(d!)")
-	     (sequence "WAITING(w@/!)" "|" "CANCELED(c@)")))
-   #+end_src
+#+begin_src emacs-lisp
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "IN-PROGRESS(i)" "|" "DONE(d!)")
+          (sequence "WAITING(w@/!)" "|" "CANCELED(c@)")))
+#+end_src
 ** Agenda
-   #+begin_src emacs-lisp
-     (setq-default org-agenda-files '("~/Notes/brain"))
-     (setq-default org-deadline-warnings-days 7
-		   org-agenda-span 'fortnight
-		   org-agenda-skip-scheduled-if-deadline-is-shown t)
-   #+end_src
+#+begin_src emacs-lisp
+  (setq-default org-agenda-files '("~/Notes/brain"))
+  (setq-default org-deadline-warnings-days 7
+                org-agenda-span 'fortnight
+                org-agenda-skip-scheduled-if-deadline-is-shown t)
+#+end_src
 ** Capture
-   #+begin_src emacs-lisp
-     (defvar org-agenda-file-inbox "~/Notes/brain/Inbox.org")
-     (defvar org-agenda-file-bookmarks "~/Notes/brain/Bookmarks.org")
-     (setq-default org-default-notes-file "~/Notes/brain/Inbox.org")
-     (require 'org-protocol)
-     ;; [[https://github.com/toure00/org-capture-tag-bookmark]]
-     (setq-default org-capture-templates
-		   '(("t" "todo" entry (file org-agenda-file-inbox)
-		      "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
-		     ("n" "note" entry (file org-agenda-file-inbox)
-		      "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
-		     ("b" "brain" plain (function org-brain-goto-end)
-		      "* %i%?" :empty-lines 1)
-		     ("p" "Org Protocol")
-		     ("pb" "Protocol Bookmarks" entry (file+headline org-agenda-file-bookmarks "Bookmarks")
-		      "* %U - %:annotation %:initial" :immediate-finish t :kill-buffer t)
-		     ("pn" "Protocol Notes" entry (file org-agenda-file-inbox)
-		      "* %U - %:annotation %:initial" :immediate-finish t :kill-buffer t)))
-     (setq-default org-refile-targets '((nil :maxlevel . 9)
-					(org-agenda-files :maxlevel . 9))
-	   org-refile-use-outline-path t
-	   org-outline-path-complete-in-steps nil
-	   org-refile-allow-creating-parent-nodes 'confirm
-	   org-indirect-buffer-display 'current-window)
-   #+end_src
+#+begin_src emacs-lisp
+  (defvar org-agenda-file-inbox "~/Notes/brain/Inbox.org")
+  (defvar org-agenda-file-bookmarks "~/Notes/brain/Bookmarks.org")
+  (setq org-default-notes-file "~/Notes/brain/Inbox.org")
+  (require 'org-protocol)
+  ;; [[https://github.com/toure00/org-capture-tag-bookmark]]
+  (setq org-capture-templates
+        '(("t" "todo" entry (file org-agenda-file-inbox)
+           "* TODO %?\n%U\n%a\n" :kill-buffer t)
+          ("n" "note" entry (file org-agenda-file-inbox)
+           "* %? :NOTE:\n%U\n%a\n" :kill-buffer t)
+          ("b" "brain" plain (function org-brain-goto-end)
+           "* %i%?" :empty-lines 1)
+          ("p" "Org Protocol")
+          ("pb" "Protocol Bookmarks" entry (file+headline org-agenda-file-bookmarks "Bookmarks")
+           "* %U - %:annotation %:initial" :immediate-finish t :kill-buffer t)
+          ("pn" "Protocol Notes" entry (file org-agenda-file-inbox)
+           "* %U - %:annotation %:initial" :immediate-finish t :kill-buffer t)))
+  (setq org-refile-targets '((nil :maxlevel . 9)
+                             (org-agenda-files :maxlevel . 9))
+        org-refile-use-outline-path t
+        org-outline-path-complete-in-steps nil
+        org-refile-allow-creating-parent-nodes 'confirm
+        org-indirect-buffer-display 'current-window)
+#+end_src
 ** Org drill
-   #+begin_src emacs-lisp
-     (use-package org-drill
-       :defer t
-       :init
-       (setq org-drill-maximum-items-per-session 50
-	     org-drill-maximum-duration 20   ; 20 minutes
-	     org-drill-use-visible-cloze-face-p t
-	     org-drill-add-random-noise-to-intervals-p t
-	     org-drill-hint-separator "||"
-	     org-drill-left-cloze-delimiter "<["
-	     org-drill-right-cloze-delimiter "]>"
-	     org-drill-learn-fraction 0.25
-	     org-drill-cram-hours 2
-	     org-drill-leech-method 'warn)
-       :config
-       (progn
-	 (add-to-list 'org-modules 'org-drill)))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package org-drill
+    :defer t
+    :commands (org-drill org-drill-tree org-drill-directory)
+    :init
+    (setq org-drill-maximum-items-per-session 50
+          org-drill-maximum-duration 20   ; 20 minutes
+          org-drill-use-visible-cloze-face-p t
+          org-drill-add-random-noise-to-intervals-p t
+          org-drill-hint-separator "||"
+          org-drill-left-cloze-delimiter "<["
+          org-drill-right-cloze-delimiter "]>"
+          org-drill-learn-fraction 0.25
+          org-drill-cram-hours 2
+          org-drill-leech-method 'warn)
+    :config
+    (progn
+      (add-to-list 'org-modules 'org-drill)))
+#+end_src
 ** Org babel
-   #+begin_src emacs-lisp
-     (use-package babel
-       :ensure t
-       :init
-       (setq org-confirm-babel-evaluate nil))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package babel
+    :defer t
+    :init
+    (setq org-confirm-babel-evaluate nil))
+#+end_src
 ** Deft
-   #+begin_src emacs-lisp
-     (use-package deft
-       :ensure t
-       :init
-       (setq deft-extensions '("org")
-	     deft-recursive nil
-	     deft-use-filename-as-title t))
+#+begin_src emacs-lisp
+  (use-package deft
+    :commands (deft)
+    :init
+    (setq deft-extensions '("org")
+          deft-recursive nil
+          deft-use-filename-as-title t))
 
-     (defun st/deft (dir)
-       "Run deft in directory DIR"
-       (setq deft-directory dir)
-       (switch-to-buffer "*Deft*")
-       (kill-this-buffer)
-       (deft))
+  (defun st/deft (dir)
+    "Run deft in directory DIR"
+    (setq deft-directory dir)
+    (switch-to-buffer "*Deft*")
+    (kill-this-buffer)
+    (deft))
 
-     (defun st/deft-org ()
-       "Uses the st/deft function to search in the default org directory"
-       (interactive)
-       (st/deft "~/Notes"))
+  (defun st/deft-org ()
+    "Uses the st/deft function to search in the default org directory"
+    (interactive)
+    (st/deft "~/Notes"))
 
-     (defun st/deft-blog ()
-       "Uses the st/deft function to search in the blog posts directory"
-       (interactive)
-       (st/deft "~/blog"))
+  (defun st/deft-brain ()
+    (interactive)
+    (st/deft "~/Notes/brain"))
 
-     (defun st/deft-brain ()
-       "Uses the st/deft function to search in the org-brain directory"
-       (interactive)
-       (st/deft "~/Notes/brain"))
+  (bind-keys*
+   ("M-m o f" . st/deft-org))
 
-     (bind-keys*
-      ("M-m o f" . st/deft-org)
-      ("M-m o F" . st/deft-blog))
+  (modalka-define-kbd "o f" "M-m o f")
 
-     (modalka-define-kbd "o f" "M-m o f")
-     (modalka-define-kbd "o F" "M-m o F")
-
-     (which-key-add-key-based-replacements
-       "o f" "filter org files"
-       "o F" "filter blog posts")
-   #+end_src
-** Interleave
-   #+begin_src emacs-lisp
-     (use-package interleave
-       :ensure t
-       :bind* (("M-m o n" . interleave-mode)))
-
-     (modalka-define-kbd "o n" "M-m o n")
-
-     (which-key-add-key-based-replacements
-       "o n" "org notes")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "o f" "filter org files")
+#+end_src
 ** Org download
-   #+begin_src emacs-lisp
-     (use-package org-download
-       :ensure t)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package org-download)
+#+end_src
+** Org bullets
+#+begin_src emacs-lisp
+  (use-package org-bullets
+    :hook (org-mode . org-bullets-mode))
+#+end_src
 ** Org reference
-   #+begin_src emacs-lisp
-     ;; (use-package org-ref
-     ;;   :ensure t
-     ;;   :init
-     ;;   (setq org-ref-completion-library 'org-ref-ivy-bibtex)
-     ;;   (setq org-ref-notes-directory "~/Notes/references/notes"
-     ;; 	org-ref-bibliography-notes "~/Notes/references/articles.org"
-     ;; 	org-ref-default-bibliography '("~/Notes/references/pl.bib")
-     ;; 	org-ref-pdf-directory "~/Notes/references/pdfs"))
-   #+end_src
+#+begin_src emacs-lisp
+  ;; (use-package org-ref
+  ;;
+  ;;   :init
+  ;;   (setq org-ref-completion-library 'org-ref-ivy-bibtex)
+  ;;   (setq org-ref-notes-directory "~/Notes/references/notes"
+  ;; 	org-ref-bibliography-notes "~/Notes/references/articles.org"
+  ;; 	org-ref-default-bibliography '("~/Notes/references/pl.bib")
+  ;; 	org-ref-pdf-directory "~/Notes/references/pdfs"))
+#+end_src
 ** org-brain
-   #+begin_src emacs-lisp
-     (use-package org-brain
-       :ensure t
-       :init
-       (setq org-brain-path "~/Notes/brain")
-       :config
-       (setq org-id-track-globally t)
-       (setq org-id-locations-file "~/Notes/brain/config/org-id-locations")
-       (setq org-brain-data-file "~/Notes/brain/config/org-brain-data.el")
-       (load org-brain-data-file)
-       (setq org-brain-visualize-default-choices 'all)
-       (setq org-brain-title-max-length 32))
-   #+end_src
-** org-attach
-   #+begin_src emacs-lisp
-     (use-package org-attach
-       :init
-       (setq org-attach-directory (expand-file-name "~/Notes/attachments")))
-   #+end_src
+#+begin_src emacs-lisp
+  (defun org-brain-open-org-noter (entry)
+    "Open `org-noter' on the ENTRY.
+  If run interactively, get ENTRY from context."
+    (interactive (list (org-brain-entry-at-pt)))
+    (org-with-point-at (org-brain-entry-marker entry)
+      (org-noter)))
+
+  (use-package org-brain
+    :init
+    (setq org-brain-path "~/Notes/brain")
+    :hook (org-brain-visualize-mode . darkroom-mode)
+    :bind (:map org-brain-visualize-mode-map
+                ("C-c n" . org-brain-open-org-noter))
+    :config
+    (setq org-id-track-globally t)
+    (setq org-id-locations-file "~/Notes/brain/config/org-id-locations")
+    (setq org-brain-data-file "~/Notes/brain/config/org-brain-data.el")
+    (load org-brain-data-file)
+    (setq org-brain-visualize-default-choices 'all)
+    (setq org-brain-title-max-length 32))
+#+end_src
+** org-noter
+#+begin_src emacs-lisp
+  (use-package org-noter
+    :hook (org-noter-insert-heading . org-id-get-create)
+    :bind* (("M-m o n" . org-noter)))
+
+  (modalka-define-kbd "o n" "M-m o n")
+
+  (which-key-add-key-based-replacements
+    "o n" "org notes")
+#+end_src
 ** 按键绑定
-   #+begin_src emacs-lisp
-     (bind-keys*
-      ("M-m o a"   . org-agenda)
-      ("M-m o c"   . org-capture)
-      ("M-m o i"   . org-insert-link)
-      ("M-m o s"   . org-store-link)
-      ("M-m o S"   . org-list-make-subtree)
-      ("M-m o A"   . org-archive-subtree)
-      ("M-m o g"   . org-goto)
-      ("M-m o l"   . org-toggle-latex-fragment)
-      ("M-m o L"   . org-toggle-link-display)
-      ("M-m o I"   . org-toggle-inline-images)
-      ("M-m o k"   . org-cut-subtree)
-      ("M-m o V"   . org-reveal)
-      ("M-m o R"   . org-refile)
-      ("M-m o y"   . org-copy-subtree)
-      ("M-m o h"   . org-toggle-heading)
-      ("M-m o H"   . org-insert-heading-respect-content)
-      ("M-m o e"   . org-export-dispatch)
-      ("M-m o u"   . org-update-dblock)
-      ("M-m o U"   . org-update-all-dblocks)
-      ("M-m o O"   . org-footnote-new)
-      ("M-m o ]"   . org-narrow-to-subtree)
-      ("M-m o ["   . widen)
-      ("M-m o N"   . org-add-note)
-      ("M-m o F"   . org-attach)
-      ("M-m o E"   . org-set-effort)
-      ("M-m o B"   . org-table-blank-field)
-      ("M-m o b"   . org-brain-visualize)
-      ("M-m o <"   . org-date-from-calendar)
-      ("M-m o >"   . org-goto-calendar)
-      ("M-m o d"   . org-todo)
-      ("M-m o t"   . org-set-tags-command)
-      ("M-m o w"   . org-edit-special)
-      ("M-m o q"   . org-edit-src-exit)
-      ("M-m o z"   . clone-indirect-buffer-other-window)
-      ("M-m a s"   . org-mark-subtree)
-      ("M-m o RET" . org-open-at-point))
+#+begin_src emacs-lisp
+  (bind-keys*
+   ("M-m o a"   . org-agenda)
+   ("M-m o c"   . org-capture)
+   ("M-m o i"   . org-insert-link)
+   ("M-m o s"   . org-store-link)
+   ("M-m o S"   . org-list-make-subtree)
+   ("M-m o A"   . org-archive-subtree)
+   ("M-m o g"   . org-goto)
+   ("M-m o l"   . org-toggle-latex-fragment)
+   ("M-m o L"   . org-toggle-link-display)
+   ("M-m o I"   . org-toggle-inline-images)
+   ("M-m o k"   . org-cut-subtree)
+   ("M-m o V"   . org-reveal)
+   ("M-m o R"   . org-refile)
+   ("M-m o y"   . org-copy-subtree)
+   ("M-m o h"   . org-toggle-heading)
+   ("M-m o H"   . org-insert-heading-respect-content)
+   ("M-m o e"   . org-export-dispatch)
+   ("M-m o u"   . org-update-dblock)
+   ("M-m o U"   . org-update-all-dblocks)
+   ("M-m o O"   . org-footnote-new)
+   ("M-m o ]"   . org-narrow-to-subtree)
+   ("M-m o ["   . widen)
+   ("M-m o N"   . org-add-note)
+   ("M-m o F"   . org-attach)
+   ("M-m o E"   . org-set-effort)
+   ("M-m o B"   . org-table-blank-field)
+   ("M-m o b"   . org-brain-visualize)
+   ("M-m o <"   . org-date-from-calendar)
+   ("M-m o >"   . org-goto-calendar)
+   ("M-m o d"   . org-todo)
+   ("M-m o t"   . org-set-tags-command)
+   ("M-m o w"   . org-edit-special)
+   ("M-m o q"   . org-edit-src-exit)
+   ("M-m o z"   . clone-indirect-buffer-other-window)
+   ("M-m a s"   . org-mark-subtree)
+   ("M-m o RET" . org-open-at-point))
 
-     (which-key-add-key-based-replacements
-       "M-m o" "org mode prefix")
+  (which-key-add-key-based-replacements
+    "M-m o" "org mode prefix")
 
-     (modalka-define-kbd "o a"   "M-m o a")
-     (modalka-define-kbd "o c"   "M-m o c")
-     (modalka-define-kbd "o i"   "M-m o i")
-     (modalka-define-kbd "o s"   "M-m o s")
-     (modalka-define-kbd "o S"   "M-m o S")
-     (modalka-define-kbd "o A"   "M-m o A")
-     (modalka-define-kbd "o g"   "M-m o g")
-     (modalka-define-kbd "o l"   "M-m o l")
-     (modalka-define-kbd "o L"   "M-m o L")
-     (modalka-define-kbd "o I"   "M-m o I")
-     (modalka-define-kbd "o k"   "M-m o k")
-     (modalka-define-kbd "o V"   "M-m o V")
-     (modalka-define-kbd "o R"   "M-m o R")
-     (modalka-define-kbd "o y"   "M-m o y")
-     (modalka-define-kbd "o h"   "M-m o h")
-     (modalka-define-kbd "o H"   "M-m o H")
-     (modalka-define-kbd "o e"   "M-m o e")
-     (modalka-define-kbd "o u"   "M-m o u")
-     (modalka-define-kbd "o U"   "M-m o U")
-     (modalka-define-kbd "o O"   "M-m o O")
-     (modalka-define-kbd "o ]"   "M-m o ]")
-     (modalka-define-kbd "o ["   "M-m o [")
-     (modalka-define-kbd "o N"   "M-m o N")
-     (modalka-define-kbd "o F"   "M-m o F")
-     (modalka-define-kbd "o E"   "M-m o E")
-     (modalka-define-kbd "o B"   "M-m o B")
-     (modalka-define-kbd "o b"   "M-m o b")
-     (modalka-define-kbd "o <"   "M-m o <")
-     (modalka-define-kbd "o >"   "M-m o >")
-     (modalka-define-kbd "o d"   "M-m o d")
-     (modalka-define-kbd "o t"   "M-m o t")
-     (modalka-define-kbd "o z"   "M-m o z")
-     (modalka-define-kbd "o w"   "M-m o w")
-     (modalka-define-kbd "o q"   "M-m o q")
-     (modalka-define-kbd "a s"   "M-m a s")
-     (modalka-define-kbd "o RET" "M-m o RET")
+  (modalka-define-kbd "o a"   "M-m o a")
+  (modalka-define-kbd "o c"   "M-m o c")
+  (modalka-define-kbd "o i"   "M-m o i")
+  (modalka-define-kbd "o s"   "M-m o s")
+  (modalka-define-kbd "o S"   "M-m o S")
+  (modalka-define-kbd "o A"   "M-m o A")
+  (modalka-define-kbd "o g"   "M-m o g")
+  (modalka-define-kbd "o l"   "M-m o l")
+  (modalka-define-kbd "o L"   "M-m o L")
+  (modalka-define-kbd "o I"   "M-m o I")
+  (modalka-define-kbd "o k"   "M-m o k")
+  (modalka-define-kbd "o V"   "M-m o V")
+  (modalka-define-kbd "o R"   "M-m o R")
+  (modalka-define-kbd "o y"   "M-m o y")
+  (modalka-define-kbd "o h"   "M-m o h")
+  (modalka-define-kbd "o H"   "M-m o H")
+  (modalka-define-kbd "o e"   "M-m o e")
+  (modalka-define-kbd "o u"   "M-m o u")
+  (modalka-define-kbd "o U"   "M-m o U")
+  (modalka-define-kbd "o O"   "M-m o O")
+  (modalka-define-kbd "o ]"   "M-m o ]")
+  (modalka-define-kbd "o ["   "M-m o [")
+  (modalka-define-kbd "o N"   "M-m o N")
+  (modalka-define-kbd "o F"   "M-m o F")
+  (modalka-define-kbd "o E"   "M-m o E")
+  (modalka-define-kbd "o B"   "M-m o B")
+  (modalka-define-kbd "o b"   "M-m o b")
+  (modalka-define-kbd "o <"   "M-m o <")
+  (modalka-define-kbd "o >"   "M-m o >")
+  (modalka-define-kbd "o d"   "M-m o d")
+  (modalka-define-kbd "o t"   "M-m o t")
+  (modalka-define-kbd "o z"   "M-m o z")
+  (modalka-define-kbd "o w"   "M-m o w")
+  (modalka-define-kbd "o q"   "M-m o q")
+  (modalka-define-kbd "a s"   "M-m a s")
+  (modalka-define-kbd "o RET" "M-m o RET")
 
-     (which-key-add-key-based-replacements
-       "o"     "org prefix"
-       "o a"   "org agenda"
-       "o c"   "org capture"
-       "o i"   "org insert link"
-       "o s"   "org store link"
-       "o S"   "org subtree from list"
-       "o A"   "org archive subtree"
-       "o g"   "org goto"
-       "o l"   "org latex preview"
-       "o L"   "org toggle link display"
-       "o I"   "org image preview"
-       "o k"   "org kill subtree"
-       "o V"   "org reveal"
-       "o R"   "org refile"
-       "o y"   "org copy subtree"
-       "o h"   "org toggle heading"
-       "o H"   "org insert heading"
-       "o e"   "org export"
-       "o u"   "org update current"
-       "o U"   "org update all"
-       "o O"   "org footnote"
-       "o ]"   "org narrow subtree"
-       "o ["   "org widen"
-       "o N"   "org note"
-       "o F"   "org attach"
-       "o E"   "org set effort"
-       "o B"   "org table blank field"
-       "o b"   "org brain random"
-       "o <"   "org select from cal"
-       "o >"   "org goto cal"
-       "o t"   "org tag"
-       "o d"   "org todo"
-       "o z"   "split and clone"
-       "o w"   "org special edit"
-       "o q"   "org special edit quit"
-       "a s"   "mark org subtree"
-       "o RET" "org open link")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "o"     "org prefix"
+    "o a"   "org agenda"
+    "o c"   "org capture"
+    "o i"   "org insert link"
+    "o s"   "org store link"
+    "o S"   "org subtree from list"
+    "o A"   "org archive subtree"
+    "o g"   "org goto"
+    "o l"   "org latex preview"
+    "o L"   "org toggle link display"
+    "o I"   "org image preview"
+    "o k"   "org kill subtree"
+    "o V"   "org reveal"
+    "o R"   "org refile"
+    "o y"   "org copy subtree"
+    "o h"   "org toggle heading"
+    "o H"   "org insert heading"
+    "o e"   "org export"
+    "o u"   "org update current"
+    "o U"   "org update all"
+    "o O"   "org footnote"
+    "o ]"   "org narrow subtree"
+    "o ["   "org widen"
+    "o N"   "org note"
+    "o F"   "org attach"
+    "o E"   "org set effort"
+    "o B"   "org table blank field"
+    "o b"   "org brain random"
+    "o <"   "org select from cal"
+    "o >"   "org goto cal"
+    "o t"   "org tag"
+    "o d"   "org todo"
+    "o z"   "split and clone"
+    "o w"   "org special edit"
+    "o q"   "org special edit quit"
+    "a s"   "mark org subtree"
+    "o RET" "org open link")
+#+end_src
 * Calibre Library
-  #+begin_src emacs-lisp
-    (require 'calibre-mode)
-    (setq sql-sqlite-program "/usr/bin/sqlite3"
-	  calibre-root-dir (expand-file-name "~/Calibre Library"))
-  #+end_src
+#+begin_src emacs-lisp
+  (require 'calibre-mode)
+  (setq sql-sqlite-program "/usr/bin/sqlite3"
+        calibre-root-dir (expand-file-name "~/Calibre Library"))
+#+end_src
 * Blog
-  #+begin_src emacs-lisp
-    (use-package blog-admin
-      :ensure t
-      :defer 2
-      :init
-      (setq blog-admin-backend-path "~/blog"
-	    blog-admin-backend-type 'hexo
-	    blog-admin-backend-new-post-in-drafts t
-	    blog-admin-backend-new-post-with-same-name-dir t))
-  #+end_src
+#+begin_src emacs-lisp
+  (use-package blog-admin
+    :defer 2
+    :init
+    (setq blog-admin-backend-path "~/blog"
+          blog-admin-backend-type 'hexo
+          blog-admin-backend-new-post-in-drafts t
+          blog-admin-backend-new-post-with-same-name-dir t))
+#+end_src
+* 版本控制
+** Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :bind* (("M-m SPC e" . magit-status)
+            ("M-m g b" . magit-blame)))
+
+  (modalka-define-kbd "SPC e" "M-m SPC e")
+  (modalka-define-kbd "g b" "M-m g b")
+
+  (which-key-add-key-based-replacements
+    "SPC e" "explore git"
+    "g b" "git blame")
+#+end_src
+** Highlight diffs
+#+begin_src emacs-lisp
+  (use-package diff-hl
+    :commands (global-diff-hl-mode
+               diff-hl-mode
+               diff-hl-next-hunk
+               diff-hl-previous-hunk
+               diff-hl-mark-hunk
+               diff-hl-diff-goto-hunk
+               diff-hl-revert-hunk)
+    :bind* (("M-m ] h" . diff-hl-next-hunk)
+            ("M-m [ h" . diff-hl-previous-hunk)
+            ("M-m i h" . diff-hl-mark-hunk)
+            ("M-m a h" . diff-hl-mark-hunk)
+            ("M-m g h" . diff-hl-diff-goto-hunk)
+            ("M-m g H" . diff-hl-revert-hunk))
+    :config
+    (global-diff-hl-mode)
+    (diff-hl-flydiff-mode)
+    (diff-hl-margin-mode)
+    (diff-hl-dired-mode))
+
+  (modalka-define-kbd "] h" "M-m ] h")
+  (modalka-define-kbd "[ h" "M-m [ h")
+  (modalka-define-kbd "g h" "M-m g h")
+  (modalka-define-kbd "g H" "M-m g H")
+  (modalka-define-kbd "i h" "M-m i h")
+  (modalka-define-kbd "a h" "M-m a h")
+
+  (which-key-add-key-based-replacements
+    "] h" "next git hunk"
+    "[ h" "previous git hunk"
+    "g h" "goto git hunk"
+    "g H" "revert git hunk"
+    "i h" "select git hunk"
+    "a h" "select a git hunk")
+#+end_src
+** Git time machine
+#+begin_src emacs-lisp
+  (use-package git-timemachine
+    :commands (git-timemachine-toggle
+               git-timemachine-switch-branch)
+    :bind* (("M-m g l" . git-timemachine-toggle)
+            ("M-m g L" . git-timemachine-switch-branch)))
+
+  (modalka-define-kbd "g l" "M-m g l")
+  (modalka-define-kbd "g L" "M-m g L")
+
+  (which-key-add-key-based-replacements
+    "g l" "git time machine"
+    "g L" "time machine switch branch")
+#+end_src
+** Gists
+#+begin_src emacs-lisp
+  (use-package yagist
+    :commands (yagist-region-or-buffer
+               yagist-region-or-buffer-private)
+    :bind* (("M-m g p" . yagist-region-or-buffer)
+            ("M-m g P" . yagist-region-or-buffer-private))
+    :init
+    (setq yagist-encrypt-risky-config t))
+
+  (modalka-define-kbd "g p" "M-m g p")
+  (modalka-define-kbd "g P" "M-m g P")
+
+  (which-key-add-key-based-replacements
+    "g p" "gist public"
+    "g P" "gist private")
+
+#+end_src
+** Browse remote files
+#+begin_src emacs-lisp
+  (use-package browse-at-remote
+    :bind* (("M-m g i" . browse-at-remote)
+            ("M-m g I" . browse-at-remote-kill)))
+
+  (modalka-define-kbd "g i" "M-m g i")
+  (modalka-define-kbd "g I" "M-m g I")
+
+  (which-key-add-key-based-replacements
+    "g i" "browse file/region remote"
+    "g I" "copy remote URL")
+#+end_src
 * 开发相关
 ** 自动缩进
-   #+begin_src emacs-lisp
-     (use-package aggressive-indent
-       :ensure t
-       :hook ((emacs-lisp-mode
-	       c-mode
-	       scheme-mode
-	       js2-mode) . aggressive-indent-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package aggressive-indent
+    :hook ((emacs-lisp-mode
+            scheme-mode) . aggressive-indent-mode))
+#+end_src
 ** REPL
 *** Eshell
-    #+begin_src emacs-lisp
-      (use-package eshell
-	:bind* (("M-m SPC s" . st/eshell-vertical)
-		("M-m SPC S" . st/eshell-horizontal))
-	:config
-	(setq eshell-glob-case-insensitive t
-	      eshell-scroll-to-bottom-on-input 'this
-	      eshell-buffer-shorthand t
-	      eshell-history-size 1024
-	      eshell-cmpl-ignore-case t
-	      eshell-aliases-file (concat user-emacs-directory ".eshell-aliases")
-	      eshell-last-dir-ring-size 512)
-	:hook
-	(shell-mode . goto-address-mode))
+#+begin_src emacs-lisp
+  (use-package eshell
+    :bind* (("M-m SPC s" . st/eshell-vertical)
+            ("M-m SPC S" . st/eshell-horizontal))
+    :config
+    (setq eshell-glob-case-insensitive t
+          eshell-scroll-to-bottom-on-input 'this
+          eshell-buffer-shorthand t
+          eshell-history-size 1024
+          eshell-cmpl-ignore-case t
+          eshell-aliases-file (concat user-emacs-directory ".eshell-aliases")
+          eshell-last-dir-ring-size 512)
+    :hook
+    (shell-mode . goto-address-mode))
 
-      ;; Vertical split eshell
-      (defun st/eshell-vertical ()
-	"opens up a new shell in the directory associated with the current buffer's file."
-	(interactive)
-	(let* ((parent (if (buffer-file-name)
-			   (file-name-directory (buffer-file-name))
-			 default-directory))
-	       (name (car (last (split-string parent "/" t)))))
-	  (split-window-right)
-	  (other-window 1)
-	  (eshell "new")
-	  (rename-buffer (concat "*eshell: " name "*"))
-	  (eshell-send-input)))
+  ;; Vertical split eshell
+  (defun st/eshell-vertical ()
+    "opens up a new shell in the directory associated with the current buffer's file."
+    (interactive)
+    (let* ((parent (if (buffer-file-name)
+                       (file-name-directory (buffer-file-name))
+                     default-directory))
+           (name (car (last (split-string parent "/" t)))))
+      (split-window-right)
+      (other-window 1)
+      (eshell "new")
+      (rename-buffer (concat "*eshell: " name "*"))
+      (eshell-send-input)))
 
-      ;; Horizontal split eshell
-      (defun st/eshell-horizontal ()
-	"opens up a new shell in the directory associated with the current buffer's file."
-	(interactive)
-	(let* ((parent (if (buffer-file-name)
-			   (file-name-directory (buffer-file-name))
-			 default-directory))
-	       (name (car (last (split-string parent "/" t)))))
-	  (split-window-below)
-	  (other-window 1)
-	  (eshell "new")
-	  (rename-buffer (concat "*eshell: " name "*"))
-	  (eshell-send-input)))
+  ;; Horizontal split eshell
+  (defun st/eshell-horizontal ()
+    "opens up a new shell in the directory associated with the current buffer's file."
+    (interactive)
+    (let* ((parent (if (buffer-file-name)
+                       (file-name-directory (buffer-file-name))
+                     default-directory))
+           (name (car (last (split-string parent "/" t)))))
+      (split-window-below)
+      (other-window 1)
+      (eshell "new")
+      (rename-buffer (concat "*eshell: " name "*"))
+      (eshell-send-input)))
 
-      (bind-keys*
-       ("M-m SPC s" . st/eshell-vertical)
-       ("M-m SPC S" . st/eshell-horizontal))
+  (bind-keys*
+   ("M-m SPC s" . st/eshell-vertical)
+   ("M-m SPC S" . st/eshell-horizontal))
 
-      (modalka-define-kbd "SPC s" "M-m SPC s")
-      (modalka-define-kbd "SPC S" "M-m SPC S")
+  (modalka-define-kbd "SPC s" "M-m SPC s")
+  (modalka-define-kbd "SPC S" "M-m SPC S")
 
-      (which-key-add-key-based-replacements
-	"SPC s" "eshell vertical split"
-	"SPC S" "eshell horizontal split")
-    #+end_src
+  (which-key-add-key-based-replacements
+    "SPC s" "eshell vertical split"
+    "SPC S" "eshell horizontal split")
+#+end_src
+** lsp
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :init
+    (setq lsp-enable-snippet t)
+    :commands lsp)
+
+  ;;optionally
+  (use-package lsp-ui
+    :init
+    (setq lsp-ui-sideline-enable t))
+
+  (use-package company-lsp
+    :init
+    (setq company-lsp-async t
+          company-lsp-enable-snippet t
+          company-lsp-cache-candicates nil))
+
+  (use-package helm-lsp)
+
+  ;; (use-package cquery
+  ;;   )
+#+end_src
 ** company
 #+begin_src emacs-lisp
   (use-package company
-    :ensure t
     :init
     (setq-default company-minimum-prefix-length 2
-		  company-require-match 0
-		  company-selection-wrap-around t
-		  company-dabbrev-downcase nil
-		  company-tooltip-limit 20                      ; bigger popup window
-		  company-tooltip-align-annotations 't          ; align annotations to the right tooltip border
-		  company-idle-delay .4                         ; decrease delay before autocompletion popup shows
-		  company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
+                  company-require-match 0
+                  company-selection-wrap-around t
+                  company-dabbrev-downcase nil
+                  company-tooltip-limit 20                      ; bigger popup window
+                  company-tooltip-align-annotations 't          ; align annotations to the right tooltip border
+                  company-idle-delay .4                         ; decrease delay before autocompletion popup shows
+                  company-begin-commands '(self-insert-command)) ; start autocompletion only after typing
     (eval-after-load 'company
       '(add-to-list 'company-backends '(company-files
-					company-capf)))
+                                        company-capf)))
     :bind (("M-t"   . company-complete)
-	   ("C-c f" . company-files)
-	   ("C-c a" . company-dabbrev)
-	   ("C-c d" . company-ispell)
-	   :map company-active-map
-	   ("C-n"    . company-select-next)
-	   ("C-p"    . company-select-previous)
-	   ([return] . company-complete-selection)
-	   ([tab] . company-complete-selection)
-	   ("C-w"    . backward-kill-word)
-	   ("C-c"    . company-abort)
-	   ("C-c"    . company-search-abort))
-    :diminish (company-mode . "ς")
+           ("C-c f" . company-files)
+           ("C-c a" . company-dabbrev)
+           ("C-c d" . company-ispell)
+           :map company-active-map
+           ("C-n"    . company-select-next)
+           ("C-p"    . company-select-previous)
+           ([return] . company-complete-selection)
+           ([tab] . company-complete-selection)
+           ("C-w"    . backward-kill-word)
+           ("C-c"    . company-abort)
+           ("C-c"    . company-search-abort))
+    :diminish (company-mode . " cp")
     :config
     (global-company-mode)
     ;; C++ header completion
     (use-package company-c-headers
-      :ensure t
       :config
       (add-to-list 'company-backends 'company-c-headers))
-    ;; Python auto completion
-    (use-package company-jedi
-      :ensure t
-      :config
-      (add-to-list 'company-backends 'company-jedi))
-    ;; HTML completion
-    (use-package company-web
-      :ensure t
-      :config
-      (add-to-list 'company-backends 'company-web-html))
     (use-package company-box
-      :ensure t
+      :diminish company-box-mode
       :hook (company-mode . company-box-mode)
       :config
       (setq company-box-show-single-candidate t
-	    company-box-backends-colors nil
-	    company-box-max-candidates 50
-	    company-box-icons-alist 'company-box-icons-all-the-icons
-	    company-box-icons-functions
-	    '(+company-box-icons--yasnippet company-box-icons--lsp +company-box-icons--elisp)
-	    company-box-icons-all-the-icons
-	    `((Unknown       . ,(all-the-icons-material "find_in_page"             :height 0.8 :face 'all-the-icons-purple))
-	      (Text          . ,(all-the-icons-material "text_fields"              :height 0.8 :face 'all-the-icons-green))
-	      (Method        . ,(all-the-icons-material "functions"                :height 0.8 :face 'all-the-icons-red))
-	      (Function      . ,(all-the-icons-material "functions"                :height 0.8 :face 'all-the-icons-red))
-	      (Constructor   . ,(all-the-icons-material "functions"                :height 0.8 :face 'all-the-icons-red))
-	      (Field         . ,(all-the-icons-material "functions"                :height 0.8 :face 'all-the-icons-red))
-	      (Variable      . ,(all-the-icons-material "adjust"                   :height 0.8 :face 'all-the-icons-blue))
-	      (Class         . ,(all-the-icons-material "class"                    :height 0.8 :face 'all-the-icons-red))
-	      (Interface     . ,(all-the-icons-material "settings_input_component" :height 0.8 :face 'all-the-icons-red))
-	      (Module        . ,(all-the-icons-material "view_module"              :height 0.8 :face 'all-the-icons-red))
-	      (Property      . ,(all-the-icons-material "settings"                 :height 0.8 :face 'all-the-icons-red))
-	      (Unit          . ,(all-the-icons-material "straighten"               :height 0.8 :face 'all-the-icons-red))
-	      (Value         . ,(all-the-icons-material "filter_1"                 :height 0.8 :face 'all-the-icons-red))
-	      (Enum          . ,(all-the-icons-material "plus_one"                 :height 0.8 :face 'all-the-icons-red))
-	      (Keyword       . ,(all-the-icons-material "filter_center_focus"      :height 0.8 :face 'all-the-icons-red))
-	      (Snippet       . ,(all-the-icons-material "short_text"               :height 0.8 :face 'all-the-icons-red))
-	      (Color         . ,(all-the-icons-material "color_lens"               :height 0.8 :face 'all-the-icons-red))
-	      (File          . ,(all-the-icons-material "insert_drive_file"        :height 0.8 :face 'all-the-icons-red))
-	      (Reference     . ,(all-the-icons-material "collections_bookmark"     :height 0.8 :face 'all-the-icons-red))
-	      (Folder        . ,(all-the-icons-material "folder"                   :height 0.8 :face 'all-the-icons-red))
-	      (EnumMember    . ,(all-the-icons-material "people"                   :height 0.8 :face 'all-the-icons-red))
-	      (Constant      . ,(all-the-icons-material "pause_circle_filled"      :height 0.8 :face 'all-the-icons-red))
-	      (Struct        . ,(all-the-icons-material "streetview"               :height 0.8 :face 'all-the-icons-red))
-	      (Event         . ,(all-the-icons-material "event"                    :height 0.8 :face 'all-the-icons-red))
-	      (Operator      . ,(all-the-icons-material "control_point"            :height 0.8 :face 'all-the-icons-red))
-	      (TypeParameter . ,(all-the-icons-material "class"                    :height 0.8 :face 'all-the-icons-red))
-	      (Yasnippet     . ,(all-the-icons-material "short_text"               :height 0.8 :face 'all-the-icons-green))
-	      (ElispFunction . ,(all-the-icons-material "functions"                :height 0.8 :face 'all-the-icons-red))
-	      (ElispVariable . ,(all-the-icons-material "check_circle"             :height 0.8 :face 'all-the-icons-blue))
-	      (ElispFeature  . ,(all-the-icons-material "stars"                    :height 0.8 :face 'all-the-icons-orange))
-	      (ElispFace     . ,(all-the-icons-material "format_paint"             :height 0.8 :face 'all-the-icons-pink))))
+            company-box-backends-colors nil
+            company-box-max-candidates 50
+            company-box-icons-alist 'company-box-icons-all-the-icons
+            company-box-icons-functions
+            '(+company-box-icons--yasnippet company-box-icons--lsp +company-box-icons--elisp)
+            company-box-icons-all-the-icons
+            `((Unknown       . ,(all-the-icons-material "find_in_page"             :height 0.8 :face 'all-the-icons-purple))
+              (Text          . ,(all-the-icons-material "text_fields"              :height 0.8 :face 'all-the-icons-green))
+              (Method        . ,(all-the-icons-material "functions"                :height 0.8 :face 'all-the-icons-red))
+              (Function      . ,(all-the-icons-material "functions"                :height 0.8 :face 'all-the-icons-red))
+              (Constructor   . ,(all-the-icons-material "functions"                :height 0.8 :face 'all-the-icons-red))
+              (Field         . ,(all-the-icons-material "functions"                :height 0.8 :face 'all-the-icons-red))
+              (Variable      . ,(all-the-icons-material "adjust"                   :height 0.8 :face 'all-the-icons-blue))
+              (Class         . ,(all-the-icons-material "class"                    :height 0.8 :face 'all-the-icons-red))
+              (Interface     . ,(all-the-icons-material "settings_input_component" :height 0.8 :face 'all-the-icons-red))
+              (Module        . ,(all-the-icons-material "view_module"              :height 0.8 :face 'all-the-icons-red))
+              (Property      . ,(all-the-icons-material "settings"                 :height 0.8 :face 'all-the-icons-red))
+              (Unit          . ,(all-the-icons-material "straighten"               :height 0.8 :face 'all-the-icons-red))
+              (Value         . ,(all-the-icons-material "filter_1"                 :height 0.8 :face 'all-the-icons-red))
+              (Enum          . ,(all-the-icons-material "plus_one"                 :height 0.8 :face 'all-the-icons-red))
+              (Keyword       . ,(all-the-icons-material "filter_center_focus"      :height 0.8 :face 'all-the-icons-red))
+              (Snippet       . ,(all-the-icons-material "short_text"               :height 0.8 :face 'all-the-icons-red))
+              (Color         . ,(all-the-icons-material "color_lens"               :height 0.8 :face 'all-the-icons-red))
+              (File          . ,(all-the-icons-material "insert_drive_file"        :height 0.8 :face 'all-the-icons-red))
+              (Reference     . ,(all-the-icons-material "collections_bookmark"     :height 0.8 :face 'all-the-icons-red))
+              (Folder        . ,(all-the-icons-material "folder"                   :height 0.8 :face 'all-the-icons-red))
+              (EnumMember    . ,(all-the-icons-material "people"                   :height 0.8 :face 'all-the-icons-red))
+              (Constant      . ,(all-the-icons-material "pause_circle_filled"      :height 0.8 :face 'all-the-icons-red))
+              (Struct        . ,(all-the-icons-material "streetview"               :height 0.8 :face 'all-the-icons-red))
+              (Event         . ,(all-the-icons-material "event"                    :height 0.8 :face 'all-the-icons-red))
+              (Operator      . ,(all-the-icons-material "control_point"            :height 0.8 :face 'all-the-icons-red))
+              (TypeParameter . ,(all-the-icons-material "class"                    :height 0.8 :face 'all-the-icons-red))
+              (Yasnippet     . ,(all-the-icons-material "short_text"               :height 0.8 :face 'all-the-icons-green))
+              (ElispFunction . ,(all-the-icons-material "functions"                :height 0.8 :face 'all-the-icons-red))
+              (ElispVariable . ,(all-the-icons-material "check_circle"             :height 0.8 :face 'all-the-icons-blue))
+              (ElispFeature  . ,(all-the-icons-material "stars"                    :height 0.8 :face 'all-the-icons-orange))
+              (ElispFace     . ,(all-the-icons-material "format_paint"             :height 0.8 :face 'all-the-icons-pink))))
       (defun +company-box-icons--yasnippet (candidate)
-	(when (get-text-property 0 'yas-annotation candidate)
-	  'Yasnippet))
+        (when (get-text-property 0 'yas-annotation candidate)
+          'Yasnippet))
 
       (defun +company-box-icons--elisp (candidate)
-	(when (derived-mode-p 'emacs-lisp-mode)
-	  (let ((sym (intern candidate)))
-	    (cond ((fboundp sym)  'ElispFunction)
-		  ((boundp sym)   'ElispVariable)
-		  ((featurep sym) 'ElispFeature)
-		  ((facep sym)    'ElispFace))))))
+        (when (derived-mode-p 'emacs-lisp-mode)
+          (let ((sym (intern candidate)))
+            (cond ((fboundp sym)  'ElispFunction)
+                  ((boundp sym)   'ElispVariable)
+                  ((featurep sym) 'ElispFeature)
+                  ((facep sym)    'ElispFace))))))
 
     (use-package company-tabnine
-      :ensure t
       :init
       (setq company-idle-delay 0)
       (setq company-show-numbers t)
-      :config
-      (company-tng-configure-default)
-      (setq company-frontends
-	    '(company-tng-frontend
-	      company-pseudo-tooltip-frontend
-	      company-echo-metadata-frontend))
-      (add-to-list 'company-backends 'company-tabnine)))
-   #+end_src
-** lsp
-   #+begin_src emacs-lisp
-     (use-package lsp-mode
-       :ensure t
-       :defer 1
-       :hook ((js2-mode c-mode) . lsp))
+      ;; :config
+      ;; (company-tng-configure-default)
+      ;; (setq company-frontends
+      ;; 	  '(company-tng-frontend
+      ;; 	    company-pseudo-tooltip-frontend
+      ;; 	    company-echo-metadata-frontend))
+      ;; (push '(company-tabnine :with company-yasnippet) company-backends)
+      )
 
-     ;;optionally
-     (use-package lsp-ui
-       :ensure t
-       :defer 1
-       :init
-       (setq lsp-ui-sideline-enable nil))
-     (use-package company-lsp
-       :ensure t
-       :defer 1)
-     (use-package helm-lsp
-       :ensure t
-       :defer 1)
-     (use-package lsp-treemacs
-       :ensure t
-       :defer 1)
-   #+end_src
+    (use-package company-statistics
+      :hook (after-init . company-statistics-mode)))
+
+
+  ;; (add-hook 'c-mode-hook
+  ;; 	  (lambda ()
+  ;; 	    (set (make-local-variable 'company-backends)
+  ;; 		 '((company-lsp
+  ;; 		    :with company-c-headers
+  ;; 		    :with company-yasnippet)))))
+
+  ;; (add-hook 'scheme-mode-hook
+  ;; 	  (lambda ()
+  ;; 	    (set (make-local-variable 'company-backends)
+  ;; 		 '((company-tabnine
+  ;; 		    company-yasnippet)))))
+
+  (add-hook 'js2-mode-hook
+            (lambda ()
+              (set (make-local-variable 'company-backends)
+                   '((company-tide :with company-tabnine :with company-yasnippet :separate)))))
+
+  (add-hook 'typescript-mode-hook
+            (lambda ()
+              (set (make-local-variable 'company-backends)
+                   '((company-tide :with company-tabnine :with company-yasnippet :separate)))))
+#+end_src
 ** 语法检查
-   #+begin_src emacs-lisp
-     (use-package flycheck
-       :ensure t
-       :diminish (flycheck-mode . " ⓢ")
-       :config
-       (global-flycheck-mode)
-       (setq-default
-	flycheck-disabled-checkers
-	(append flycheck-disabled-checkers
-		'(javascript-jshint ; use eslint instead
-		  json-jsonlist
-		  emacs-lisp-checkdoc)))
-       (flycheck-add-mode 'javascript-eslint 'web-mode)
-       (flycheck-add-mode 'javascript-eslint 'react-mode)
-       (setq-default flycheck-temp-prefix ".flycheck"))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :diminish (flycheck-mode . " fc")
+    :config
+    (global-flycheck-mode)
+    (setq-default
+     flycheck-disabled-checkers
+     (append flycheck-disabled-checkers
+             '(javascript-jshint ; use eslint instead
+               json-jsonlist
+               emacs-lisp-checkdoc)))
+    (flycheck-add-mode 'javascript-eslint 'web-mode)
+    (flycheck-add-mode 'javascript-eslint 'react-mode)
+    (setq-default flycheck-temp-prefix ".flycheck"))
+#+end_src
 ** Rainbow
-   #+begin_src emacs-lisp
-     (use-package rainbow-delimiters
-       :ensure t
-       :init
-       (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+
+  (use-package rainbow-mode)
+#+end_src
+** Show Paren
+#+begin_src emacs-lisp
+  (use-package paren
+    :hook
+    (prog-mode . show-paren-mode))
+#+end_src
 ** C
+*** c-mode
+#+begin_src emacs-lisp
+  (use-package cc-mode
+    :hook (c-mode . (lambda ()
+                      (lsp)
+                      (set
+                       (make-local-variable 'company-backends)
+                       '((company-lsp :with company-c-headers
+                                      :with company-yasnippet
+                                      :separate))))))
+#+end_src
 *** Compile commands
-    #+begin_src emacs-lisp
-      (defun st/compile-c ()
-	"Compiles the file"
-	(interactive)
-	(compile
-	 (concat "gcc -Wall -g "
-		 (buffer-file-name)
-		 " -o "
-		 (file-name-sans-extension buffer-file-name)
-		 ".out")))
-    #+end_src
+#+begin_src emacs-lisp
+  (defun st/compile-c ()
+    "Compiles the file"
+    (interactive)
+    (compile
+     (concat "gcc -Wall -g "
+             (buffer-file-name)
+             " -o "
+             (file-name-sans-extension buffer-file-name)
+             ".out")))
+#+end_src
 *** Rtags
-    #+begin_src emacs-lisp
-      (use-package rtags
-	:ensure t
-	:bind (:map c-mode-map
-		    ("C-c I" . rtags-print-symbol-info)
-		    ("C-c S" . rtags-find-symbol-at-point))
-	:init
-	(setq rtags-autostart-diagnostics t
-	      rtags-completions-enabled t))
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package rtags
+
+    :bind (:map c-mode-map
+                ("C-c I" . rtags-print-symbol-info)
+                ("C-c S" . rtags-find-symbol-at-point))
+    :init
+    (setq rtags-autostart-diagnostics t
+          rtags-completions-enabled t))
+#+end_src
 *** Cmake IDE
-    #+begin_src emacs-lisp
-      (use-package cmake-ide
-	:ensure t
-	:config
-	(cmake-ide-setup))
-    #+end_src
+#+begin_src emacs-lisp
+  ;; (use-package cmake-ide
+  ;;
+  ;;   :config
+  ;;   (cmake-ide-setup))
+#+end_src
 ** Emacs Lisp
-   #+begin_src emacs-lisp
-     (use-package elisp-mode
-       :mode ("\\.el$" . emacs-lisp-mode)
-       :bind (:map emacs-lisp-mode-map
-		   ("C-c I" . describe-function)
-		   ("C-c S" . find-function-at-point)))
+#+begin_src emacs-lisp
+  (use-package elisp-mode
+    :ensure nil
+    :mode ("\\.el$" . emacs-lisp-mode)
+    :bind (:map emacs-lisp-mode-map
+                ("C-c I" . describe-function)
+                ("C-c S" . find-function-at-point)))
 
-     (use-package macrostep
-       :ensure t)
-   #+end_src
+  (use-package macrostep)
+#+end_src
+** Scheme
+#+begin_src emacs-lisp
+  (use-package scheme
+    :mode ("\\.ss\\'" . scheme-mode)
+    :config
+    (require 'scheme-keywords))
+
+  (use-package geiser
+    :init
+    (setq geiser-active-implementations '(chez)))
+#+end_src
+** Go
+#+begin_src emacs-lisp
+  (use-package go-mode
+    :hook ((before-save . gofmt-before-save))
+    :init
+    (setq gofmt-command "goimports")
+    :config
+    (add-hook 'go-mode-hook 'electric-pair-mode))
+
+  (use-package go-eldoc
+    :defer t
+    :hook (go-mode . go-eldoc-setup))
+
+  (use-package go-guru
+    :defer t
+    :hook (go-mode . go-guru-hl-identifer-mode))
+
+  (use-package go-rename
+    :defer t)
+
+  (use-package company-go
+    :defer t
+    :config
+    (add-hook 'go-mode-hook
+              (lambda ()
+                (add-to-list (make-local-variable 'company-backends)
+                             '(company-go
+                               company-files
+                               company-yasnippet
+                               company-capf)))))
+#+end_src
 ** Markdown
-   #+begin_src emacs-lisp
-     (use-package markdown-mode
-       :ensure t
-       :mode ("\\.m[k]d" . markdown-mode))
-
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :mode ("\\.m[k]d" . markdown-mode))
+#+end_src
 ** json-mode
-   #+begin_src emacs-lisp
-     (use-package json-mode
-       :ensure t
-       :init
-       (add-auto-mode 'json-mode "\\.json\\'"))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package json-mode
+    :defer 1
+    :mode
+    (("\\.json\\'" . json-mode)))
+#+end_src
 ** yaml-mode
-   #+begin_src emacs-lisp
-     (use-package yaml-mode
-       :ensure t
-       :mode (("\\.\\(yml\\|yaml\\)\\'" . yaml-mode)
-	      ("Procfile\\'" . yaml-mode))
-       :config (add-hook 'yaml-mode-hook
-			 '(lambda ()
-			    (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package yaml-mode
+    :mode (("\\.\\(yml\\|yaml\\)\\'" . yaml-mode)
+           ("Procfile\\'" . yaml-mode))
+    :config (add-hook 'yaml-mode-hook
+                      '(lambda ()
+                         (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
+#+end_src
 ** toml-mode
-   #+begin_src emacs-lisp
-     (use-package toml-mode
-       :ensure t
-       :mode "\\.toml\\'")
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package toml-mode
+    :mode "\\.toml\\'")
+#+end_src
 ** Web
+*** tide
+#+begin_src emacs-lisp
+  (use-package tide
+
+    :hook ((js2-mode . setup-tide-mode)
+           (typescript-mode . setup-tide-mode)))
+
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    (company-mode +1))
+#+end_src
 *** prettier
-    #+begin_src emacs-lisp
-      (use-package prettier-js
-	:ensure t
-	:init
-	(setq prettier-js-command "prettier-eslint")
-	:hook (js2-mode . prettier-js-mode))
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package prettier-js
+
+    :init
+    (setq prettier-js-command "prettier")
+    :hook ((js2-mode react-mode) . prettier-js-mode))
+#+end_src
 *** emmet-mode
-    #+begin_src emacs-lisp
-      (use-package emmet-mode
-	:ensure t
-	:diminish (emmet-mode . "ε")
-	:bind* (("C-)" . emmet-next-edit-point)
-		("C-(" . emmet-prev-edit-point)))
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package emmet-mode
+
+    :diminish (emmet-mode . " emt")
+    :bind* (("C-)" . emmet-next-edit-point)
+            ("C-(" . emmet-prev-edit-point)))
+#+end_src
 *** js2-mode
-    #+begin_src emacs-lisp
-      (use-package js2-mode
-	:ensure t
-	:init
-	(add-auto-mode 'js2-mode "\\.js\\'")
-	;; Required to make imenu functions work correctly
-	(add-hook 'js2-mode-hook 'js2-imenu-extras-mode)
-	(setq
-	 js2-basic-offset 2 
-	 js-indent-level 2
-	 js2-strict-trailing-comma-warning nil
-	 js2-strict-missing-semi-warning nil))
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package js2-mode
+
+    :mode
+    (("\\.js\\'" . js2-mode))
+    :init
+    (setq
+     js2-basic-offset 2
+     js2-global-externs '("module" "require" "assert" "setInterval" "console" "__dirname__")
+     js-indent-level 2
+     ;; js2-strict-trailing-comma-warning nil
+     ;; js2-strict-missing-semi-warning nil
+     ))
+#+end_src
+*** js-doc
+#+begin_src emacs-lisp
+  ;; (use-package js-doc
+  ;;
+  ;;   :config
+  ;;   (add-hook 'js2-mode-hook
+  ;;             #'(lambda ()
+  ;;                 (define-key js2-mode-map "\C-ci" 'js-doc-insert-function-doc)
+  ;;                 (define-key js2-mode-map "@" 'js-doc-insert-tag))))
+#+end_src
 *** web-mode
-    #+begin_src emacs-lisp
-      (use-package web-mode
-	:ensure t
-	:init
-	(setq web-mode-markup-indent-offset 2)
-	(setq web-mode-css-indent-offset 2)
-	(setq web-mode-code-indent-offset 2)
-	:mode
-	(("\\.phtml\\'"      . web-mode)
-	 ("\\.tpl\\.php\\'"  . web-mode)
-	 ("\\.twig\\'"       . web-mode)
-	 ("\\.html\\'"       . web-mode)
-	 ("\\.htm\\'"        . web-mode)
-	 ("\\.[gj]sp\\'"     . web-mode)
-	 ("\\.as[cp]x?\\'"   . web-mode)
-	 ("\\.eex\\'"        . web-mode)
-	 ("\\.erb\\'"        . web-mode)
-	 ("\\.mustache\\'"   . web-mode)
-	 ("\\.handlebars\\'" . web-mode)
-	 ("\\.hbs\\'"        . web-mode)
-	 ("\\.eco\\'"        . web-mode)
-	 ("\\.ejs\\'"        . web-mode)
-	 ("\\.djhtml\\'"     . web-mode)))
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package web-mode
+
+    :init
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+    :mode
+    (("\\.phtml\\'"      . web-mode)
+     ("\\.tpl\\.php\\'"  . web-mode)
+     ("\\.twig\\'"       . web-mode)
+     ("\\.html\\'"       . web-mode)
+     ("\\.htm\\'"        . web-mode)
+     ("\\.[gj]sp\\'"     . web-mode)
+     ("\\.as[cp]x?\\'"   . web-mode)
+     ("\\.eex\\'"        . web-mode)
+     ("\\.erb\\'"        . web-mode)
+     ("\\.mustache\\'"   . web-mode)
+     ("\\.handlebars\\'" . web-mode)
+     ("\\.hbs\\'"        . web-mode)
+     ("\\.eco\\'"        . web-mode)
+     ("\\.ejs\\'"        . web-mode)
+     ("\\.djhtml\\'"     . web-mode)))
+#+end_src
 *** css
-    #+begin_src emacs-lisp
-      (use-package css-mode
-	:ensure t
-	:init
-	(progn
-	  ;(push 'company-css company-backends-css-mode)
-	  ;; Mark `css-indent-offset' as safe-local variable
-	  (put 'css-indent-offset 'safe-local-variable #'integerp)))
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package css-mode
+
+    :defer 1
+    :init
+    (progn
+                                          ;(push 'company-css company-backends-css-mode)
+      ;; Mark `css-indent-offset' as safe-local variable
+      (put 'css-indent-offset 'safe-local-variable #'integerp)))
+#+end_src
 *** sass&scss
-    #+begin_src emacs-lisp
-      (use-package sass-mode
-	:ensure t
-	:mode ("\\.sass\\'" . sass-mode))
+#+begin_src emacs-lisp
+  (use-package sass-mode
+    :mode ("\\.sass\\'" . sass-mode))
 
-      (use-package scss-mode
-	:ensure t
-	:mode ("\\.scss\\'" . scss-mode))
-    #+end_src
+  (use-package scss-mode
+    :mode ("\\.scss\\'" . scss-mode))
+#+end_src
 *** react
-    ~ yarn global add eslint babel-eslint eslint-plugin-react ~
-    #+begin_src emacs-lisp
-      (define-derived-mode react-mode web-mode "react")
-      (add-auto-mode
-       'react-mode
-       "\\.jsx\\'"
-       "\\.react.js\\'"
-       "\\index.android.js\\'"
-       "\\index.ios.js\\'")
+~ yarn global add eslint babel-eslint eslint-plugin-react ~
+#+begin_src emacs-lisp
+  (define-derived-mode react-mode web-mode "react")
+  (add-auto-mode
+   'react-mode
+   "\\.jsx\\'"
+   "\\.react.js\\'"
+   "\\index.android.js\\'"
+   "\\index.ios.js\\'")
 
-      (add-magic-mode
-       'react-mode
-       "/\\*\\* @jsx React\\.DOM \\*/"
-       "^import React")
+  (add-magic-mode
+   'react-mode
+   "/\\*\\* @jsx React\\.DOM \\*/"
+   "^import React")
 
-      (defun st/setup-react-mode ()
-	"Adjust web-mode to accommodate react-mode"
-	(web-mode-set-content-type "jsx")
-	(setq-local web-mode-enable-auto-quoting nil))
-      (add-hook 'react-mode-hook 'st/setup-react-mode)
+  (defun st/setup-react-mode ()
+    "Adjust web-mode to accommodate react-mode"
+    (web-mode-set-content-type "jsx")
+    (setq-local web-mode-enable-auto-quoting nil))
+  (add-hook 'react-mode-hook 'st/setup-react-mode)
 
-      (defun st/use-eslint-from-node-modules ()
-	(let* ((root (locate-dominating-file
-		      (or (buffer-file-name) default-directory)
-		      "node_modules"))
-	       (global-eslint (executable-find "eslint"))
-	       (local-eslint (expand-file-name "node_modules/.bin/eslint"
-					       root))
-	       (eslint (if (file-executable-p local-eslint)
-			   local-eslint
-			 global-eslint)))
-    
+  (defun st/use-eslint-from-node-modules ()
+    (let* ((root (locate-dominating-file
+                  (or (buffer-file-name) default-directory)
+                  "node_modules"))
+           (global-eslint (executable-find "eslint"))
+           (local-eslint (expand-file-name "node_modules/.bin/eslint"
+                                           root))
+           (eslint (if (file-executable-p local-eslint)
+                       local-eslint
+                     global-eslint)))
+
       (with-eval-after-load 'flycheck
-	(dolist (checker '(javascript-eslint javascript-standard))
-	  (flycheck-add-mode checker 'react-mode))
-	(setq-local flycheck-javascript-eslint-executable eslint)))
-	(add-hook 'react-mode-hook #'st/use-eslint-from-node-modules))
-    #+end_src
+        (dolist (checker '(javascript-eslint javascript-standard))
+          (flycheck-add-mode checker 'react-mode))
+        (setq-local flycheck-javascript-eslint-executable eslint)))
+    (add-hook 'react-mode-hook #'st/use-eslint-from-node-modules))
+#+end_src
+** Helm Dash
+#+begin_src emacs-lisp
+  (use-package helm-dash
+    :init
+    ;; (setq helm-dash-browser-func 'eww)
+    )
+#+end_src
 * 工具函数
 ** 打开 *config.org* 文件
-   #+begin_src emacs-lisp
-     (defun utils/open-config ()
-       "打开emacs配置文件config.org"
-       (interactive)
-       (find-file (concat user-emacs-directory "config.org")))
+#+begin_src emacs-lisp
+  (defun utils/open-config ()
+    "打开emacs配置文件config.org"
+    (interactive)
+    (find-file (concat user-emacs-directory "config.org")))
 
-     (bind-keys*
-      ("M-m SPC v" . utils/open-config))
+  (bind-keys*
+   ("M-m SPC v" . utils/open-config))
 
-     (modalka-define-kbd "SPC v" "M-m SPC v")
+  (modalka-define-kbd "SPC v" "M-m SPC v")
 
-     (which-key-add-key-based-replacements
-       "SPC v" "view configuration file")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "SPC v" "view configuration file")
+#+end_src
 ** 创建新窗口并focus
-   #+begin_src emacs-lisp
-     (defun utils/split-below-and-move ()
-       (interactive)
-       (split-window-below)
-       (other-window 1))
+#+begin_src emacs-lisp
+  (defun utils/split-below-and-move ()
+    (interactive)
+    (split-window-below)
+    (other-window 1))
 
-     (defun utils/split-right-and-move ()
-       (interactive)
-       (split-window-right)
-       (other-window 1))
+  (defun utils/split-right-and-move ()
+    (interactive)
+    (split-window-right)
+    (other-window 1))
 
-     (bind-keys
-      ("C-x 2" . utils/split-below-and-move)
-      ("C-x 3" . utils/split-right-and-move))
-   #+end_src
+  (bind-keys
+   ("C-x 2" . utils/split-below-and-move)
+   ("C-x 3" . utils/split-right-and-move))
+#+end_src
 ** 两个窗口时滚动隔壁窗口中的pdf文件
-   #+begin_src emacs-lisp
-     (defun utils/other-pdf-next ()
-       "Turns the next page in adjoining PDF file"
-       (interactive)
-       (other-window 1)
-       (doc-view-next-page)
-       (other-window 1))
-     (defun utils/other-pdf-previous ()
-       "Turns the previous page in adjoining PDF file"
-       (interactive)
-       (other-window 1)
-       (doc-view-previous-page)
-       (other-window 1))
+#+begin_src emacs-lisp
+  (defun utils/other-pdf-next ()
+    "Turns the next page in adjoining PDF file"
+    (interactive)
+    (other-window 1)
+    (pdf-view-next-page)
+    (other-window 1))
+  (defun utils/other-pdf-previous ()
+    "Turns the previous page in adjoining PDF file"
+    (interactive)
+    (other-window 1)
+    (pdf-view-previous-page)
+    (other-window 1))
 
-     (bind-keys*
-       ("M-m ] d" . utils/other-pdf-next)
-       ("M-m [ d" . utils/other-pdf-previous))
+  (bind-keys*
+   ("M-m ] d" . utils/other-pdf-next)
+   ("M-m [ d" . utils/other-pdf-previous))
 
-     (modalka-define-kbd "] d" "M-m ] d")
-     (modalka-define-kbd "[ d" "M-m [ d")
+  (modalka-define-kbd "] d" "M-m ] d")
+  (modalka-define-kbd "[ d" "M-m [ d")
 
-     (which-key-add-key-based-replacements
-       "] d" "adjacent pdf next page"
-       "[ d" "adjacent pdf prev page")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "] d" "adjacent pdf next page"
+    "[ d" "adjacent pdf prev page")
+#+end_src
 ** 两个窗口时滚动隔壁的窗口
-   #+begin_src emacs-lisp
-     (defun utils/other-window-down ()
-       "Scrolls down in adjoining window"
-       (interactive)
-       (other-window 1)
-       (scroll-up-command)
-       (other-window 1))
-     (defun utils/other-window-up ()
-       "Scrolls up in adjoining window"
-       (interactive)
-       (other-window 1)
-       (scroll-down-command)
-       (other-window 1))
+#+begin_src emacs-lisp
+  (defun utils/other-window-down ()
+    "Scrolls down in adjoining window"
+    (interactive)
+    (other-window 1)
+    (scroll-up-command)
+    (other-window 1))
+  (defun utils/other-window-up ()
+    "Scrolls up in adjoining window"
+    (interactive)
+    (other-window 1)
+    (scroll-down-command)
+    (other-window 1))
 
-     (bind-keys*
-       ("M-m g ]" . utils/other-window-down)
-       ("M-m g [" . utils/other-window-up))
+  (bind-keys*
+   ("M-m g ]" . utils/other-window-down)
+   ("M-m g [" . utils/other-window-up))
 
-     (modalka-define-kbd "g ]" "M-m g ]")
-     (modalka-define-kbd "g [" "M-m g [")
+  (modalka-define-kbd "g ]" "M-m g ]")
+  (modalka-define-kbd "g [" "M-m g [")
 
-     (which-key-add-key-based-replacements
-       "g ]" "adjacent window next page"
-       "g [" "adjacent window prev page")
-   #+end_src
+  (which-key-add-key-based-replacements
+    "g ]" "adjacent window next page"
+    "g [" "adjacent window prev page")
+#+end_src
 ** smater start of line
-   #+begin_src emacs-lisp
-     (defun utils/smarter-move-beginning-of-line (arg)
-       "Move point back to indentation of beginning of line.
-     Move point to the first non-whitespace character on this line.
-     If point is already there, move to the beginning of the line.
-     Effectively toggle between the first non-whitespace character and
-     the beginning of the line.
-     If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-     point reaches the beginning or end of the buffer, stop there."
-       (interactive "^p")
-       (setq arg (or arg 1))
-       ;; Move lines first
-       (when (/= arg 1)
-	 (let ((line-move-visual nil))
-	   (forward-line (1- arg))))
-       (let ((orig-point (point)))
-	 (back-to-indentation)
-	 (when (= orig-point (point))
-	   (move-beginning-of-line 1))))
+#+begin_src emacs-lisp
+  (defun utils/smarter-move-beginning-of-line (arg)
+    "Move point back to indentation of beginning of line.
+  Move point to the first non-whitespace character on this line.
+  If point is already there, move to the beginning of the line.
+  Effectively toggle between the first non-whitespace character and
+  the beginning of the line.
+  If ARG is not nil or 1, move forward ARG - 1 lines first.  If
+  point reaches the beginning or end of the buffer, stop there."
+    (interactive "^p")
+    (setq arg (or arg 1))
+    ;; Move lines first
+    (when (/= arg 1)
+      (let ((line-move-visual nil))
+        (forward-line (1- arg))))
+    (let ((orig-point (point)))
+      (back-to-indentation)
+      (when (= orig-point (point))
+        (move-beginning-of-line 1))))
 
-     (global-set-key [remap move-beginning-of-line]
-		     'utils/smarter-move-beginning-of-line)
-   #+end_src
+  (global-set-key [remap move-beginning-of-line]
+                  'utils/smarter-move-beginning-of-line)
+#+end_src
 ** rotate windows
-   #+begin_src emacs-lisp
-     (defun utils/rotate-windows ()
-       "Rotate your windows"
-       (interactive)
-       (cond ((not (> (count-windows) 1))
-	      (message "You can't rotate a single window!"))
-	     (t
-	      (let ((i 1)
-		    (numWindows (count-windows)))
-		(while (< i numWindows)
-		  (let* ((w1 (elt (window-list) i))
-			 (w2 (elt (window-list) (+ (% i numWindows) 1)))
-			 (b1 (window-buffer w1))
-			 (b2 (window-buffer w2))
-			 (s1 (window-start w1))
-			 (s2 (window-start w2)))
-		    (set-window-buffer w1 b2)
-		    (set-window-buffer w2 b1)
-		    (set-window-start w1 s2)
-		    (set-window-start w2 s1)
-		    (setq i (1+ i))))))))
-   #+end_src
+#+begin_src emacs-lisp
+  (defun utils/rotate-windows ()
+    "Rotate your windows"
+    (interactive)
+    (cond ((not (> (count-windows) 1))
+           (message "You can't rotate a single window!"))
+          (t
+           (let ((i 1)
+                 (numWindows (count-windows)))
+             (while (< i numWindows)
+               (let* ((w1 (elt (window-list) i))
+                      (w2 (elt (window-list) (+ (% i numWindows) 1)))
+                      (b1 (window-buffer w1))
+                      (b2 (window-buffer w2))
+                      (s1 (window-start w1))
+                      (s2 (window-start w2)))
+                 (set-window-buffer w1 b2)
+                 (set-window-buffer w2 b1)
+                 (set-window-start w1 s2)
+                 (set-window-start w2 s1)
+                 (setq i (1+ i))))))))
+#+end_src
 ** 字数统计
-   修改自： [[http://kuanyui.github.io/2014/01/18/count-chinese-japanese-and-english-words-in-emacs/]]
-   #+begin_src emacs-lisp
-     (defvar wc-regexp-chinese-char-and-punc
-	   (rx (category chinese)))
-     (defvar wc-regexp-chinese-punc
-       "[。，！？；：「」『』（）、【】《》〈〉※—]")
-     (defvar wc-regexp-english-word
-       "[a-zA-Z0-9-]+")
+修改自： [[http://kuanyui.github.io/2014/01/18/count-chinese-japanese-and-english-words-in-emacs/]]
+#+begin_src emacs-lisp
+  (defvar wc-regexp-chinese-char-and-punc
+    (rx (category chinese)))
+  (defvar wc-regexp-chinese-punc
+    "[。，！？；：「」『』（）、【】《》〈〉※—]")
+  (defvar wc-regexp-english-word
+    "[a-zA-Z0-9-]+")
 
-     (defun st/count-words ()
-       "「較精確地」統計中/日/英文字數。
-     - 文章中的註解不算在字數內。
-     - 平假名與片假名亦包含在「中日文字數」內，每個平/片假名都算單獨一個字（但片假
-       名不含連音「ー」）。
-     - 英文只計算「單字數」，不含標點。
-     - 韓文不包含在內。
+  (defun st/count-words ()
+    "「較精確地」統計中/日/英文字數。
+  - 文章中的註解不算在字數內。
+  - 平假名與片假名亦包含在「中日文字數」內，每個平/片假名都算單獨一個字（但片假
+    名不含連音「ー」）。
+  - 英文只計算「單字數」，不含標點。
+  - 韓文不包含在內。
 
-     ※計算標準太多種了，例如英文標點是否算入、以及可能有不太常用的標點符號沒算入等
-     。且中日文標點的計算標準要看 Emacs 如何定義特殊標點符號如ヴァランタン・アルカン
-     中間的點也被 Emacs 算為一個字而不是標點符號。"
-       (interactive)
-       (let* ((v-buffer-string
-	       (replace-regexp-in-string (format "^ *%s *.+" comment-start) ""
-					 (if (eq major-mode 'org-mode)
-					     (replace-regexp-in-string "^#\\+.+" ""
-								       (buffer-substring-no-properties (point-min) (point-max)))
-					   (buffer-substring-no-properties (point-min) (point-max)))))
-	      (chinese-char-and-punc 0)
-	      (chinese-punc 0)
-	      (english-word 0)
-	      (chinese-char 0))
-	 (with-temp-buffer
-	   (insert v-buffer-string)
-	   (goto-char (point-min))
-	   ;; 中文（含標點、片假名）
-	   (while (re-search-forward wc-regexp-chinese-char-and-punc nil :no-error)
-	     (setq chinese-char-and-punc (1+ chinese-char-and-punc)))
-	   ;; 中文標點符號
-	   (goto-char (point-min))
-	   (while (re-search-forward wc-regexp-chinese-punc nil :no-error)
-	     (setq chinese-punc (1+ chinese-punc)))
-	   ;; 英文字數（不含標點）
-	   (goto-char (point-min))
-	   (while (re-search-forward wc-regexp-english-word nil :no-error)
-	     (setq english-word (1+ english-word))))
-	 (setq chinese-char (- chinese-char-and-punc chinese-punc))
-	 (message
-	  (format "中日文字数（不含标点）：%s
-     中日文字数（包含标点）：%s
-     英文单词数（不含标点）：%s
-     =======================
-     中英文合计（不含标点）：%s"
-		  chinese-char chinese-char-and-punc english-word
-		  (+ chinese-char english-word)))))
-   #+end_src
+  ※計算標準太多種了，例如英文標點是否算入、以及可能有不太常用的標點符號沒算入等
+  。且中日文標點的計算標準要看 Emacs 如何定義特殊標點符號如ヴァランタン・アルカン
+  中間的點也被 Emacs 算為一個字而不是標點符號。"
+    (interactive)
+    (let* ((v-buffer-string
+            (replace-regexp-in-string (format "^ *%s *.+" comment-start) ""
+                                      (if (eq major-mode 'org-mode)
+                                          (replace-regexp-in-string "^#\\+.+" ""
+                                                                    (buffer-substring-no-properties (point-min) (point-max)))
+                                        (buffer-substring-no-properties (point-min) (point-max)))))
+           (chinese-char-and-punc 0)
+           (chinese-punc 0)
+           (english-word 0)
+           (chinese-char 0))
+      (with-temp-buffer
+        (insert v-buffer-string)
+        (goto-char (point-min))
+        ;; 中文（含標點、片假名）
+        (while (re-search-forward wc-regexp-chinese-char-and-punc nil :no-error)
+          (setq chinese-char-and-punc (1+ chinese-char-and-punc)))
+        ;; 中文標點符號
+        (goto-char (point-min))
+        (while (re-search-forward wc-regexp-chinese-punc nil :no-error)
+          (setq chinese-punc (1+ chinese-punc)))
+        ;; 英文字數（不含標點）
+        (goto-char (point-min))
+        (while (re-search-forward wc-regexp-english-word nil :no-error)
+          (setq english-word (1+ english-word))))
+      (setq chinese-char (- chinese-char-and-punc chinese-punc))
+      (message
+       (format "中日文字数（不含标点）：%s
+  中日文字数（包含标点）：%s
+  英文单词数（不含标点）：%s
+  =======================
+  中英文合计（不含标点）：%s"
+               chinese-char chinese-char-and-punc english-word
+               (+ chinese-char english-word)))))
+#+end_src
 * 音乐播放
-  #+begin_src emacs-lisp
-    (use-package bongo
-      :ensure t
-      :init
-      (setq bongo-display-header-icons nil)
-      (setq bongo-display-track-icons nil)
-      (setq bongo-enabled-backends '(vlc)))
-  #+end_src
+#+begin_src emacs-lisp
+  (use-package bongo
+    :init
+    (setq bongo-display-header-icons nil)
+    (setq bongo-display-track-icons nil)
+    (setq bongo-enabled-backends '(vlc)))
+#+end_src
+* 图片浏览
+#+begin_src emacs-lisp
+  (use-package picpocket)
+#+end_src
+* X11
+#+begin_src emacs-lisp
+  (use-package xelb)
+#+end_src
 * 启动emacs server
-  主要是为了org-protocol
-  #+begin_src emacs-lisp
-    (server-start)
-  #+end_src
+主要是为了org-protocol
+#+begin_src emacs-lisp
+  (server-start)
+#+end_src
 * 性能相关
 ** ESUP
-   #+begin_src emacs-lisp
-     (use-package esup
-       :ensure t)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package esup)
+#+end_src
+* 自动升级package
+#+begin_src emacs-lisp
+  (use-package auto-package-update
+    :init
+    (setq auto-package-update-delete-old-versions t
+          auto-package-update-interval 5)
+    :config
+    (auto-package-update-maybe))
+#+end_src
 * 参考的配置（不完全）
-  - [[https://sriramkswamy.github.io/dotemacs/][https://sriramkswamy.github.io/dotemacs/]]
-  - [[http://huxiaoxing.com/setup/emacs.html][http://huxiaoxing.com/setup/emacs.html]]
- 
+- [[https://sriramkswamy.github.io/dotemacs/][https://sriramkswamy.github.io/dotemacs/]]
+- [[http://huxiaoxing.com/setup/emacs.html][http://huxiaoxing.com/setup/emacs.html]]
