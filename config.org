@@ -6,43 +6,43 @@
 * 基础配置
 ** 包管理器（use-package）
 #+begin_src emacs-lisp
-  (require 'package)
-  (setq package-enable-at-startup nil)
-  (require 'package-x)
+   (require 'package)
+   (setq package-enable-at-startup nil)
+   (require 'package-x)
 
-  ;; local文件夹可以存放自己写的包，然后通过use-package安装，但是如果修改的话需要重新安装
-  (defvar local-archive
-    (expand-file-name "local/" user-emacs-directory)
-    "Location of the package archive.")
+   ;; local文件夹可以存放自己写的包，然后通过use-package安装，但是如果修改的话需要重新安装
+   (defvar local-archive
+     (expand-file-name "local/" user-emacs-directory)
+     "Location of the package archive.")
 
-  (setq package-archive-upload-base local-archive)
+   (setq package-archive-upload-base local-archive)
 
-  (setq package-archives `(("gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                           ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-                           ("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
-                           ("local" . ,local-archive)))
+   (setq package-archives `(("gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+                            ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+                            ("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
+                            ("local" . ,local-archive)))
 
-  ;; 该文件夹存放一些代码片段，比如一些还没有形成包的代码。
-  (add-to-list 'load-path "~/.emacs.d/customs")
+   ;; 该文件夹存放一些代码片段，比如一些还没有形成包的代码。
+   (add-to-list 'load-path "~/.emacs.d/customs")
 
   (package-initialize)
 
   (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
+     (package-refresh-contents)
+     (package-install 'use-package))
 
-  (eval-when-compile
-    (require 'use-package)
-    (setq use-package-always-ensure t))
+   (eval-when-compile
+     (require 'use-package)
+     (setq use-package-always-ensure t))
 
-  (use-package diminish
-    :demand t
-    :diminish (visual-line-mode . " vl")
-    :diminish hs-minor-mode
-    :diminish abbrev-mode
-    :diminish auto-fill-function
-    :diminish subword-mode
-    :diminish eldoc-mode)
+   (use-package diminish
+     :demand t
+     :diminish (visual-line-mode . " vl")
+     :diminish hs-minor-mode
+     :diminish abbrev-mode
+     :diminish auto-fill-function
+     :diminish subword-mode
+     :diminish eldoc-mode)
 #+end_src
 ** Auto tangle
 保存时，自动导出配置代码并编译，由于编译速度慢，用async包优化
@@ -101,7 +101,6 @@
         initial-scratch-message nil
         sentence-end-double-space nil)
   (fset 'yes-or-no-p 'y-or-n-p)
-  (setq-default truncate-lines t)
 
   (tool-bar-mode 0)
   (menu-bar-mode 0)
@@ -157,6 +156,15 @@
 #+end_src
 ** 文件浏览（dired）
 #+begin_src emacs-lisp
+  (define-minor-mode dired-follow-mode
+    "Display file at point in dired after a move."
+    :lighter " dired-f"
+    :global t
+    (if dired-follow-mode
+        (advice-add 'dired-next-line
+                    :after (lambda (arg) (dired-display-file)))
+      (advice-remove 'dired-next-line (lambda (arg) (dired-display-file)))))
+
   (use-package dired
     :ensure nil
     :bind (:map dired-mode-map
@@ -167,7 +175,8 @@
           dired-recursive-deletes 'top
           dired-listing-switches "-alh")
     :config
-    (add-hook 'dired-mode-hook 'dired-hide-details-mode))
+    ;;(add-hook 'dired-mode-hook 'dired-hide-details-mode)
+    (add-hook 'dired-mode-hook 'dired-follow-mode))
 #+end_src
 ** 内置浏览器（eww）
 #+begin_src emacs-lisp
@@ -188,12 +197,6 @@
     (add-to-list 'shr-external-rendering-functions
                  '(pre . shr-tag-pre-highlight)))
 #+end_src
-** doc
-#+begin_src emacs-lisp
-  (use-package doc-view
-    :config
-    (setq doc-view-continuous t))
-#+end_src
 ** winner-mode
 #+begin_src emacs-lisp
   (use-package winner
@@ -203,6 +206,13 @@
 ** display line number
 #+begin_src emacs-lisp
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+#+end_src
+** prettify-symbols
+#+begin_src emacs-lisp
+  (global-prettify-symbols-mode 1)
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (push '("function" . 955) prettify-symbols-alist)))
 #+end_src
 ** 按键绑定
 #+begin_src emacs-lisp
@@ -249,7 +259,7 @@
 ** 图标
 #+begin_src emacs-lisp
   (use-package all-the-icons
-
+    :if window-system
     :config
     (unless (member "all-the-icons" (font-family-list))
       (all-the-icons-install-fonts t)))
@@ -326,55 +336,6 @@
   (use-package proxy-mode
     )
 #+end_src
-** pyim
-#+begin_src emacs-lisp
-  (use-package pyim
-
-    :config
-    ;; 激活 basedict 拼音词库
-    (use-package pyim-basedict
-
-      :config (pyim-basedict-enable))
-
-    ;; posframe
-    (use-package posframe
-      )
-
-    (setq default-input-method "pyim")
-
-    ;; 我使用全拼
-    (setq pyim-default-scheme 'quanpin)
-
-    ;; 设置 pyim 探针设置，这是 pyim 高级功能设置，可以实现 *无痛* 中英文切换 :-)
-    ;; 我自己使用的中英文动态切换规则是：
-    ;; 1. 光标只有在注释里面时，才可以输入中文。
-    ;; 2. 光标前是汉字字符时，才能输入中文。
-    ;; 3. 使用 M-j 快捷键，强制将光标前的拼音字符串转换为中文。
-    (setq-default pyim-english-input-switch-functions
-                  '(pyim-probe-dynamic-english
-                    pyim-probe-isearch-mode
-                    pyim-probe-program-mode
-                    pyim-probe-org-structure-template))
-
-    (setq-default pyim-punctuation-half-width-functions
-                  '(pyim-probe-punctuation-line-beginning
-                    pyim-probe-punctuation-after-punctuation))
-
-    ;; 开启拼音搜索功能
-    (pyim-isearch-mode 1)
-
-    ;; 使用 pupup-el 来绘制选词框
-    (setq pyim-page-tooltip 'posframe)
-
-    ;; 选词框显示5个候选词
-    (setq pyim-page-length 5)
-
-    ;; 让 Emacs 启动时自动加载 pyim 词库
-    (add-hook 'emacs-startup-hook
-              #'(lambda () (pyim-restart-1 t)))
-    :bind
-    (("M-j" . pyim-convert-code-at-point)))
-#+end_src
 * Modal editing
 ** 初始化
 #+begin_src emacs-lisp
@@ -396,20 +357,21 @@
     (add-to-list 'modalka-excluded-modes 'blog-admin-mode)
     (add-to-list 'modalka-excluded-modes 'org-brain-visualize-mode)
     (add-to-list 'modalka-excluded-modes 'nov-mode)
-    (add-to-list 'modalka-excluded-modes 'pdf-view-mode))
+    (add-to-list 'modalka-excluded-modes 'pdf-view-mode)
+    (add-to-list 'modalka-excluded-modes 'elfeed-search-mode))
 
-  (which-key-add-key-based-replacements
-    "M-m"     "Modalka prefix"
-    "M-m :"   "extended prefix"
-    "M-m m"   "move prefix"
-    "M-m s"   "send code prefix"
-    "M-m SPC" "user prefix"
-    "M-m g"   "global prefix"
-    "M-m o"   "org prefix"
-    "M-m a"   "expand around prefix"
-    "M-m i"   "expand inside prefix"
-    "M-m ["   "prev nav prefix"
-    "M-m ]"   "next nav prefix")
+    (which-key-add-key-based-replacements
+      "M-m"     "Modalka prefix"
+      "M-m :"   "extended prefix"
+      "M-m m"   "move prefix"
+      "M-m s"   "send code prefix"
+      "M-m SPC" "user prefix"
+      "M-m g"   "global prefix"
+      "M-m o"   "org prefix"
+      "M-m a"   "expand around prefix"
+      "M-m i"   "expand inside prefix"
+      "M-m ["   "prev nav prefix"
+      "M-m ]"   "next nav prefix")
 #+end_src
 ** 按键绑定
 *** Numbers
@@ -964,7 +926,7 @@
 #+begin_src emacs-lisp
   (defhydra st/hydra-bookmarks (:color blue :hint nil)
     "
-   _s_: set  _b_: bookmark   _j_: jump   _d_: delete   _q_: quit
+   _s_: set  _b_: save   _j_: jump   _d_: delete   _q_: quit
     "
     ("s" bookmark-set)
     ("b" bookmark-save)
@@ -1340,23 +1302,14 @@
 #+end_src
 ** Mode line
 #+begin_src emacs-lisp
-  ;; (use-package spaceline
-  ;;
-  ;;   :demand t
-  ;;   :init
-  ;;   (setq powerline-default-separator 'arrow-fade)
-  ;;   :config
-  ;;   (require 'spaceline-config)
-  ;;   (spaceline-spacemacs-theme)
-  ;;   (spaceline-helm-mode))
-#+end_src
-** Fancy battery
-#+begin_src emacs-lisp
-  (use-package fancy-battery
+  (use-package spaceline
+    :demand t
     :init
-    (setq fancy-battery-show-percentage t)
+    (setq powerline-default-separator 'arrow-fade)
     :config
-    (fancy-battery-mode))
+    (require 'spaceline-config)
+    (spaceline-spacemacs-theme)
+    (spaceline-helm-mode))
 #+end_src
 ** Origami
 #+begin_src emacs-lisp
@@ -1407,7 +1360,7 @@
   (use-package cnfonts
     :init
     (setq cnfonts-profiles '("program" "org-mode" "read-book")
-          cnfonts--profiles-steps '(("program" . 2)))
+          cnfonts--profiles-steps '(("program" . 5)))
     :config
     (cnfonts-enable))
 
@@ -1458,20 +1411,15 @@
 ** 主题
 #+begin_src emacs-lisp
   ;; (use-package color-theme-sanityinc-tomorrow
-  ;;
   ;;   :config
   ;;   (load-theme 'sanityinc-tomorrow-day t))
   ;; (use-package doom-themes
-  ;;
   ;;   :config
   ;;   (load-theme 'whiteboard t)
   ;;   (require 'tear-theme)
   ;;   (load-theme 'tear t)
   ;;   )
-  ;;(require 'tear-theme)
-  ;;(load-theme 'tear t)
   ;; (use-package tear-theme
-  ;;
   ;;   :config
   ;;   (load-theme 'tear t))
   (require 'tear-theme)
@@ -1657,7 +1605,7 @@
 ** Pair
 #+begin_src emacs-lisp
   (use-package paredit
-    :diminish (paredit-mode . "Pe")
+    :diminish (paredit-mode . "()")
     :hook ((emacs-lisp-mode
             scheme-mode) . enable-paredit-mode))
   (add-hook 'c-mode-hook 'electric-pair-mode)
@@ -1759,93 +1707,6 @@
   (which-key-add-key-based-replacements
     "s q" "switch quotes")
 #+end_src
-* 阅读相关
-** pdf阅读
-#+begin_src emacs-lisp
-  (use-package pdf-tools
-    :config
-    (pdf-tools-install)
-    (setq-default pdf-view-display-size 'fit-page)
-    (bind-keys :map pdf-view-mode-map
-               ("\\" . hydra-pdftools/body)
-               ("<s-spc>" . pdf-view-scroll-down-or-next-page)
-               ("g" . pdf-view-first-page)
-               ("G" . pdf-view-last-page)
-               ("l" . image-forward-hscroll)
-               ("h" . image-backward-hscroll)
-               ("j" . pdf-view-next-line-or-next-page)
-               ("k" . pdf-view-previous-line-or-previous-page)
-               ("e" . pdf-view-goto-page)
-               ("u" . pdf-view-revert-buffer)
-               ("al" . pdf-annot-list-annotations)
-               ("ad" . pdf-annot-delete)
-               ("aa" . pdf-annot-attachment-dired)
-               ("am" . pdf-annot-add-markup-annotation)
-               ("at" . pdf-annot-add-text-annotation)
-               ("y" . pdf-view-kill-ring-save)
-               ("i" . pdf-misc-display-metadata)
-               ("s" . pdf-occur)
-               ("b" . pdf-view-set-slice-from-bounding-box)
-               ("r" . pdf-view-reset-slice))
-    (use-package org-pdfview
-      ))
-
-  (defhydra hydra-pdftools (:color blue :hint nil)
-    "
-                                                                        ╭───────────┐
-         Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
-     ╭──────────────────────────────────────────────────────────────────┴───────────╯
-           ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
-           ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
-           ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
-           ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
-      _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
-           ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
-           ^^_n_^^      ^ ^  _r_eset slice box
-           ^^^↓^^^
-           ^^_G_^^
-     --------------------------------------------------------------------------------
-          "
-    ("\\" hydra-master/body "back")
-    ("al" pdf-annot-list-annotations)
-    ("ad" pdf-annot-delete)
-    ("aa" pdf-annot-attachment-dired)
-    ("am" pdf-annot-add-markup-annotation)
-    ("at" pdf-annot-add-text-annotation)
-    ("y"  pdf-view-kill-ring-save)
-    ("+" pdf-view-enlarge :color red)
-    ("-" pdf-view-shrink :color red)
-    ("0" pdf-view-scale-reset)
-    ("H" pdf-view-fit-height-to-window)
-    ("W" pdf-view-fit-width-to-window)
-    ("P" pdf-view-fit-page-to-window)
-    ("n" pdf-view-next-page-command :color red)
-    ("p" pdf-view-previous-page-command :color red)
-    ("d" pdf-view-dark-minor-mode)
-    ("b" pdf-view-set-slice-from-bounding-box)
-    ("r" pdf-view-reset-slice)
-    ("g" pdf-view-first-page)
-    ("G" pdf-view-last-page)
-    ("e" pdf-view-goto-page)
-    ("o" pdf-outline)
-    ("s" pdf-occur)
-    ("i" pdf-misc-display-metadata)
-    ("u" pdf-view-revert-buffer)
-    ("F" pdf-links-action-perfom)
-    ("f" pdf-links-isearch-link)
-    ("B" pdf-history-backward :color red)
-    ("N" pdf-history-forward :color red)
-    ("l" image-forward-hscroll :color red)
-    ("h" image-backward-hscroll :color red))
-#+end_src
-** epub阅读
-#+begin_src emacs-lisp
-  (use-package nov
-    :mode ("\\.epub\\'" . nov-mode)
-    :bind (:map nov-mode-map
-                ("j" . next-line)
-                ("k" . previous-line)))
-#+end_src
 * Org相关
 ** 基础设置
 #+begin_src emacs-lisp
@@ -1860,7 +1721,9 @@
           org-image-actual-width '(300)
           org-src-fontify-natively t
           org-src-tab-acts-natively t
-          org-export-backends '(beamer html latex md)))
+          org-export-backends '(beamer html latex md))
+    :config
+    (org-reload))
 
   (use-package ox
     :pin org
@@ -2153,6 +2016,118 @@
     "o q"   "org special edit quit"
     "a s"   "mark org subtree"
     "o RET" "org open link")
+#+end_src
+* 阅读相关
+** pdf阅读
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :config
+    (pdf-tools-install)
+    (setq-default pdf-view-display-size 'fit-page)
+    (bind-keys :map pdf-view-mode-map
+               ("\\" . hydra-pdftools/body)
+               ("<s-spc>" . pdf-view-scroll-down-or-next-page)
+               ("g" . pdf-view-first-page)
+               ("G" . pdf-view-last-page)
+               ("l" . image-forward-hscroll)
+               ("h" . image-backward-hscroll)
+               ("j" . pdf-view-next-line-or-next-page)
+               ("k" . pdf-view-previous-line-or-previous-page)
+               ("e" . pdf-view-goto-page)
+               ("u" . pdf-view-revert-buffer)
+               ("al" . pdf-annot-list-annotations)
+               ("ad" . pdf-annot-delete)
+               ("aa" . pdf-annot-attachment-dired)
+               ("am" . pdf-annot-add-markup-annotation)
+               ("at" . pdf-annot-add-text-annotation)
+               ("y" . pdf-view-kill-ring-save)
+               ("i" . pdf-misc-display-metadata)
+               ("s" . pdf-occur)
+               ("b" . pdf-view-set-slice-from-bounding-box)
+               ("r" . pdf-view-reset-slice))
+    (use-package org-pdfview
+      ))
+
+  (defhydra hydra-pdftools (:color blue :hint nil)
+    "
+                                                                        ╭───────────┐
+         Move  History   Scale/Fit     Annotations  Search/Link    Do   │ PDF Tools │
+     ╭──────────────────────────────────────────────────────────────────┴───────────╯
+           ^^_g_^^      _B_    ^↧^    _+_    ^ ^     [_al_] list    [_s_] search    [_u_] revert buffer
+           ^^^↑^^^      ^↑^    _H_    ^↑^  ↦ _W_ ↤   [_am_] markup  [_o_] outline   [_i_] info
+           ^^_p_^^      ^ ^    ^↥^    _0_    ^ ^     [_at_] text    [_F_] link      [_d_] dark mode
+           ^^^↑^^^      ^↓^  ╭─^─^─┐  ^↓^  ╭─^ ^─┐   [_ad_] delete  [_f_] search link
+      _h_ ←pag_e_→ _l_  _N_  │ _P_ │  _-_    _b_     [_aa_] dired
+           ^^^↓^^^      ^ ^  ╰─^─^─╯  ^ ^  ╰─^ ^─╯   [_y_]  yank
+           ^^_n_^^      ^ ^  _r_eset slice box
+           ^^^↓^^^
+           ^^_G_^^
+     --------------------------------------------------------------------------------
+          "
+    ("\\" hydra-master/body "back")
+    ("al" pdf-annot-list-annotations)
+    ("ad" pdf-annot-delete)
+    ("aa" pdf-annot-attachment-dired)
+    ("am" pdf-annot-add-markup-annotation)
+    ("at" pdf-annot-add-text-annotation)
+    ("y"  pdf-view-kill-ring-save)
+    ("+" pdf-view-enlarge :color red)
+    ("-" pdf-view-shrink :color red)
+    ("0" pdf-view-scale-reset)
+    ("H" pdf-view-fit-height-to-window)
+    ("W" pdf-view-fit-width-to-window)
+    ("P" pdf-view-fit-page-to-window)
+    ("n" pdf-view-next-page-command :color red)
+    ("p" pdf-view-previous-page-command :color red)
+    ("d" pdf-view-dark-minor-mode)
+    ("b" pdf-view-set-slice-from-bounding-box)
+    ("r" pdf-view-reset-slice)
+    ("g" pdf-view-first-page)
+    ("G" pdf-view-last-page)
+    ("e" pdf-view-goto-page)
+    ("o" pdf-outline)
+    ("s" pdf-occur)
+    ("i" pdf-misc-display-metadata)
+    ("u" pdf-view-revert-buffer)
+    ("F" pdf-links-action-perfom)
+    ("f" pdf-links-isearch-link)
+    ("B" pdf-history-backward :color red)
+    ("N" pdf-history-forward :color red)
+    ("l" image-forward-hscroll :color red)
+    ("h" image-backward-hscroll :color red))
+#+end_src
+** epub阅读
+#+begin_src emacs-lisp
+  (use-package nov
+    :mode ("\\.epub\\'" . nov-mode)
+    :bind (:map nov-mode-map
+                ("j" . next-line)
+                ("k" . previous-line)))
+#+end_src
+** rss阅读
+#+begin_src emacs-lisp
+  (use-package elfeed-org
+    :init
+    (setq rmh-elfeed-org-files (list "~/Notes/brain/elfeed.org"))
+    :config
+    (elfeed-org))
+
+  (defun st/elfeed-load-db-and-open ()
+    "Wrapper to load the elfeed db from disk before opening"
+    (interactive)
+    (elfeed-db-load)
+    (elfeed)
+    (elfeed-search-update--force))
+
+  (defun st/elfeed-save-db-and-bury ()
+    "Wrapper to save the elfeed db to disk before burying buffer"
+    (interactive)
+    (elfeed-db-save)
+    (quit-window))
+
+  (use-package elfeed
+    :bind (:map elfeed-search-mode-map
+                ("q" . st/elfeed-save-db-and-bury)))
 #+end_src
 * Calibre Library
 #+begin_src emacs-lisp
@@ -2567,6 +2542,7 @@
 #+begin_src emacs-lisp
   (use-package scheme
     :mode ("\\.ss\\'" . scheme-mode)
+    :hook (scheme-mode . prettify-symbols-mode)
     :config
     (require 'scheme-keywords))
 
@@ -2635,9 +2611,9 @@
 *** tide
 #+begin_src emacs-lisp
   (use-package tide
-
     :hook ((js2-mode . setup-tide-mode)
-           (typescript-mode . setup-tide-mode)))
+           (typescript-mode . setup-tide-mode)
+           (react-mode . setup-tide-mode)))
 
   (defun setup-tide-mode ()
     (interactive)
@@ -2651,7 +2627,6 @@
 *** prettier
 #+begin_src emacs-lisp
   (use-package prettier-js
-
     :init
     (setq prettier-js-command "prettier")
     :hook ((js2-mode react-mode) . prettier-js-mode))
@@ -2659,7 +2634,6 @@
 *** emmet-mode
 #+begin_src emacs-lisp
   (use-package emmet-mode
-
     :diminish (emmet-mode . " emt")
     :bind* (("C-)" . emmet-next-edit-point)
             ("C-(" . emmet-prev-edit-point)))
@@ -2667,7 +2641,6 @@
 *** js2-mode
 #+begin_src emacs-lisp
   (use-package js2-mode
-
     :mode
     (("\\.js\\'" . js2-mode))
     :init
@@ -2692,7 +2665,6 @@
 *** web-mode
 #+begin_src emacs-lisp
   (use-package web-mode
-
     :init
     (setq web-mode-markup-indent-offset 2)
     (setq web-mode-css-indent-offset 2)
@@ -2717,7 +2689,6 @@
 *** css
 #+begin_src emacs-lisp
   (use-package css-mode
-
     :defer 1
     :init
     (progn
@@ -2997,7 +2968,8 @@
   (use-package auto-package-update
     :init
     (setq auto-package-update-delete-old-versions t
-          auto-package-update-interval 5)
+          auto-pacakge-update-hide-results t
+          auto-package-update-interval 2)
     :config
     (auto-package-update-maybe))
 #+end_src
