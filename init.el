@@ -1,45 +1,56 @@
-(defvar *emacs-config-directory* (file-name-directory load-file-name))
+;; <leaf-install-code>
+(eval-and-compile
+  (customize-set-variable
+   'package-archives '(("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
+                       ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+                       ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+  (package-initialize)
+  (unless (package-installed-p 'leaf)
+    (package-refresh-contents)
+    (package-install 'leaf))
 
-(require 'package)
+  (leaf leaf-keywords
+    :ensure t
+    :init
+    ;; optional packages if you want to use :hydra, :el-get, :blackout,,,
+    (leaf hydra :ensure t)
+    (leaf el-get :ensure t)
+    (leaf blackout :ensure t)
+    
+    :config
+    ;; initialize leaf-keywords.el
+    (leaf-keywords-init)))
+;; </leaf-install-code>
 
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(leaf startup
+  :custom
+  `((inhibit-startup-screen . t)
+    (inhibit-startup-message . t)
+    (inhibit-splash-screen . t)
+    (inhibit-startup-echo-area-message . t)
+    (initial-scratch-message . ,(concat ";; Happy hacking, "
+					user-login-name " - Emacs ♥ you!\n\n")))
+  :config
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1))
 
-(add-to-list 'load-path (expand-file-name "shredderming-color-theme-moe/" *emacs-config-directory*))
+(leaf ui
+  :load-path* "config/ui"
+  :require t)
 
-(defun package-install-with-refresh (package)
-  (unless (assq package package-alist)
-    (package-refresh-contents))
-  (unless (package-installed-p package)
-    (package-install package)))
+(leaf editor
+  :load-path* "config/editor"
+  :require t)
 
-(defun require-or-install (package)
-  (or (require package nil t)
-      (progn
-       (package-install-with-refresh package)
-       (require package))))
+(leaf lang
+  :load-path* "config/lang"
+  :require t)
 
-;; init-loader
+(leaf completion
+  :load-path* "config"
+  :require t)
 
-(package-initialize)
-(require-or-install 'init-loader)
-
-(setq init-loader-show-log-after-init nil)
-
-(init-loader-load
- (expand-file-name "inits/" *emacs-config-directory*))
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (web-mode rjsx-mode recentf-ext prettier-js init-loader helm exec-path-from-shell evil emmet-mode))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(leaf hbb-meow
+  :load-path* "config"
+  :require t)
