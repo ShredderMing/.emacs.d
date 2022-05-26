@@ -45,12 +45,14 @@
 ;;   (load-theme 'doom-dracula t))
 
 (leaf lambda-themes
-  :straight (lambda-themes :type git :host github :repo "lambda-emacs/lambda-themes")
+  :el-get lambda-emacs/lambda-themes
+  :require t
   :custom
   ((lambda-themes-set-italic-comments . t)
    (lambda-themes-set-italic-keywords . t)
    (lambda-themes-set-variable-pitch . t))
   :config
-  (load-theme 'lambda-light t))
+  (load-theme 'lambda-light-faded t))
+
 (provide 'theme)
 ;;; theme.el ends here

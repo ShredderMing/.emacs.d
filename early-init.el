@@ -16,7 +16,7 @@
  package-enable-at-startup         nil
  read-process-output-max           #x10000
  redisplay-skip-fontification-on-input    t
- visible-bell t
+ ;; visible-bell t
  native-comp-async-report-warnings-errors 'silent
  backup-directory-alist `(("." . ,(locate-user-emacs-file "backups")))
  custom-file (locate-user-emacs-file "custom.el"))

@@ -14,25 +14,15 @@
     :init
     ;; optional packages if you want to use :hydra, :el-get, :blackout,,,
     (leaf hydra :ensure t)
-    (leaf el-get :ensure t)
+    (leaf el-get
+      :ensure t
+      :custom
+      ((el-get-git-shallow-clone . t)))
     (leaf blackout :ensure t)
     :config
     ;; initialize leaf-keywords.el
     (leaf-keywords-init)))
 ;; </leaf-install-code>
-
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
 
 (leaf startup
   :custom
