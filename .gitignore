@@ -4,3 +4,11 @@ elpa
 recentf
 .directory
 network-security.data
+.cache/
+backups/
+custom.el
+eln-cache/
+prescient
+racket-mode/
+straight/
+transient/

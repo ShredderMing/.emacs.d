@@ -58,13 +58,6 @@
   :config
   (global-git-gutter-mode 1))
 
-(leaf volatile-highlights
-  :ensure t
-  :hook (after-init-hook)
-  :blackout t
-  :custom-face
-  ((vhl/default-face . '((nil (:foreground "#FF3333" :background "#FFCDCD"))))))
-
 (leaf beacon
   :ensure t
   :blackout t

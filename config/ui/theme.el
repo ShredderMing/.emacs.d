@@ -29,20 +29,28 @@
 ;  :config
 ;  (load-theme 'twilight-bright t))
 
-(leaf doom-themes
-  :ensure t
-  :custom ((doom-themes-enable-italic . t)
-           (doom-themes-enable-bold . t)
-           (doom-challenger-deep-brighter-comments . t)
-           (doom-monokai-brighter-comments . t)
-           (doom-dracula-brighter-comments . t))
-  :custom-face ((line-number . '((t (:foreground "#757878"))))
-                (ivy-virtual . '((t (:foreground "#FF6188")))))
-  :config
-  (doom-themes-org-config)
-  (doom-themes-treemacs-config)
-  (doom-themes-visual-bell-config)
-  (load-theme 'doom-dracula t))
+;; (leaf doom-themes
+;;   :ensure t
+;;   :custom ((doom-themes-enable-italic . t)
+;;            (doom-themes-enable-bold . t)
+;;            (doom-challenger-deep-brighter-comments . t)
+;;            (doom-monokai-brighter-comments . t)
+;;            (doom-dracula-brighter-comments . t))
+;;   :custom-face ((line-number . '((t (:foreground "#757878"))))
+;;                 (ivy-virtual . '((t (:foreground "#FF6188")))))
+;;   :config
+;;   (doom-themes-org-config)
+;;   (doom-themes-treemacs-config)
+;;   (doom-themes-visual-bell-config)
+;;   (load-theme 'doom-dracula t))
 
+(leaf lambda-themes
+  :straight (lambda-themes :type git :host github :repo "lambda-emacs/lambda-themes")
+  :custom
+  ((lambda-themes-set-italic-comments . t)
+   (lambda-themes-set-italic-keywords . t)
+   (lambda-themes-set-variable-pitch . t))
+  :config
+  (load-theme 'lambda-light t))
 (provide 'theme)
 ;;; theme.el ends here
