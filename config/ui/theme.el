@@ -52,7 +52,7 @@
    (lambda-themes-set-italic-keywords . t)
    (lambda-themes-set-variable-pitch . t))
   :config
-  (load-theme 'lambda-light-faded t))
+  (load-theme 'lambda-light t))
 
 (provide 'theme)
 ;;; theme.el ends here

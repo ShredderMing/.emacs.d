@@ -24,32 +24,32 @@
 
 ;;; Code:
 
-;; (leaf doom-modeline
-;;   :ensure t
-;;   :hook (after-init-hook)
-;;   :custom ((doom-modeline-buffer-file-name-style quote truncate-with-project)
-;;            (doom-modeline-icon . t)
-;;            (doom-modeline-major-mode-icon . t)
-;;            (doom-modeline-major-mode-color-icon . t)
-;;            (line-number-mode . 1)
-;;            (column-number-mode . 1)))
+(leaf doom-modeline
+  :ensure t
+  :hook (after-init-hook)
+  :custom ((doom-modeline-buffer-file-name-style quote truncate-with-project)
+           (doom-modeline-icon . t)
+           (doom-modeline-major-mode-icon . t)
+           (doom-modeline-major-mode-color-icon . t)
+           (line-number-mode . 1)
+           (column-number-mode . 1)))
 
-(leaf lambda-line
-  :el-get lambda-emacs/lambda-line
-  :custom
-  ((lambda-line-abbrev . t)	    ;; abbreviate major modes
-   (lambda-line-hspace . "  ")	    ;; add some cushion
-   (lambda-line-prefix . t)	    ;; use a prefix symbol
-   (lambda-line-prefix-padding . nil) ;; no extra space for prefix
-   (lambda-line-status-invert . nil)  ;; no invert colors
-   (lambda-line-gui-ro-symbol . " ⨂") ;; symbols
-   (lambda-line-gui-mod-symbol . " ⬤")
-   (lambda-line-gui-rw-symbol . " ◯")
-   (lambda-line-space-top . 0.5) ;; padding on top and bottom of line
-   (lambda-line-space-bottom . -0.5)
-   (lambda-line-symbol-position . 0.1))
-  :config
-  (lambda-line-mode))
+;; (leaf lambda-line
+;;   :el-get lambda-emacs/lambda-line
+;;   :custom
+;;   ((lambda-line-abbrev . t)	    ;; abbreviate major modes
+;;    (lambda-line-hspace . "  ")	    ;; add some cushion
+;;    (lambda-line-prefix . t)	    ;; use a prefix symbol
+;;    (lambda-line-prefix-padding . nil) ;; no extra space for prefix
+;;    (lambda-line-status-invert . nil)  ;; no invert colors
+;;    (lambda-line-gui-ro-symbol . " ⨂") ;; symbols
+;;    (lambda-line-gui-mod-symbol . " ⬤")
+;;    (lambda-line-gui-rw-symbol . " ◯")
+;;    (lambda-line-space-top . 0.5) ;; padding on top and bottom of line
+;;    (lambda-line-space-bottom . -0.5)
+;;    (lambda-line-symbol-position . 0.1))
+;;   :config
+;;   (lambda-line-mode))
 
 (provide 'modeline)
 ;;; modeline.el ends here

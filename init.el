@@ -56,3 +56,11 @@
 (leaf hbb-meow
   :load-path* "config"
   :require t)
+
+(leaf hbb-org
+  :load-path* "config/org"
+  :require t)
+
+(leaf hbb-dict
+  :load-path* "config"
+  :require t)

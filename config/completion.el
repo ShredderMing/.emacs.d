@@ -58,7 +58,7 @@
     ((corfu-auto . t)
      (corfu-cycle . t)
      (corfu-auto-prefix . 1)
-     (corfu-preselect-first . nil)
+     (corfu-preselect-first . t)
      (tab-always-indent . 'complete))
     :global-minor-mode global-corfu-mode)
 
