@@ -1,8 +1,8 @@
-;;; hbb-org.el --- org                               -*- lexical-binding: t; -*-
+;;; hbb-lang.el --- lang                                 -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  Harry
+;; Copyright (C) 2022  xlmx
 
-;; Author: Harry <harry@SummerTear>
+;; Author: xlmx <xlmx@SummerTear>
 ;; Keywords: 
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,13 +24,15 @@
 
 ;;; Code:
 
-(require 'hbb-org-roam)
+(require 'hbb-racket)
+(require 'hbb-scheme)
 
-(leaf org-superstar
+(leaf lispy
   :ensure t
-  :hook org-mode-hook
-  :custom
-  ((org-superstar-headline-bullets-list . '("⬢" "◆" "▲" "■"))))
+  :hook
+  emacs-lisp-mode-hook
+  scheme-mode-hook
+  racket-mode-hook)
 
-(provide 'hbb-org)
-;;; hbb-org.el ends here
+(provide 'hbb-lang)
+;;; hbb-lang.el ends here

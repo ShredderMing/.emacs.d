@@ -1,4 +1,4 @@
-;;; lang.el --- lang                                 -*- lexical-binding: t; -*-
+;;; hbb-proxy.el --- proxy                           -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  xlmx
 
@@ -24,14 +24,8 @@
 
 ;;; Code:
 
-(require 'racket)
+(leaf proxy-mode
+  :ensure t)
 
-(leaf lispy
-  :ensure t
-  :hook
-  emacs-lisp-mode-hook
-  scheme-mode-hook
-  racket-mode-hook)
-
-(provide 'lang)
-;;; lang.el ends here
+(provide 'hbb-proxy)
+;;; hbb-proxy.el ends here

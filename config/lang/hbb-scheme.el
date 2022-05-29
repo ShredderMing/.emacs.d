@@ -1,8 +1,8 @@
-;;; hbb-org.el --- org                               -*- lexical-binding: t; -*-
+;;; hbb-scheme.el --- scheme                             -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  Harry
+;; Copyright (C) 2022  xlmx
 
-;; Author: Harry <harry@SummerTear>
+;; Author: xlmx <xlmx@SummerTear>
 ;; Keywords: 
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,13 +24,8 @@
 
 ;;; Code:
 
-(require 'hbb-org-roam)
+(leaf geiser-chez
+  :ensure t)
 
-(leaf org-superstar
-  :ensure t
-  :hook org-mode-hook
-  :custom
-  ((org-superstar-headline-bullets-list . '("⬢" "◆" "▲" "■"))))
-
-(provide 'hbb-org)
-;;; hbb-org.el ends here
+(provide 'hbb-scheme)
+;;; hbb-scheme.el ends here

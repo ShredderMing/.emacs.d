@@ -53,13 +53,19 @@
   
   (leaf corfu
     :ensure t
-    :require t
     :custom
     ((corfu-auto . t)
      (corfu-cycle . t)
-     (corfu-auto-prefix . 1)
-     (corfu-preselect-first . t)
-     (tab-always-indent . 'complete))
+     (corfu-preselect-first . nil))
+    :bind
+    ((:corfu-map
+      ("TAB" . corfu-next)
+      ([tab] . corfu-next)
+      ("S-TAB" . corfu-previous)
+      ([backtab] . corfu-previous)))
+    :config
+    (require 'kind-all-the-icons)
+    (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter)
     :global-minor-mode global-corfu-mode)
 
   (leaf corfu-doc
@@ -70,15 +76,15 @@
     ((corfu-doc-delay . 0.8)
      (corfu-doc-max-width . 70)
      (corfu-doc-max-height . 20)))
-
-  (leaf kind-icon
-    :ensure t
-    :require t
-    :after corfu
-    :custom
-    (kind-icon-default-face . 'corfu-default)
-    :config
-    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)))
+  
+  ;; (leaf kind-icon
+  ;;   :el-get jdtsmith/kind-icon
+  ;;   :after corfu
+  ;;   :custom
+  ;;   (kind-icon-default-face . 'corfu-default)
+  ;;   :config
+  ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+  )
 
 (provide 'completion)
 ;;; completion.el ends here

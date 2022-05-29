@@ -45,7 +45,7 @@
   :load-path* "config/editor"
   :require t)
 
-(leaf lang
+(leaf hbb-lang
   :load-path* "config/lang"
   :require t)
 
@@ -62,5 +62,9 @@
   :require t)
 
 (leaf hbb-dict
+  :load-path* "config"
+  :require t)
+
+(leaf hbb-proxy
   :load-path* "config"
   :require t)

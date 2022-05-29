@@ -1,4 +1,4 @@
-;;; racket.el --- racket                             -*- lexical-binding: t; -*-
+;;; hbb-racket.el --- racket                             -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  xlmx
 
@@ -27,5 +27,5 @@
 (leaf racket-mode
   :ensure t)
   
-(provide 'racket)
-;;; racket.el ends here
+(provide 'hbb-racket)
+;;; hbb-racket.el ends here
