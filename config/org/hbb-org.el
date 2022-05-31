@@ -26,6 +26,35 @@
 
 (require 'hbb-org-roam)
 
+(leaf org
+  :init
+  (defun hbb/gtd ()
+    "Start my GTD system."
+    (interactive)
+    (find-file org-default-notes-file))
+  :bind
+  (("C-c o g" . 'hbb/gtd)
+   ("C-c o a" . 'org-agenda)
+   ("C-c o c" . 'org-capture))
+  :custom
+  ((org-default-notes-file . "~/Box/roam/inbox.org")
+   (org-agenda-files . '("~/Box/"))
+   (org-src-preserve-indentation . nil)
+   (org-ellipsis . " ⋯")
+   (org-startup-folded . 'content)
+   (org-return-follows-link . t)
+   (org-todo-keywords . '((sequence "TODO(t)" "STRT(s/!)" "|" "DONE(d/!)")
+			  (sequence "WAIT(w@/!)" "|" "KILL(k@/!)")))
+   (org-capture-templates . '(("t" "Task" entry
+			       (file+headline "" "Tasks")
+			       "* TODO %^{任务名称}\n%u\n" :clock-in t :clock-resume t)
+			      ("i" "Idea" entry
+			       (file+headline "" "Ideas")
+			       "* %U - %^{Idea} %?\n")
+			      ("w" "Wana" entry
+			       (file+headline "" "I Wana")
+			       "* %U - %^{I Wana} %?\n")))))
+
 (leaf org-superstar
   :ensure t
   :hook org-mode-hook

@@ -63,9 +63,6 @@
       ([tab] . corfu-next)
       ("S-TAB" . corfu-previous)
       ([backtab] . corfu-previous)))
-    :config
-    (require 'kind-all-the-icons)
-    (add-to-list 'corfu-margin-formatters #'kind-all-the-icons-margin-formatter)
     :global-minor-mode global-corfu-mode)
 
   (leaf corfu-doc
@@ -76,14 +73,19 @@
     ((corfu-doc-delay . 0.8)
      (corfu-doc-max-width . 70)
      (corfu-doc-max-height . 20)))
-  
-  ;; (leaf kind-icon
-  ;;   :el-get jdtsmith/kind-icon
-  ;;   :after corfu
-  ;;   :custom
-  ;;   (kind-icon-default-face . 'corfu-default)
-  ;;   :config
-  ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+  (leaf yasnippet
+    :ensure t
+    :global-minor-mode yas-global-mode)
+
+  (leaf lsp-bridge
+    :el-get manateelazycat/lsp-bridge
+    :after corfu
+    :config
+    (require 'lsp-bridge-icon)
+    (require 'lsp-bridge-orderless)
+    (corfu-history-mode)
+    (global-lsp-bridge-mode))
   )
 
 (provide 'completion)

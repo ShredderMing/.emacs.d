@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(defconst *font* "Cascadia Code")
+(defconst *font* "Iosevka")
 (defconst *font-weight* 'normal)
 (defconst *font-size* 14)
 (defconst *font-cjk* "Noto Sans CJK SC")
@@ -44,8 +44,9 @@
       (set-fontset-font (frame-parameter nil 'font)
                         charset
                         (font-spec :name   *font-cjk*
-                                   :weight *font-weight-cjk*
-                                   :size   *font-size-cjk*)
+                                   ;; :weight *font-weight-cjk*
+                                   ;; :size   *font-size-cjk*
+				   )
                         frame
                         'prepend))
     

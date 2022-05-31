@@ -1,8 +1,8 @@
-;;; hbb-lang.el --- lang                                 -*- lexical-binding: t; -*-
+;;; hbb-markdown.el --- markdown                     -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  xlmx
+;; Copyright (C) 2022  Harry
 
-;; Author: xlmx <xlmx@SummerTear>
+;; Author: Harry <harry@SummerTear>
 ;; Keywords: 
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,16 +24,8 @@
 
 ;;; Code:
 
-(require 'hbb-racket)
-(require 'hbb-scheme)
-(require 'hbb-markdown)
+(leaf markdown-mode
+  :ensure t)
 
-(leaf lispy
-  :ensure t
-  :hook
-  emacs-lisp-mode-hook
-  scheme-mode-hook
-  racket-mode-hook)
-
-(provide 'hbb-lang)
-;;; hbb-lang.el ends here
+(provide 'hbb-markdown)
+;;; hbb-markdown.el ends here

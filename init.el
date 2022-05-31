@@ -25,17 +25,23 @@
 ;; </leaf-install-code>
 
 (leaf startup
+  :init
+  (defun hbb/open-config ()
+    "open init.el"
+    (interactive)
+    (find-file user-init-file))
+  :bind
+  (("C-`" . 'hbb/open-config))
   :custom
   `((inhibit-startup-screen . t)
     (inhibit-startup-message . t)
     (inhibit-splash-screen . t)
     (inhibit-startup-echo-area-message . t)
     (initial-scratch-message . ,(concat ";; Happy hacking, "
-					user-login-name " - Emacs ♥ you!\n\n")))
-  :config
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1))
+					user-login-name " - Emacs ♥ you!\n\n"))
+    (menu-bar-mode . nil)
+    (tool-bar-mode . nil)
+    (scroll-bar-mode . nil)))
 
 (leaf ui
   :load-path* "config/ui"
