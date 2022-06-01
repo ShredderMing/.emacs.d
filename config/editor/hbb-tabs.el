@@ -1,9 +1,10 @@
-;;; sidebar.el --- sidebar                           -*- lexical-binding: t; -*-
+;;; hbb-tabs.el --- tabs                                 -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  xlmx
+;; Copyright (C) 2022  Harry
 
-;; Author: xlmx <xlmx@SummerTear>
-;; Keywords: 
+;; Author: Harry <harry@SummerTear>
+;; Keywords:
+;; c
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,25 +25,18 @@
 
 ;;; Code:
 
-(leaf treemacs
+(leaf centaur-tabs
   :ensure t
-  :bind ((treemacs-mode-map
-          ([mouse-1] . treemacs-single-click-expand-action)))
+  :custom ((centaur-tabs-height . 32)
+	   (centaur-tabs-style . "bar")
+	   (centaur-tabs-set-icons . t)
+	   (centaur-tabs-set-bar . 'under)
+	   (x-underline-at-descent-line . t)
+	   (centaur-tabs-set-close-button . nil)
+	   (centaur-tabs-set-modified-marker . t)
+	   (centaur-tabs-modified-marker . "●"))
   :config
-  (treemacs-resize-icons 17))
+  (centaur-tabs-mode t))
 
-(leaf treemacs-icons-dired
-  :ensure t
-  :after treemacs dired
-  :config (treemacs-icons-dired-mode))
-
-(leaf treemacs-magit
-  :ensure t
-  :after treemacs magit)
-
-(leaf treemacs-projectile
-  :ensure t
-  :after treemacs projectile)
-
-(provide 'sidebar)
-;;; sidebar.el ends here
+(provide 'hbb-tabs)
+;;; hbb-tabs.el ends here

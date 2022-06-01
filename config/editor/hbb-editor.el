@@ -1,10 +1,9 @@
-;;; tabs.el --- tabs                                 -*- lexical-binding: t; -*-
+;;; editor.el --- editor                             -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  Harry
+;; Copyright (C) 2022  xlmx
 
-;; Author: Harry <harry@SummerTear>
-;; Keywords:
-;; c
+;; Author: xlmx <xlmx@SummerTear>
+;; Keywords: 
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,20 +24,8 @@
 
 ;;; Code:
 
-(leaf centaur-tabs
-  :ensure t
-  :custom ((centaur-tabs-height . 32)
-	   (centaur-tabs-style . "bar")
-	   (centaur-tabs-set-icons . t)
-	   (centaur-tabs-set-bar . 'under)
-	   (x-underline-at-descent-line . t)
-	   (centaur-tabs-set-close-button . nil)
-	   (centaur-tabs-set-modified-marker . t)
-	   (centaur-tabs-modified-marker . "●"))
-  :config
-  (centaur-tabs-mode t)
-  :defer-config
-  (centaur-tabs-headline-match))
+(require 'hbb-sidebar)
+(require 'hbb-tabs)
 
-(provide 'tabs)
-;;; tabs.el ends here
+(provide 'hbb-editor)
+;;; editor.el ends here

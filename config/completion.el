@@ -32,6 +32,11 @@
     ((vertico-count . 12)
      (vertico-cycle . nil))
     :global-minor-mode t)
+
+  (leaf consult
+    :ensure t
+    :bind
+    (("C-c f r" . consult-recent-file)))
   
   (leaf marginalia
     :ensure t

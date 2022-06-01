@@ -43,11 +43,17 @@
     (tool-bar-mode . nil)
     (scroll-bar-mode . nil)))
 
+(leaf recentf
+  :custom
+  ((recentf-max-menu-items . 25)
+   (recentf-max-saved-items . 25))
+  :global-minor-mode t)
+
 (leaf ui
   :load-path* "config/ui"
   :require t)
 
-(leaf editor
+(leaf hbb-editor
   :load-path* "config/editor"
   :require t)
 
@@ -72,5 +78,9 @@
   :require t)
 
 (leaf hbb-proxy
+  :load-path* "config"
+  :require t)
+
+(leaf hbb-shortcuts
   :load-path* "config"
   :require t)

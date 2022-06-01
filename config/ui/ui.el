@@ -28,8 +28,13 @@
 (require 'modeline)
 (require 'font)
 
-(leaf all-the-icons :ensure t)
+(leaf all-the-icons
+  :ensure t
+  :custom
+  (all-the-icons-scale-factor . 0.8))
+
 (leaf all-the-icons-dired :ensure t)
+
 (leaf focus
   :ensure t)
 
@@ -62,9 +67,9 @@
   :ensure t
   :blackout t
   :hook (prog-mode-hook)
-  ;; :custom ((beacon-color . "#ff7777")
-  ;;          (beacon-blink-duration . 0.7)
-  ;;          (beacon-size . 100))
+  :custom ((beacon-color . "#ff7777")
+	   (beacon-blink-duration . 0.7)
+	   (beacon-size . 100))
   )
 
 (leaf fill-column-indicator

@@ -1,4 +1,4 @@
-;;; editor.el --- editor                             -*- lexical-binding: t; -*-
+;;; hbb-sidebar.el --- sidebar                           -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  xlmx
 
@@ -24,8 +24,25 @@
 
 ;;; Code:
 
-(require 'sidebar)
-;; (require 'tabs)
+(leaf treemacs
+  :ensure t
+  :bind ((treemacs-mode-map
+          ([mouse-1] . treemacs-single-click-expand-action)))
+  :config
+  (treemacs-resize-icons 17))
 
-(provide 'editor)
-;;; editor.el ends here
+(leaf treemacs-icons-dired
+  :ensure t
+  :after treemacs dired
+  :config (treemacs-icons-dired-mode))
+
+(leaf treemacs-magit
+  :ensure t
+  :after treemacs magit)
+
+(leaf treemacs-projectile
+  :ensure t
+  :after treemacs projectile)
+
+(provide 'hbb-sidebar)
+;;; hbb-sidebar.el ends here

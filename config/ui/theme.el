@@ -24,35 +24,34 @@
 
 ;;; Code:
 
-;(leaf twilight-bright-theme
-;  :ensure t
-;  :config
-;  (load-theme 'twilight-bright t))
+;; (leaf twilight-bright-theme
+;;  :ensure t
+;;  :config
+;;  (load-theme 'twilight-bright t))
 
-;; (leaf doom-themes
-;;   :ensure t
-;;   :custom ((doom-themes-enable-italic . t)
-;;            (doom-themes-enable-bold . t)
-;;            (doom-challenger-deep-brighter-comments . t)
-;;            (doom-monokai-brighter-comments . t)
-;;            (doom-dracula-brighter-comments . t))
-;;   :custom-face ((line-number . '((t (:foreground "#757878"))))
-;;                 (ivy-virtual . '((t (:foreground "#FF6188")))))
-;;   :config
-;;   (doom-themes-org-config)
-;;   (doom-themes-treemacs-config)
-;;   (doom-themes-visual-bell-config)
-;;   (load-theme 'doom-dracula t))
-
-(leaf lambda-themes
-  :el-get lambda-emacs/lambda-themes
-  :require t
-  :custom
-  ((lambda-themes-set-italic-comments . t)
-   (lambda-themes-set-italic-keywords . t)
-   (lambda-themes-set-variable-pitch . t))
+(leaf doom-themes
+  :ensure t
+  :custom ((doom-themes-enable-italic . t)
+           (doom-themes-enable-bold . t)
+           (doom-challenger-deep-brighter-comments . t)
+           (doom-monokai-brighter-comments . t)
+           (doom-dracula-brighter-comments . t))
+  :custom-face ((line-number . '((t (:foreground "#757878"))))
+                (ivy-virtual . '((t (:foreground "#FF6188")))))
   :config
-  (load-theme 'lambda-light t))
+  (doom-themes-org-config)
+  (doom-themes-treemacs-config)
+  (load-theme 'doom-dracula t))
+
+;; (leaf lambda-themes
+;;   :el-get lambda-emacs/lambda-themes
+;;   :require t
+;;   :custom
+;;   ((lambda-themes-set-italic-comments . t)
+;;    (lambda-themes-set-italic-keywords . t)
+;;    (lambda-themes-set-variable-pitch . t))
+;;   :config
+;;   (load-theme 'lambda-light t))
 
 (provide 'theme)
 ;;; theme.el ends here
