@@ -41,7 +41,7 @@
   :config
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
-  (load-theme 'doom-dracula t))
+  (load-theme 'doom-solarized-light t))
 
 ;; (leaf lambda-themes
 ;;   :el-get lambda-emacs/lambda-themes
@@ -52,6 +52,12 @@
 ;;    (lambda-themes-set-variable-pitch . t))
 ;;   :config
 ;;   (load-theme 'lambda-light t))
+
+;; (leaf nasy-theme
+;;   :el-get nasyxx/emacs-nasy-theme
+;;   :require t
+;;   :config
+;;   (load-theme 'nasy t))
 
 (provide 'theme)
 ;;; theme.el ends here

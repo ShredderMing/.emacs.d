@@ -27,6 +27,11 @@
 
 (leaf centaur-tabs
   :ensure t
+  :hook ((dashboard-mode-hook
+	  vterm-mode-hook
+	  calendat-mode-hook
+	  org-agenda-mode-hook
+	  helpful-mode-hook) . centaur-tabs-local-mode)
   :custom ((centaur-tabs-height . 32)
 	   (centaur-tabs-style . "bar")
 	   (centaur-tabs-set-icons . t)
@@ -35,8 +40,7 @@
 	   (centaur-tabs-set-close-button . nil)
 	   (centaur-tabs-set-modified-marker . t)
 	   (centaur-tabs-modified-marker . "●"))
-  :config
-  (centaur-tabs-mode t))
+  :global-minor-mode t)
 
 (provide 'hbb-tabs)
 ;;; hbb-tabs.el ends here

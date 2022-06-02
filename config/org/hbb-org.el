@@ -39,7 +39,7 @@
   :custom
   ((org-default-notes-file . "~/Box/roam/inbox.org")
    (org-agenda-files . '("~/Box/"))
-   (org-src-preserve-indentation . nil)
+   ;; (org-src-preserve-indentation . nil)
    (org-ellipsis . " ⋯")
    (org-startup-folded . 'content)
    (org-return-follows-link . t)
@@ -59,7 +59,14 @@
   :ensure t
   :hook org-mode-hook
   :custom
-  ((org-superstar-headline-bullets-list . '("⬢" "◆" "▲" "■"))))
+  ((org-superstar-special-todo-items . t)
+   (org-superstar-headline-bullets-list . '("⬢" "◆" "▲" "■"))))
+
+(leaf org-fancy-priorities
+  :ensure t
+  :hook ((org-mode-hook org-agenda-mode-hook) . org-fancy-priorities-mode)
+  :custom
+  ((org-fancy-priorities-list . '("⚑" "⬆" "■"))))
 
 (provide 'hbb-org)
 ;;; hbb-org.el ends here

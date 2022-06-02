@@ -84,3 +84,7 @@
 (leaf hbb-shortcuts
   :load-path* "config"
   :require t)
+
+(leaf hbb-vterm
+  :load-path* "config"
+  :require t)

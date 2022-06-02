@@ -26,10 +26,10 @@
 
 (defconst *font* "Iosevka")
 (defconst *font-weight* 'normal)
-(defconst *font-size* 14)
+(defconst *font-size* 16)
 (defconst *font-cjk* "Noto Sans CJK SC")
 (defconst *font-weight-cjk* 'normal)
-(defconst *font-size-cjk* 14)
+(defconst *font-size-cjk* 16)
 
 (defun hbb/set--font (frame)
   "HBB set font for `FRAME'."

@@ -1,8 +1,8 @@
-;;; hbb-lang.el --- lang                                 -*- lexical-binding: t; -*-
+;;; hbb-vterm.el --- vterm                           -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  xlmx
+;; Copyright (C) 2022  Harry
 
-;; Author: xlmx <xlmx@SummerTear>
+;; Author: Harry <harry@SummerTear>
 ;; Keywords: 
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,19 +24,14 @@
 
 ;;; Code:
 
-(require 'hbb-racket)
-(require 'hbb-scheme)
-(require 'hbb-markdown)
+(leaf vterm
+  :ensure t)
 
-(leaf lispy
+(leaf vterm-toggle
   :ensure t
-  :hook
-  emacs-lisp-mode-hook
-  scheme-mode-hook
-  racket-mode-hook)
+  :bind (("C-c o t" . vterm-toggle))
+  :custom
+  ((vterm-toggle-scope . 'project)))
 
-(leaf elec-pair
-  :global-minor-mode electric-pair-mode)
-
-(provide 'hbb-lang)
-;;; hbb-lang.el ends here
+(provide 'hbb-vterm)
+;;; hbb-vterm.el ends here

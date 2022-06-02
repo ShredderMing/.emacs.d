@@ -75,6 +75,11 @@
 (leaf fill-column-indicator
   :commands fci-mode)
 
+(leaf paren
+  :custom
+  ((show-paren-style . 'expression))
+  :global-minor-mode show-paren-mode)
+
 (leaf rainbow-delimiters
   :ensure t
   :blackout t
