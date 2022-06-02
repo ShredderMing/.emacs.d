@@ -39,7 +39,8 @@
   :custom
   ((org-default-notes-file . "~/Box/roam/inbox.org")
    (org-agenda-files . '("~/Box/"))
-   ;; (org-src-preserve-indentation . nil)
+   (org-startup-indented . t)
+   (org-src-preserve-indentation . nil)
    (org-ellipsis . " ⋯")
    (org-startup-folded . 'content)
    (org-return-follows-link . t)
