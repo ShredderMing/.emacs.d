@@ -29,19 +29,19 @@
 ;;  :config
 ;;  (load-theme 'twilight-bright t))
 
-(leaf doom-themes
-  :ensure t
-  :custom ((doom-themes-enable-italic . t)
-           (doom-themes-enable-bold . t)
-           (doom-challenger-deep-brighter-comments . t)
-           (doom-monokai-brighter-comments . t)
-           (doom-dracula-brighter-comments . t))
-  :custom-face ((line-number . '((t (:foreground "#757878"))))
-                (ivy-virtual . '((t (:foreground "#FF6188")))))
-  :config
-  (doom-themes-org-config)
-  (doom-themes-treemacs-config)
-  (load-theme 'doom-solarized-light t))
+;; (leaf doom-themes
+;;   :ensure t
+;;   :custom ((doom-themes-enable-italic . t)
+;;            (doom-themes-enable-bold . t)
+;;            (doom-challenger-deep-brighter-comments . t)
+;;            (doom-monokai-brighter-comments . t)
+;;            (doom-dracula-brighter-comments . t))
+;;   :custom-face ((line-number . '((t (:foreground "#757878"))))
+;;                 (ivy-virtual . '((t (:foreground "#FF6188")))))
+;;   :config
+;;   (doom-themes-org-config)
+;;   (doom-themes-treemacs-config)
+;;   (load-theme 'doom-solarized-light t))
 
 ;; (leaf lambda-themes
 ;;   :el-get lambda-emacs/lambda-themes
@@ -58,6 +58,11 @@
 ;;   :require t
 ;;   :config
 ;;   (load-theme 'nasy t))
+
+(leaf solo-jazz-theme
+  :ensure t
+  :config
+  (load-theme 'solo-jazz t))
 
 (provide 'theme)
 ;;; theme.el ends here
