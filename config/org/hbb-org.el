@@ -35,7 +35,9 @@
   :bind
   (("C-c o g" . 'hbb/gtd)
    ("C-c o a" . 'org-agenda)
-   ("C-c o c" . 'org-capture))
+   ("C-c o c" . 'org-capture)
+   ("C-c o s" . 'org-schedule)
+   ("C-c o d" . 'org-deadline))
   :custom
   ((org-default-notes-file . "~/Box/roam/inbox.org")
    (org-agenda-files . '("~/Box/"))
@@ -54,7 +56,9 @@
 			       "* %U - %^{Idea} %?\n")
 			      ("w" "Wana" entry
 			       (file+headline "" "I Wana")
-			       "* %U - %^{I Wana} %?\n")))))
+			       "* %U - %^{I Wana} %?\n")))
+   (org-agenda-custom-commands . '(("g" "Get Things Done (GTD)"
+				    )))))
 
 (leaf org-superstar
   :ensure t
