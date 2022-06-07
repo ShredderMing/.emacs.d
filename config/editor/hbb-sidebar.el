@@ -26,7 +26,8 @@
 
 (leaf treemacs
   :ensure t
-  :bind ((treemacs-mode-map
+  :bind (("C-c o p" . treemacs)
+	 (treemacs-mode-map
           ([mouse-1] . treemacs-single-click-expand-action)))
   :config
   (treemacs-resize-icons 17))

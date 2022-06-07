@@ -24,8 +24,8 @@
 
 ;;; Code:
 
-(defconst *font* "Iosevka")
-(defconst *font-weight* 'normal)
+(defconst *font* "M+ 1m")
+(defconst *font-weight* 'medium)
 (defconst *font-size* 16)
 (defconst *font-cjk* "Noto Sans CJK SC")
 (defconst *font-weight-cjk* 'normal)
@@ -44,9 +44,8 @@
       (set-fontset-font (frame-parameter nil 'font)
                         charset
                         (font-spec :name   *font-cjk*
-                                   ;; :weight *font-weight-cjk*
-                                   ;; :size   *font-size-cjk*
-				   )
+                                   :weight *font-weight-cjk*
+                                   :size   *font-size-cjk*)
                         frame
                         'prepend))
     
