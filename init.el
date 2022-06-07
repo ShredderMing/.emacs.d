@@ -88,3 +88,7 @@
 (leaf hbb-vterm
   :load-path* "config"
   :require t)
+
+(leaf hbb-projectile
+  :load-path* "config"
+  :require t)
