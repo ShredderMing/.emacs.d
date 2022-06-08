@@ -30,6 +30,9 @@
 
 (leaf all-the-icons
   :ensure t
+  :defer-config
+  (add-to-list 'all-the-icons-extension-icon-alist
+	       '("ss" all-the-icons-fileicon "scheme" :height 1.2 :face all-the-icons-red))
   :custom
   (all-the-icons-scale-factor . 0.8))
 
@@ -67,7 +70,7 @@
   :ensure t
   :blackout t
   :hook (prog-mode-hook)
-  :custom ((beacon-color . "#ff7777")
+  :custom ((beacon-color . "#bd93f9")
 	   (beacon-blink-duration . 0.7)
 	   (beacon-size . 100))
   )
@@ -91,6 +94,12 @@
 
 (leaf rainbow-mode
   :ensure t)
+
+(leaf centered-window
+  :ensure t
+  :custom
+  ((cwm-centered-window-width . 180))
+  :global-minor-mode t)
 
 (provide 'ui)
 ;;; ui.el ends here

@@ -27,5 +27,12 @@
 (require 'hbb-sidebar)
 (require 'hbb-tabs)
 
+(leaf ace-window
+  :ensure t
+  :bind (("M-o" . ace-window))
+  :custom
+  ((aw-keys . '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+   (aw-background . nil)))
+
 (provide 'hbb-editor)
 ;;; editor.el ends here

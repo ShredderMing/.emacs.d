@@ -30,7 +30,7 @@
 	 (treemacs-mode-map
           ([mouse-1] . treemacs-single-click-expand-action)))
   :config
-  (treemacs-resize-icons 17))
+  (treemacs-resize-icons 16))
 
 (leaf treemacs-icons-dired
   :ensure t

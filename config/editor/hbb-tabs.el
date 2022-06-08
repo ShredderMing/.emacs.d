@@ -32,6 +32,9 @@
 	  calendat-mode-hook
 	  org-agenda-mode-hook
 	  helpful-mode-hook) . centaur-tabs-local-mode)
+  :bind
+  (("s-{" . centaur-tabs-backward)
+   ("s-}" . centaur-tabs-forward))
   :custom ((centaur-tabs-height . 32)
 	   (centaur-tabs-style . "bar")
 	   (centaur-tabs-set-icons . t)
