@@ -1,8 +1,7 @@
 ;; <leaf-install-code>
 (eval-and-compile
   (customize-set-variable
-   'package-archives '(("org" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
-                       ("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+   'package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
                        ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
   (package-initialize)
   (unless (package-installed-p 'leaf)

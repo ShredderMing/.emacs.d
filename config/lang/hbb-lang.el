@@ -37,6 +37,12 @@
   racket-mode-hook)
 
 (leaf elec-pair
+  :hook ((org-mode-hook) . (lambda ()
+			     (setq-local electric-pair-inhibit-predicate
+					 `(lambda (c)
+					    (if (char-equal c ?<)
+						t
+					      (,electric-pair-inhibit-predicate c))))))
   :global-minor-mode electric-pair-mode)
 
 (provide 'hbb-lang)

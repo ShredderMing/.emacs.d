@@ -26,7 +26,10 @@
 
 (leaf geiser-chez
   :ensure t
-  :hook ((scheme-mode-hook) . geiser-mode))
+  :hook ((scheme-mode-hook) . geiser-mode)
+  :custom ((geiser-activate-implementation . '(chez))
+	   (geiser-chez-binary . "scheme")
+	   (geiser-default-implementation . 'chez)))
 
 (provide 'hbb-scheme)
 ;;; hbb-scheme.el ends here
