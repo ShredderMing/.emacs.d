@@ -36,7 +36,8 @@
   (leaf consult
     :ensure t
     :bind
-    (("C-c f r" . consult-recent-file)))
+    (("C-c f r" . consult-recent-file)
+     ("C-c t t" . consult-theme)))
   
   (leaf marginalia
     :ensure t

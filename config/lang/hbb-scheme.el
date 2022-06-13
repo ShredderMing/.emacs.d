@@ -25,7 +25,8 @@
 ;;; Code:
 
 (leaf geiser-chez
-  :ensure t)
+  :ensure t
+  :hook ((scheme-mode-hook) . geiser-mode))
 
 (provide 'hbb-scheme)
 ;;; hbb-scheme.el ends here

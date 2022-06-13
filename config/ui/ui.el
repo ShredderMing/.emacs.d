@@ -70,9 +70,9 @@
   :ensure t
   :blackout t
   :hook (prog-mode-hook)
-  :custom ((beacon-color . "#bd93f9")
-	   (beacon-blink-duration . 0.7)
-	   (beacon-size . 100))
+  ;; :custom ((beacon-color . "#bd93f9")
+  ;; 	   (beacon-blink-duration . 0.7)
+  ;; 	   (beacon-size . 100))
   )
 
 (leaf fill-column-indicator
@@ -83,10 +83,15 @@
   ((show-paren-style . 'expression))
   :global-minor-mode show-paren-mode)
 
-(leaf rainbow-delimiters
+(leaf paren-face
   :ensure t
-  :blackout t
-  :hook (prog-mode-hook))
+  :custom-face ((parenthesis . '((t (:foreground "DimGray")))))
+  :global-minor-mode global-paren-face-mode)
+
+;; (leaf rainbow-delimiters
+;;   :ensure t
+;;   :blackout t
+;;   :hook (prog-mode-hook))
 
 (leaf presentation
   :ensure t

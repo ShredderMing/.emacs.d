@@ -1,8 +1,8 @@
-;;; hbb-lang.el --- lang                                 -*- lexical-binding: t; -*-
+;;; hbb-dart.el --- dart                             -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  xlmx
+;; Copyright (C) 2022  Harry
 
-;; Author: xlmx <xlmx@SummerTear>
+;; Author: Harry <harry@SummerTear>
 ;; Keywords: 
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,20 +24,8 @@
 
 ;;; Code:
 
-(require 'hbb-racket)
-(require 'hbb-scheme)
-(require 'hbb-markdown)
-(require 'hbb-dart)
+(leaf dart-mode
+  :ensure t)
 
-(leaf lispy
-  :ensure t
-  :hook
-  emacs-lisp-mode-hook
-  scheme-mode-hook
-  racket-mode-hook)
-
-(leaf elec-pair
-  :global-minor-mode electric-pair-mode)
-
-(provide 'hbb-lang)
-;;; hbb-lang.el ends here
+(provide 'hbb-dart)
+;;; hbb-dart.el ends here

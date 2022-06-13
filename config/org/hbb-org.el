@@ -39,8 +39,9 @@
    ("C-c o s" . 'org-schedule)
    ("C-c o d" . 'org-deadline))
   :custom
-  ((org-default-notes-file . "~/Box/roam/inbox.org")
-   (org-agenda-files . '("~/Box/"))
+  ((org-directory . "~/Box")
+   (org-default-notes-file . "~/Box/roam/inbox.org")
+   (org-agenda-files . '("~/Box/roam/projects.org"))
    (org-startup-indented . t)
    (org-src-preserve-indentation . nil)
    (org-ellipsis . " ⋯")
@@ -57,15 +58,23 @@
 			      ("w" "Wana" entry
 			       (file+headline "" "I Wana")
 			       "* %U - %^{I Wana} %?\n")))
-   (org-agenda-custom-commands . '(("g" "Get Things Done (GTD)"
-				    )))))
+   )
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages '((C . t)
+			       (shell . t)
+			       (scheme . t))
+   ))
 
 (leaf org-superstar
   :ensure t
   :hook org-mode-hook
   :custom
   ((org-superstar-special-todo-items . t)
-   (org-superstar-headline-bullets-list . '("⬢" "◆" "▲" "■"))))
+   (org-superstar-headline-bullets-list . '("⁖" "◉" "✸" "✫"))
+   (org-superstar-item-bullet-alist . '((?* . ?✼)
+					(?+ . ?✚)
+					(?- . ?⁍)))))
 
 (leaf org-fancy-priorities
   :ensure t
