@@ -7,7 +7,7 @@
   (unless (package-installed-p 'leaf)
     (package-refresh-contents)
     (package-install 'leaf))
-
+  (require 'leaf)
   (leaf leaf-keywords
     :ensure t
     :init
@@ -20,7 +20,11 @@
     (leaf blackout :ensure t)
     :config
     ;; initialize leaf-keywords.el
-    (leaf-keywords-init)))
+    (leaf-keywords-init))
+  (leaf feather
+	:el-get conao3/feather.el
+	:config (feather-mode))
+  )
 ;; </leaf-install-code>
 
 (leaf startup
