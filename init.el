@@ -21,9 +21,6 @@
     :config
     ;; initialize leaf-keywords.el
     (leaf-keywords-init))
-  (leaf feather
-	:el-get conao3/feather.el
-	:config (feather-mode))
   )
 ;; </leaf-install-code>
 

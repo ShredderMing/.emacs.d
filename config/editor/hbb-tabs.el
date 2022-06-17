@@ -43,6 +43,8 @@
 	   (centaur-tabs-set-close-button . nil)
 	   (centaur-tabs-set-modified-marker . t)
 	   (centaur-tabs-modified-marker . "●"))
+  :config
+  (centaur-tabs-group-by-projectile-project)
   :global-minor-mode t)
 
 (provide 'hbb-tabs)

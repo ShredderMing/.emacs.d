@@ -88,9 +88,6 @@
     :el-get manateelazycat/lsp-bridge
     :after corfu
     :config
-    (require 'lsp-bridge-icon)
-    (require 'lsp-bridge-orderless)
-    (corfu-history-mode)
     (global-lsp-bridge-mode))
   )
 

@@ -19,7 +19,8 @@
  ;; visible-bell t
  native-comp-async-report-warnings-errors 'silent
  backup-directory-alist `(("." . ,(locate-user-emacs-file "backups")))
- custom-file (locate-user-emacs-file "custom.el"))
+ custom-file (locate-user-emacs-file "custom.el")
+ default-frame-alist '((width . 80) (height . 45)))
 
 (let ((old-file-name-handler-alist file-name-handler-alist))
 
