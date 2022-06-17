@@ -24,10 +24,8 @@
 
 ;;; Code:
 
-;; (leaf twilight-bright-theme
-;;  :ensure t
-;;  :config
-;;  (load-theme 'twilight-bright t))
+(leaf twilight-bright-theme
+  :ensure t)
 
 (leaf doom-themes
   :ensure t
@@ -42,32 +40,23 @@
 		(org-block . '((t (:background nil))))
 		(org-block-begin-line . '((t (:background nil))))
 		(org-block-end-line . '((t (:background nil))))
-		(show-paren-match-expression . '((t (:background "#11121c")))))
+		(show-paren-match-expression . '((t (:background "#eeeeee"))))
+		)
   :config
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
-  (load-theme 'doom-dracula t))
+  (load-theme 'doom-tomorrow-day t)
+  )
 
-;; (leaf lambda-themes
-;;   :el-get lambda-emacs/lambda-themes
-;;   :require t
-;;   :custom
-;;   ((lambda-themes-set-italic-comments . t)
-;;    (lambda-themes-set-italic-keywords . t)
-;;    (lambda-themes-set-variable-pitch . t))
-;;   :config
-;;   (load-theme 'lambda-light t))
+(leaf lambda-themes
+  :el-get lambda-emacs/lambda-themes
+  :custom
+  ((lambda-themes-set-italic-comments . t)
+   (lambda-themes-set-italic-keywords . t)
+   (lambda-themes-set-variable-pitch . t)))
 
-;; (leaf nasy-theme
-;;   :el-get nasyxx/emacs-nasy-theme
-;;   :require t
-;;   :config
-;;   (load-theme 'nasy t))
-
-;; (leaf solo-jazz-theme
-;;   :ensure t
-;;   :config
-;;   (load-theme 'solo-jazz t))
+(leaf solo-jazz-theme
+  :ensure t)
 
 (provide 'theme)
 ;;; theme.el ends here

@@ -82,5 +82,10 @@
   :custom
   ((org-fancy-priorities-list . '("⚑" "⬆" "■"))))
 
+(leaf valign
+  :ensure t
+  :hook ((org-mode-hook) . valign-mode)
+  :custom (valign-fancy-bar . t))
+
 (provide 'hbb-org)
 ;;; hbb-org.el ends here

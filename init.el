@@ -1,4 +1,9 @@
-;; <leaf-install-code>
+(eval-and-compile
+  (when (or load-file-name byte-compile-current-file)
+    (setq user-emacs-directory
+          (expand-file-name
+           (file-name-directory (or load-file-name byte-compile-current-file))))))
+
 (eval-and-compile
   (customize-set-variable
    'package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
@@ -22,7 +27,6 @@
     ;; initialize leaf-keywords.el
     (leaf-keywords-init))
   )
-;; </leaf-install-code>
 
 (leaf startup
   :init
