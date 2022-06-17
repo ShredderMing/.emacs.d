@@ -42,7 +42,7 @@
 		(org-block . '((t (:background nil))))
 		(org-block-begin-line . '((t (:background nil))))
 		(org-block-end-line . '((t (:background nil))))
-		(show-paren-match-expression . '((t (:background "#111111")))))
+		(show-paren-match-expression . '((t (:background "#11121c")))))
   :config
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
