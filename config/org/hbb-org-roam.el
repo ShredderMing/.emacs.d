@@ -37,5 +37,14 @@
   :config
   (org-roam-db-autosync-mode))
 
+(leaf deft
+  :ensure t
+  :bind (("C-c n r d" . deft))
+  :custom
+  ((deft-recursive . t)
+   (deft-use-filter-string-for-filename . t)
+   (deft-default-extension . "org")
+   (deft-directory . org-roam-directory)))
+
 (provide 'hbb-org-roam)
 ;;; hbb-org-roam.el ends here
