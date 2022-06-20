@@ -85,7 +85,7 @@
 
 (leaf paren-face
   :ensure t
-  :custom-face ((parenthesis . '((t (:foreground "DimGray")))))
+  :custom-face ((parenthesis . '((t (:foreground "#dadcda")))))
   :global-minor-mode global-paren-face-mode)
 
 ;; (leaf rainbow-delimiters

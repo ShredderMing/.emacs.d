@@ -47,6 +47,7 @@
    (org-ellipsis . " ⋯")
    (org-startup-folded . 'content)
    (org-return-follows-link . t)
+   (org-confirm-babel-evaluate . nil)
    (org-todo-keywords . '((sequence "TODO(t)" "STRT(s/!)" "|" "DONE(d/!)")
 			  (sequence "WAIT(w@/!)" "|" "KILL(k@/!)")))
    (org-capture-templates . '(("t" "Task" entry

@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(defconst *font* "CamingoCode")
+(defconst *font* "Cascadia Code")
 (defconst *font-weight* 'normal)
 (defconst *font-size* 16)
 (defconst *font-cjk* "Noto Sans CJK SC")
