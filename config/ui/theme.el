@@ -45,7 +45,7 @@
   :config
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
-  (load-theme 'doom-tomorrow-day t)
+  (load-theme 'doom-plain t)
   )
 
 (leaf lambda-themes
