@@ -43,6 +43,7 @@
    (org-default-notes-file . "~/Box/roam/inbox.org")
    (org-agenda-files . '("~/Box/roam/projects.org"))
    (org-startup-indented . t)
+   (org-startup-with-inline-images . t)
    (org-src-preserve-indentation . nil)
    (org-ellipsis . " ⋯")
    (org-startup-folded . 'content)
