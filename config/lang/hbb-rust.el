@@ -1,4 +1,4 @@
-;;; hbb-lang.el --- lang                                 -*- lexical-binding: t; -*-
+;;; hbb-rust.el --- rust                             -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  xlmx
 
@@ -24,27 +24,15 @@
 
 ;;; Code:
 
-(require 'hbb-racket)
-(require 'hbb-scheme)
-(require 'hbb-markdown)
-(require 'hbb-dart)
-(require 'hbb-rust)
-
-(leaf lispy
+(leaf rust-mode
   :ensure t
-  :hook
-  emacs-lisp-mode-hook
-  scheme-mode-hook
-  racket-mode-hook)
+  :custom
+  ((rust-format-on-save . t)
+   (rust-indent-offset . 4)))
 
-(leaf elec-pair
-  :hook ((org-mode-hook) . (lambda ()
-			     (setq-local electric-pair-inhibit-predicate
-					 `(lambda (c)
-					    (if (char-equal c ?<)
-						t
-					      (,electric-pair-inhibit-predicate c))))))
-  :global-minor-mode electric-pair-mode)
+(leaf cargo-mode
+  :ensure t
+  :hook (rust-mode-hook . cargo-minor-mode))
 
-(provide 'hbb-lang)
-;;; hbb-lang.el ends here
+(provide 'hbb-rust)
+;;; hbb-rust.el ends here
