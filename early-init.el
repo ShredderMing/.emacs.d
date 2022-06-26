@@ -37,3 +37,4 @@
 
 (set-language-environment "UTF-8")
 (setq selection-coding-system 'utf-8)
+(fset 'yes-or-no-p 'y-or-n-p)

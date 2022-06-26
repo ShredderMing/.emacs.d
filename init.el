@@ -1,13 +1,7 @@
 (eval-and-compile
-  (when (or load-file-name byte-compile-current-file)
-    (setq user-emacs-directory
-          (expand-file-name
-           (file-name-directory (or load-file-name byte-compile-current-file))))))
-
-(eval-and-compile
   (customize-set-variable
    'package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                       ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+		       ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
   (package-initialize)
   (unless (package-installed-p 'leaf)
     (package-refresh-contents)
