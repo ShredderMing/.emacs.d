@@ -46,5 +46,9 @@
 					      (,electric-pair-inhibit-predicate c))))))
   :global-minor-mode electric-pair-mode)
 
+(leaf prog-mode
+  :config
+  (global-prettify-symbols-mode))
+
 (provide 'hbb-lang)
 ;;; hbb-lang.el ends here

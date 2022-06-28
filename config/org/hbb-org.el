@@ -89,5 +89,8 @@
   :hook ((org-mode-hook) . valign-mode)
   :custom (valign-fancy-bar . t))
 
+(leaf org-pomodoro
+  :ensure t)
+
 (provide 'hbb-org)
 ;;; hbb-org.el ends here

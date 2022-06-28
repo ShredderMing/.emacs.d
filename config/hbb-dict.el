@@ -27,7 +27,7 @@
 (leaf youdao-dictionary
   :ensure t
   :bind
-  (("C-h y" . youdao-dictionary-search-at-point-tooltip)))
+  (("C-h y" . youdao-dictionary-search-at-point-posframe)))
 
 (provide 'hbb-dict)
 ;;; hbb-dict.el ends here
