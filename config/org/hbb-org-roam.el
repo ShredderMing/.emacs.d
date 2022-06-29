@@ -46,7 +46,7 @@
   :bind (("C-c n r d" . deft))
   :custom
   ((deft-recursive . t)
-   (deft-directory . org-directory)
+   (deft-directory . org-roam-directory)
    (deft-strip-summary-regexp . ":PROPERTIES:\n\\(.+\n\\)+:END:\n")
    (deft-use-filename-as-title . t)))
 

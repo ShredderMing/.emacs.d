@@ -87,8 +87,7 @@
   (leaf lsp-bridge
     :el-get manateelazycat/lsp-bridge
     :after corfu
-    :config
-    (global-lsp-bridge-mode))
+    :hook ((prog-mode-hook) lsp-bridge-mode))
   )
 
 (provide 'completion)

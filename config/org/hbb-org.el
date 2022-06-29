@@ -65,8 +65,12 @@
   (org-babel-do-load-languages
    'org-babel-load-languages '((C . t)
 			       (shell . t)
-			       (scheme . t))
+			       (scheme . t)
+			       (racket . t))
    ))
+
+(leaf ob-racket
+  :el-get DEADB17/ob-racket)
 
 (leaf org-superstar
   :ensure t

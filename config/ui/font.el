@@ -24,10 +24,10 @@
 
 ;;; Code:
 
-(defconst *font* "CamingoCode")
+(defconst *font* "Cascadia Code")
 (defconst *font-weight* 'normal)
 (defconst *font-size* 16)
-(defconst *font-cjk* "Noto Sans CJK SC")
+(defconst *font-cjk* "文泉驿微米黑")
 (defconst *font-weight-cjk* 'normal)
 (defconst *font-size-cjk* 16)
 
