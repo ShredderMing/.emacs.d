@@ -33,30 +33,31 @@
            (doom-themes-enable-bold . t)
 	   (doom-themes-treemacs-theme . "doom-colors")
            (doom-challenger-deep-brighter-comments . t)
-           (doom-monokai-brighter-comments . t)
-           (doom-dracula-brighter-comments . t))
-  :custom-face ((line-number . '((t (:foreground "#757878"))))
-                (ivy-virtual . '((t (:foreground "#FF6188"))))
+           ;; (doom-monokai-brighter-comments . t)
+           ;; (doom-dracula-brighter-comments . t)
+	   )
+  :custom-face (;; (line-number . '((t (:foreground "#757878"))))
+                ;; (ivy-virtual . '((t (:foreground "#FF6188"))))
 		(org-block . '((t (:background nil))))
 		(org-block-begin-line . '((t (:background nil))))
 		(org-block-end-line . '((t (:background nil))))
-		(show-paren-match-expression . '((t (:background "#ebedeb"))))
+		;; (show-paren-match-expression . '((t (:background "#ebedeb"))))
 		)
   :config
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
-  (load-theme 'doom-plain t)
+  (load-theme 'doom-material-dark t)
   )
 
-(leaf lambda-themes
-  :el-get lambda-emacs/lambda-themes
-  :custom
-  ((lambda-themes-set-italic-comments . t)
-   (lambda-themes-set-italic-keywords . t)
-   (lambda-themes-set-variable-pitch . t)))
+;;(leaf lambda-themes
+;;  :el-get lambda-emacs/lambda-themes
+;;  :custom
+;;  ((lambda-themes-set-italic-comments . t)
+;;   (lambda-themes-set-italic-keywords . t)
+;;   (lambda-themes-set-variable-pitch . t)))
 
-(leaf solo-jazz-theme
-  :ensure t)
+;;(leaf solo-jazz-theme
+;;  :ensure t)
 
 (provide 'theme)
 ;;; theme.el ends here

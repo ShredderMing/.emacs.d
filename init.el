@@ -90,3 +90,7 @@
 (leaf hbb-projectile
   :load-path* "config"
   :require t)
+
+(leaf hbb-spell
+  :load-path* "config"
+  :require t)

@@ -79,19 +79,19 @@
   :commands fci-mode)
 
 (leaf paren
-  :custom
-  ((show-paren-style . 'expression))
+  ;; :custom
+  ;; ((show-paren-style . 'expression))
   :global-minor-mode show-paren-mode)
 
-(leaf paren-face
-  :ensure t
-  :custom-face ((parenthesis . '((t (:foreground "#dadcda")))))
-  :global-minor-mode global-paren-face-mode)
-
-;; (leaf rainbow-delimiters
+;; (leaf paren-face
 ;;   :ensure t
-;;   :blackout t
-;;   :hook (prog-mode-hook))
+;;   :custom-face ((parenthesis . '((t (:foreground "#dadcda")))))
+;;   :global-minor-mode global-paren-face-mode)
+
+(leaf rainbow-delimiters
+  :ensure t
+  :blackout t
+  :hook (prog-mode-hook))
 
 (leaf presentation
   :ensure t
