@@ -30,23 +30,24 @@
 (require 'hbb-dart)
 (require 'hbb-rust)
 
-(leaf lispy
-  :ensure t
+(use-package lispy
   :hook
   emacs-lisp-mode-hook
   scheme-mode-hook
   racket-mode-hook)
 
-(leaf elec-pair
+(use-package elec-pair
+  :straight nil
   :hook ((org-mode-hook) . (lambda ()
 			     (setq-local electric-pair-inhibit-predicate
 					 `(lambda (c)
 					    (if (char-equal c ?<)
 						t
 					      (,electric-pair-inhibit-predicate c))))))
-  :global-minor-mode electric-pair-mode)
+  :config (electric-pair-mode))
 
-(leaf prog-mode
+(use-package prog-mode
+  :straight nil
   :config
   (global-prettify-symbols-mode))
 

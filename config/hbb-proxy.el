@@ -24,8 +24,7 @@
 
 ;;; Code:
 
-(leaf proxy-mode
-  :ensure t)
+(use-package proxy-mode)
 
 (provide 'hbb-proxy)
 ;;; hbb-proxy.el ends here

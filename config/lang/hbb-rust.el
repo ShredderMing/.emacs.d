@@ -24,14 +24,12 @@
 
 ;;; Code:
 
-(leaf rust-mode
-  :ensure t
+(use-package rust-mode
   :custom
-  ((rust-format-on-save . t)
-   (rust-indent-offset . 4)))
+  (rust-format-on-save t)
+  (rust-indent-offset 4))
 
-(leaf cargo-mode
-  :ensure t
+(use-package cargo-mode
   :hook (rust-mode-hook . cargo-minor-mode))
 
 (provide 'hbb-rust)

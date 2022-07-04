@@ -1,4 +1,4 @@
-;;; ui.el --- ui                                     -*- lexical-binding: t; -*-
+;;; hbb-ui.el --- ui                                     -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2022  xlmx
 
@@ -28,83 +28,72 @@
 (require 'modeline)
 (require 'font)
 
-(leaf all-the-icons
-  :ensure t
-  :defer-config
+(use-package all-the-icons
+  :config
   (add-to-list 'all-the-icons-extension-icon-alist
 	       '("ss" all-the-icons-fileicon "scheme" :height 1.2 :face all-the-icons-red))
   :custom
-  (all-the-icons-scale-factor . 0.8))
+  (all-the-icons-scale-factor 0.8))
 
-(leaf all-the-icons-dired :ensure t)
+(use-package all-the-icons-dired)
 
-(leaf focus
-  :ensure t)
+(use-package focus)
 
-(leaf color-identifiers-mode
-  :ensure t
-  :blackout t
-  :commands global-color-identifiers-mode
+(use-package color-identifiers-mode
   :hook ((after-init-hook . global-color-identifiers-mode)))
 
-(leaf highlight-indent-guides
-  :ensure t
-  :blackout t
+(use-package highlight-indent-guides
   :hook (yaml-mode-hook)
-  :custom ((highlight-indent-guides-auto-enabled . t)
-           (highlight-indent-guides-responsive . t)
-           (highlight-indent-guides-method . 'character)))
+  :custom
+  (highlight-indent-guides-auto-enabled t)
+  (highlight-indent-guides-responsive t)
+  (highlight-indent-guides-method 'character))
 
-(leaf git-gutter
-  :ensure t
-  :custom ((git-gutter:modified-sign . "~")
-           (git-gutter:added-sign . "+")
-           (git-gutter:deleted-sign . "-"))
-  :custom-face ((git-gutter:modified . '((t (:background "#f1fa8c"))))
-                (git-gutter:added . '((t (:background "#50fa7b"))))
-                (git-gutter:deleted . '((t (:background "#ff79c6")))))
+(use-package git-gutter
+  :custom
+  (git-gutter:modified-sign "~")
+  (git-gutter:added-sign "+")
+  (git-gutter:deleted-sign "-")
+  :custom-face
+  (git-gutter:modified ((t (:background "#f1fa8c"))))
+  (git-gutter:added ((t (:background "#50fa7b"))))
+  (git-gutter:deleted ((t (:background "#ff79c6"))))
   :config
   (global-git-gutter-mode 1))
 
-(leaf beacon
-  :ensure t
-  :blackout t
+(use-package beacon
   :hook (prog-mode-hook)
   ;; :custom ((beacon-color . "#bd93f9")
   ;; 	   (beacon-blink-duration . 0.7)
   ;; 	   (beacon-size . 100))
   )
 
-(leaf fill-column-indicator
+(use-package fill-column-indicator
   :commands fci-mode)
 
-(leaf paren
+(use-package paren
   ;; :custom
   ;; ((show-paren-style . 'expression))
-  :global-minor-mode show-paren-mode)
+  :config (show-paren-mode))
 
 ;; (leaf paren-face
 ;;   :ensure t
 ;;   :custom-face ((parenthesis . '((t (:foreground "#dadcda")))))
 ;;   :global-minor-mode global-paren-face-mode)
 
-(leaf rainbow-delimiters
-  :ensure t
-  :blackout t
+(use-package rainbow-delimiters
   :hook (prog-mode-hook))
 
-(leaf presentation
-  :ensure t
+(use-package presentation
   :commands presentation-mode)
 
-(leaf rainbow-mode
-  :ensure t)
+(use-package rainbow-mode)
 
-(leaf centered-window
-  :ensure t
+(use-package centered-window
   :custom
-  ((cwm-centered-window-width . 180))
-  :global-minor-mode t)
+  (cwm-centered-window-width 180)
+  :config
+  (centered-window-mode))
 
-(provide 'ui)
-;;; ui.el ends here
+(provide 'hbb-ui)
+;;; hbb-ui.el ends here

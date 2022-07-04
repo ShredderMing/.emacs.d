@@ -24,8 +24,7 @@
 
 ;;; Code:
 
-(leaf racket-mode
-  :ensure t)
+(use-package racket-mode)
   
 (provide 'hbb-racket)
 ;;; hbb-racket.el ends here

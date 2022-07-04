@@ -24,14 +24,12 @@
 
 ;;; Code:
 
-(leaf vterm
-  :ensure t)
+(use-package vterm)
 
-(leaf vterm-toggle
-  :ensure t
+(use-package vterm-toggle
   :bind (("C-c o t" . vterm-toggle))
   :custom
-  ((vterm-toggle-scope . 'project)))
+  (vterm-toggle-scope 'project))
 
 (provide 'hbb-vterm)
 ;;; hbb-vterm.el ends here

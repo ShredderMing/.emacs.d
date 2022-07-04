@@ -24,9 +24,7 @@
 
 ;;; Code:
 
-(leaf meow
-  :ensure t
-  :require t
+(use-package meow
   :config
   (defun meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty
@@ -119,7 +117,7 @@
      '("'" . repeat)
      '("<escape>" . ignore)))
   (meow-setup)
-  :global-minor-mode meow-global-mode)
+  :config (meow-global-mode))
 
 (provide 'hbb-meow)
 ;;; hbb-meow.el ends here

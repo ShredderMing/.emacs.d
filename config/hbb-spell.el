@@ -24,10 +24,10 @@
 
 ;;; Code:
 
-(leaf flyspell
+(use-package flyspell
   :hook ((org-mode-hook) . flyspell-mode)
   :custom
-  ((ispell-dictionary . "american")))
+  (ispell-dictionary "american"))
 
 (provide 'hbb-spell)
 ;;; hbb-spell.el ends here

@@ -24,8 +24,7 @@
 
 ;;; Code:
 
-(leaf markdown-mode
-  :ensure t)
+(use-package markdown-mode)
 
 (provide 'hbb-markdown)
 ;;; hbb-markdown.el ends here

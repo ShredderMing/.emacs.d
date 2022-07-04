@@ -26,7 +26,8 @@
 
 (require 'hbb-org-roam)
 
-(leaf org
+(use-package org
+  :defer t
   :init
   (defun hbb/gtd ()
     "Start my GTD system."
@@ -39,28 +40,27 @@
    ("C-c o s" . 'org-schedule)
    ("C-c o d" . 'org-deadline))
   :custom
-  ((org-directory . "~/Box")
-   (org-default-notes-file . "~/Box/roam/inbox.org")
-   (org-agenda-files . '("~/Box/roam/projects.org"))
-   (org-startup-indented . t)
-   (org-startup-with-inline-images . t)
-   (org-src-preserve-indentation . nil)
-   (org-ellipsis . " ⋯")
-   (org-startup-folded . 'content)
-   (org-return-follows-link . t)
-   (org-confirm-babel-evaluate . nil)
-   (org-todo-keywords . '((sequence "TODO(t)" "STRT(s/!)" "|" "DONE(d/!)")
-			  (sequence "WAIT(w@/!)" "|" "KILL(k@/!)")))
-   (org-capture-templates . '(("t" "Task" entry
-			       (file+headline "" "Tasks")
-			       "* TODO %^{任务名称}\n%u\n" :clock-in t :clock-resume t)
-			      ("i" "Idea" entry
-			       (file+headline "" "Ideas")
-			       "* %U - %^{Idea} %?\n")
-			      ("w" "Wana" entry
-			       (file+headline "" "I Wana")
-			       "* %U - %^{I Wana} %?\n")))
-   )
+  (org-directory "~/Box")
+  (org-default-notes-file "~/Box/roam/inbox.org")
+  (org-agenda-files '("~/Box/roam/projects.org"))
+  (org-startup-indented t)
+  (org-startup-with-inline-images t)
+  (org-src-preserve-indentation nil)
+  (org-ellipsis " ⋯")
+  (org-startup-folded 'content)
+  (org-return-follows-link t)
+  (org-confirm-babel-evaluate nil)
+  (org-todo-keywords '((sequence "TODO(t)" "STRT(s/!)" "|" "DONE(d/!)")
+		       (sequence "WAIT(w@/!)" "|" "KILL(k@/!)")))
+  (org-capture-templates '(("t" "Task" entry
+			    (file+headline "" "Tasks")
+			    "* TODO %^{任务名称}\n%u\n" :clock-in t :clock-resume t)
+			   ("i" "Idea" entry
+			    (file+headline "" "Ideas")
+			    "* %U - %^{Idea} %?\n")
+			   ("w" "Wana" entry
+			    (file+headline "" "I Wana")
+			    "* %U - %^{I Wana} %?\n")))
   :config
   (org-babel-do-load-languages
    'org-babel-load-languages '((C . t)
@@ -69,32 +69,29 @@
 			       (racket . t))
    ))
 
-(leaf ob-racket
-  :el-get DEADB17/ob-racket)
+(use-package ob-racket
+  :straight (ob-racket :type git :host github :repo "DEADB17/ob-racket"))
 
-(leaf org-superstar
-  :ensure t
-  :hook org-mode-hook
+(use-package org-superstar
+  :hook (org-mode . org-superstar-mode)
   :custom
-  ((org-superstar-special-todo-items . t)
-   (org-superstar-headline-bullets-list . '("⁖" "◉" "✸" "✫"))
-   (org-superstar-item-bullet-alist . '((?* . ?✼)
-					(?+ . ?✚)
-					(?- . ?⁍)))))
+  (org-superstar-special-todo-items t)
+  (org-superstar-headline-bullets-list '("⁖" "◉" "✸" "✫"))
+  (org-superstar-item-bullet-alist '((?* . ?✼)
+				     (?+ . ?✚)
+				     (?- . ?⁍))))
 
-(leaf org-fancy-priorities
-  :ensure t
+(use-package org-fancy-priorities
   :hook ((org-mode-hook org-agenda-mode-hook) . org-fancy-priorities-mode)
   :custom
-  ((org-fancy-priorities-list . '("⚑" "⬆" "■"))))
+  (org-fancy-priorities-list '("⚑" "⬆" "■")))
 
-(leaf valign
-  :ensure t
+(use-package valign
   :hook ((org-mode-hook) . valign-mode)
-  :custom (valign-fancy-bar . t))
+  :custom (valign-fancy-bar t))
 
-(leaf org-pomodoro
-  :ensure t)
+(use-package org-pomodoro
+  :after org)
 
 (provide 'hbb-org)
 ;;; hbb-org.el ends here

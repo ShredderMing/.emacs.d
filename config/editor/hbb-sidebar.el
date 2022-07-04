@@ -24,25 +24,21 @@
 
 ;;; Code:
 
-(leaf treemacs
-  :ensure t
-  :bind (("C-c o p" . treemacs)
-	 (treemacs-mode-map
-          ([mouse-1] . treemacs-single-click-expand-action)))
+(use-package treemacs
+  :bind
+  (:map global-map
+	("C-c o p" . treemacs))
   :config
   (treemacs-resize-icons 16))
 
-(leaf treemacs-icons-dired
-  :ensure t
+(use-package treemacs-icons-dired
   :after treemacs dired
   :config (treemacs-icons-dired-mode))
 
-(leaf treemacs-magit
-  :ensure t
+(use-package treemacs-magit
   :after treemacs magit)
 
-(leaf treemacs-projectile
-  :ensure t
+(use-package treemacs-projectile
   :after treemacs projectile)
 
 (provide 'hbb-sidebar)

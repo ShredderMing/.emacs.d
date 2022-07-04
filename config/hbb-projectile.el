@@ -24,10 +24,9 @@
 
 ;;; Code:
 
-(leaf projectile
-  :ensure t
-  :bind-keymap ("C-c p" . projectile-command-map)
-  :global-minor-mode t)
+(use-package projectile
+  :bind-keymap
+  ("C-c p" . projectile-command-map))
 
 (provide 'hbb-projectile)
 ;;; hbb-projectile.el ends here

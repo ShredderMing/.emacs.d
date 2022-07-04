@@ -24,31 +24,28 @@
 
 ;;; Code:
 
-(leaf org-roam
-  :ensure t
+(use-package org-roam
   :custom
-  ((org-roam-v2-ack . t)
-   (org-roam-directory . "~/Box/roam/")
-   (org-roam-db-location . "~/Box/roam/org-roam.db"))
+  (org-roam-v2-ack t)
+  (org-roam-directory "~/Box/roam/")
+  (org-roam-db-location "~/Box/roam/org-roam.db")
   :bind (("C-c n r f" . org-roam-node-find)
 	 ("C-c n r r" . org-roam-node-random)
-	 (:org-mode-map
-	  (("C-c n r i" . org-roam-node-insert)
-	   ("C-c n r o" . org-id-get-create)
-	   ("C-c n r t" . org-roam-tag-add)
-	   ("C-c n r a" . org-roam-alias-add)
-	   ("C-c n r l" . org-roam-buffer-toggle))))
+	 ("C-c n r i" . org-roam-node-insert)
+	 ("C-c n r o" . org-id-get-create)
+	 ("C-c n r t" . org-roam-tag-add)
+	 ("C-c n r a" . org-roam-alias-add)
+	 ("C-c n r l" . org-roam-buffer-toggle))
   :config
   (org-roam-db-autosync-mode))
 
-(leaf deft
-  :ensure t
+(use-package deft
   :bind (("C-c n r d" . deft))
   :custom
-  ((deft-recursive . t)
-   (deft-directory . org-roam-directory)
-   (deft-strip-summary-regexp . ":PROPERTIES:\n\\(.+\n\\)+:END:\n")
-   (deft-use-filename-as-title . t)))
+  (deft-recursive t)
+  (deft-directory org-roam-directory)
+  (deft-strip-summary-regexp ":PROPERTIES:\n\\(.+\n\\)+:END:\n")
+  (deft-use-filename-as-title t))
 
 (provide 'hbb-org-roam)
 ;;; hbb-org-roam.el ends here

@@ -24,8 +24,7 @@
 
 ;;; Code:
 
-(leaf dart-mode
-  :ensure t)
+(use-package dart-mode)
 
 (provide 'hbb-dart)
 ;;; hbb-dart.el ends here

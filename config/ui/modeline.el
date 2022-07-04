@@ -24,15 +24,15 @@
 
 ;;; Code:
 
-(leaf doom-modeline
-  :ensure t
+(use-package doom-modeline
   :hook (after-init-hook)
-  :custom ((doom-modeline-buffer-file-name-style quote truncate-with-project)
-           (doom-modeline-icon . t)
-           (doom-modeline-major-mode-icon . t)
-           (doom-modeline-major-mode-color-icon . t)
-           (line-number-mode . 1)
-           (column-number-mode . 1)))
+  :custom
+  (doom-modeline-buffer-file-name-style quote truncate-with-project)
+  (doom-modeline-icon t)
+  (doom-modeline-major-mode-icon t)
+  (doom-modeline-major-mode-color-icon t)
+  (line-number-mode 1)
+  (column-number-mode 1))
 
 ;; (leaf lambda-line
 ;;   :el-get lambda-emacs/lambda-line

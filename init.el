@@ -1,28 +1,26 @@
-(eval-and-compile
-  (customize-set-variable
-   'package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-		       ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
-  (package-initialize)
-  (unless (package-installed-p 'leaf)
-    (package-refresh-contents)
-    (package-install 'leaf))
-  (require 'leaf)
-  (leaf leaf-keywords
-    :ensure t
-    :init
-    ;; optional packages if you want to use :hydra, :el-get, :blackout,,,
-    (leaf hydra :ensure t)
-    (leaf el-get
-      :ensure t
-      :custom
-      ((el-get-git-shallow-clone . t)))
-    (leaf blackout :ensure t)
-    :config
-    ;; initialize leaf-keywords.el
-    (leaf-keywords-init))
-  )
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(leaf startup
+;; Install use-package
+(straight-use-package 'use-package)
+
+;; Configure use-package to use straight.el by default
+(use-package straight
+  :custom (straight-use-package-by-default t))
+
+(use-package startup
+  :straight nil
+  :defer t
   :init
   (defun hbb/open-config ()
     "open init.el"
@@ -31,66 +29,58 @@
   :bind
   (("C-`" . 'hbb/open-config))
   :custom
-  `((inhibit-startup-screen . t)
-    (inhibit-startup-message . t)
-    (inhibit-splash-screen . t)
-    (inhibit-startup-echo-area-message . t)
-    (initial-scratch-message . ,(concat ";; Happy hacking, "
-					user-login-name " - Emacs ♥ you!\n\n"))
-    (menu-bar-mode . nil)
-    (tool-bar-mode . nil)
-    (scroll-bar-mode . nil)))
+  (inhibit-startup-screen t)
+  (inhibit-startup-message t)
+  (inhibit-splash-screen t)
+  (inhibit-startup-echo-area-message t)
+  (initial-scratch-message (concat ";; Happy hacking, "
+				   user-login-name " - Emacs ♥ you!\n\n"))
+  (menu-bar-mode nil)
+  (tool-bar-mode nil)
+  (scroll-bar-mode nil))
 
-(leaf recentf
+(use-package recentf
+  :straight nil
   :custom
-  ((recentf-max-menu-items . 25)
-   (recentf-max-saved-items . 25))
-  :global-minor-mode t)
+  (recentf-max-menu-items 25)
+  (recentf-max-saved-items 25)
+  :config
+  (recentf-mode))
 
-(leaf ui
-  :load-path* "config/ui"
-  :require t)
+(use-package hbb-ui
+  :straight nil
+  :load-path "config/ui/")
+(use-package hbb-editor
+  :straight nil
+  :load-path "config/editor/")
+(use-package hbb-lang
+  :straight nil
+  :load-path "config/lang/")
+(use-package hbb-org
+  :straight nil
+  :load-path "config/org/")
+(use-package hbb-completion
+  :straight nil
+  :load-path "config/")
+(use-package hbb-meow
+  :straight nil
+  :load-path "config/")
+(use-package hbb-dict
+  :straight nil
+  :load-path "config/")
+(use-package hbb-proxy
+  :straight nil
+  :load-path "config/")
+(use-package hbb-shortcuts
+  :straight nil
+  :load-path "config/")
+(use-package hbb-vterm
+  :straight nil
+  :load-path "config/")
+(use-package hbb-projectile
+  :straight nil
+  :load-path "config/")
+(use-package hbb-spell
+  :straight nil
+  :load-path "config/")
 
-(leaf hbb-editor
-  :load-path* "config/editor"
-  :require t)
-
-(leaf hbb-lang
-  :load-path* "config/lang"
-  :require t)
-
-(leaf completion
-  :load-path* "config"
-  :require t)
-
-(leaf hbb-meow
-  :load-path* "config"
-  :require t)
-
-(leaf hbb-org
-  :load-path* "config/org"
-  :require t)
-
-(leaf hbb-dict
-  :load-path* "config"
-  :require t)
-
-(leaf hbb-proxy
-  :load-path* "config"
-  :require t)
-
-(leaf hbb-shortcuts
-  :load-path* "config"
-  :require t)
-
-(leaf hbb-vterm
-  :load-path* "config"
-  :require t)
-
-(leaf hbb-projectile
-  :load-path* "config"
-  :require t)
-
-(leaf hbb-spell
-  :load-path* "config"
-  :require t)

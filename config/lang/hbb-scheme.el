@@ -24,12 +24,12 @@
 
 ;;; Code:
 
-(leaf geiser-chez
-  :ensure t
+(use-package geiser-chez
   :hook ((scheme-mode-hook) . geiser-mode)
-  :custom ((geiser-activate-implementation . '(chez))
-	   (geiser-chez-binary . "scheme")
-	   (geiser-default-implementation . 'chez)))
+  :custom
+  (geiser-activate-implementation '(chez))
+  (geiser-chez-binary "scheme")
+  (geiser-default-implementation 'chez))
 
 (provide 'hbb-scheme)
 ;;; hbb-scheme.el ends here

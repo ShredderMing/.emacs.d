@@ -24,29 +24,28 @@
 
 ;;; Code:
 
-(leaf twilight-bright-theme
-  :ensure t)
+(use-package twilight-bright-theme)
 
-(leaf doom-themes
-  :ensure t
-  :custom ((doom-themes-enable-italic . t)
-           (doom-themes-enable-bold . t)
-	   (doom-themes-treemacs-theme . "doom-colors")
-           (doom-challenger-deep-brighter-comments . t)
-           ;; (doom-monokai-brighter-comments . t)
-           ;; (doom-dracula-brighter-comments . t)
-	   )
-  :custom-face (;; (line-number . '((t (:foreground "#757878"))))
+(use-package doom-themes
+  :custom
+  (doom-themes-enable-italic t)
+  (doom-themes-enable-bold t)
+  (doom-themes-treemacs-theme "doom-colors")
+  (doom-challenger-deep-brighter-comments t)
+  ;; (doom-monokai-brighter-comments . t)
+  ;; (doom-dracula-brighter-comments . t)
+	   
+  :custom-face ;; (line-number . '((t (:foreground "#757878"))))
                 ;; (ivy-virtual . '((t (:foreground "#FF6188"))))
-		(org-block . '((t (:background nil))))
-		(org-block-begin-line . '((t (:background nil))))
-		(org-block-end-line . '((t (:background nil))))
+		(org-block '((t (:background nil))))
+		(org-block-begin-line '((t (:background nil))))
+		(org-block-end-line '((t (:background nil))))
 		;; (show-paren-match-expression . '((t (:background "#ebedeb"))))
-		)
+		
   :config
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
-  (load-theme 'doom-material-dark t)
+  (load-theme 'doom-opera-light t)
   )
 
 ;;(leaf lambda-themes

@@ -24,7 +24,8 @@
 
 ;;; Code:
 
-(leaf shortcuts
+(use-package shortcuts
+  :straight nil
   :bind
   (("C-c f f" . find-file)
    ("C-c q q" . save-buffers-kill-terminal)))

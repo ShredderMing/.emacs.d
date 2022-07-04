@@ -25,8 +25,7 @@
 
 ;;; Code:
 
-(leaf centaur-tabs
-  :ensure t
+(use-package centaur-tabs
   :hook ((dashboard-mode-hook
 	  vterm-mode-hook
 	  calendat-mode-hook
@@ -35,17 +34,18 @@
   :bind
   (("s-{" . centaur-tabs-backward)
    ("s-}" . centaur-tabs-forward))
-  :custom ((centaur-tabs-height . 32)
-	   (centaur-tabs-style . "bar")
-	   (centaur-tabs-set-icons . t)
-	   (centaur-tabs-set-bar . 'under)
-	   (x-underline-at-descent-line . t)
-	   (centaur-tabs-set-close-button . nil)
-	   (centaur-tabs-set-modified-marker . t)
-	   (centaur-tabs-modified-marker . "●"))
+  :custom
+  (centaur-tabs-height 32)
+  (centaur-tabs-style "bar")
+  (centaur-tabs-set-icons t)
+  (centaur-tabs-set-bar 'under)
+  (x-underline-at-descent-line t)
+  (centaur-tabs-set-close-button nil)
+  (centaur-tabs-set-modified-marker t)
+  (centaur-tabs-modified-marker "●")
   :config
   (centaur-tabs-group-by-projectile-project)
-  :global-minor-mode t)
+  (centaur-tabs-mode))
 
 (provide 'hbb-tabs)
 ;;; hbb-tabs.el ends here

@@ -24,8 +24,7 @@
 
 ;;; Code:
 
-(leaf youdao-dictionary
-  :ensure t
+(use-package youdao-dictionary
   :bind
   (("C-h y" . youdao-dictionary-search-at-point-posframe)))
 
