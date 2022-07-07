@@ -25,9 +25,8 @@
 ;;; Code:
 
 (use-package doom-modeline
-  :hook (after-init-hook)
+  :hook (after-init-hook . doom-modeline-mode)
   :custom
-  (doom-modeline-buffer-file-name-style quote truncate-with-project)
   (doom-modeline-icon t)
   (doom-modeline-major-mode-icon t)
   (doom-modeline-major-mode-color-icon t)

@@ -14,20 +14,18 @@
 ;; Install use-package
 (straight-use-package 'use-package)
 
-;; Configure use-package to use straight.el by default
-(use-package straight
-  :custom (straight-use-package-by-default t))
+(setq straight-use-package-by-default t
+      use-package-compute-statistics t)
 
 (use-package startup
   :straight nil
-  :defer t
   :init
   (defun hbb/open-config ()
     "open init.el"
     (interactive)
     (find-file user-init-file))
   :bind
-  (("C-`" . 'hbb/open-config))
+  (("C-`" . hbb/open-config))
   :custom
   (inhibit-startup-screen t)
   (inhibit-startup-message t)
@@ -35,9 +33,7 @@
   (inhibit-startup-echo-area-message t)
   (initial-scratch-message (concat ";; Happy hacking, "
 				   user-login-name " - Emacs ♥ you!\n\n"))
-  (menu-bar-mode nil)
-  (tool-bar-mode nil)
-  (scroll-bar-mode nil))
+  )
 
 (use-package recentf
   :straight nil
@@ -48,8 +44,8 @@
   (recentf-mode))
 
 (use-package hbb-ui
-  :straight nil
-  :load-path "config/ui/")
+   :straight nil
+   :load-path "config/ui/")
 (use-package hbb-editor
   :straight nil
   :load-path "config/editor/")
@@ -84,3 +80,6 @@
   :straight nil
   :load-path "config/")
 
+(setq gc-cons-threshold 100000000)
+
+(provide 'init)

@@ -26,11 +26,13 @@
 ;;; Code:
 
 (use-package centaur-tabs
-  :hook ((dashboard-mode-hook
-	  vterm-mode-hook
-	  calendat-mode-hook
-	  org-agenda-mode-hook
-	  helpful-mode-hook) . centaur-tabs-local-mode)
+  :demand t
+  :hook
+  (dashboard-mode . centaur-tabs-local-mode)
+  (term-mode . centaur-tabs-local-mode)
+  (calendar-mode . centaur-tabs-local-mode)
+  (org-agenda-mode . centaur-tabs-local-mode)
+  (helpful-mode . centaur-tabs-local-mode)
   :bind
   (("s-{" . centaur-tabs-backward)
    ("s-}" . centaur-tabs-forward))

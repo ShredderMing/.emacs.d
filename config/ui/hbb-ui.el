@@ -62,11 +62,12 @@
   (global-git-gutter-mode 1))
 
 (use-package beacon
-  :hook (prog-mode-hook)
-  ;; :custom ((beacon-color . "#bd93f9")
-  ;; 	   (beacon-blink-duration . 0.7)
-  ;; 	   (beacon-size . 100))
-  )
+  :custom
+  (beacon-color "#bd93f9")
+  (beacon-blink-duration 0.7)
+  (beacon-size 100)
+  :config
+  (beacon-mode))
 
 (use-package fill-column-indicator
   :commands fci-mode)
@@ -81,8 +82,8 @@
 ;;   :custom-face ((parenthesis . '((t (:foreground "#dadcda")))))
 ;;   :global-minor-mode global-paren-face-mode)
 
-(use-package rainbow-delimiters
-  :hook (prog-mode-hook))
+;(use-package rainbow-delimiters
+;  :hook (prog-mode-hook))
 
 (use-package presentation
   :commands presentation-mode)

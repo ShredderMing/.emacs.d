@@ -31,16 +31,18 @@
   (org-roam-db-location "~/Box/roam/org-roam.db")
   :bind (("C-c n r f" . org-roam-node-find)
 	 ("C-c n r r" . org-roam-node-random)
-	 ("C-c n r i" . org-roam-node-insert)
-	 ("C-c n r o" . org-id-get-create)
-	 ("C-c n r t" . org-roam-tag-add)
-	 ("C-c n r a" . org-roam-alias-add)
-	 ("C-c n r l" . org-roam-buffer-toggle))
+	 (:map org-mode-map
+	       ("C-c n r i" . org-roam-node-insert)
+	       ("C-c n r o" . org-id-get-create)
+	       ("C-c n r t" . org-roam-tag-add)
+	       ("C-c n r a" . org-roam-alias-add)
+	       ("C-c n r l" . org-roam-buffer-toggle)))
   :config
   (org-roam-db-autosync-mode))
 
 (use-package deft
-  :bind (("C-c n r d" . deft))
+  :after org-roam
+  :bind ("C-c n r d" . deft)
   :custom
   (deft-recursive t)
   (deft-directory org-roam-directory)

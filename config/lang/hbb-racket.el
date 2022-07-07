@@ -24,7 +24,8 @@
 
 ;;; Code:
 
-(use-package racket-mode)
+(use-package racket-mode
+  :hook (racket-mode-hook . racket-xp-mode))
   
 (provide 'hbb-racket)
 ;;; hbb-racket.el ends here

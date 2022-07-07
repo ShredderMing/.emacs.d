@@ -32,13 +32,11 @@
 
 (use-package lispy
   :hook
-  emacs-lisp-mode-hook
-  scheme-mode-hook
-  racket-mode-hook)
+  ((emacs-lisp-mode scheme-mode racket-mode) . lispy-mode))
 
 (use-package elec-pair
   :straight nil
-  :hook ((org-mode-hook) . (lambda ()
+  :hook (org-mode-hook . (lambda ()
 			     (setq-local electric-pair-inhibit-predicate
 					 `(lambda (c)
 					    (if (char-equal c ?<)
