@@ -40,10 +40,10 @@
 (use-package focus)
 
 (use-package color-identifiers-mode
-  :hook ((after-init-hook . global-color-identifiers-mode)))
+  :hook (after-init . global-color-identifiers-mode))
 
 (use-package highlight-indent-guides
-  :hook (yaml-mode-hook)
+  :hook (yaml-mode . highlight-indent-guides-mode)
   :custom
   (highlight-indent-guides-auto-enabled t)
   (highlight-indent-guides-responsive t)
@@ -62,12 +62,11 @@
   (global-git-gutter-mode 1))
 
 (use-package beacon
+  :hook (after-init . beacon-mode)
   :custom
   (beacon-color "#bd93f9")
   (beacon-blink-duration 0.7)
-  (beacon-size 100)
-  :config
-  (beacon-mode))
+  (beacon-size 100))
 
 (use-package fill-column-indicator
   :commands fci-mode)
@@ -77,10 +76,10 @@
   ;; ((show-paren-style . 'expression))
   :config (show-paren-mode))
 
-;; (leaf paren-face
-;;   :ensure t
-;;   :custom-face ((parenthesis . '((t (:foreground "#dadcda")))))
-;;   :global-minor-mode global-paren-face-mode)
+(use-package paren-face
+  :custom-face (parenthesis ((t (:foreground "#dadcda"))))
+  :config
+  (global-paren-face-mode))
 
 ;(use-package rainbow-delimiters
 ;  :hook (prog-mode-hook))

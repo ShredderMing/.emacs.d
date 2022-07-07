@@ -8,5 +8,5 @@
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
-(push '(alpha . 95) default-frame-alist)
+;; (push '(alpha . 95) default-frame-alist)
 (advice-add #'x-apply-session-resources :override #'ignore)

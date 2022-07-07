@@ -35,12 +35,12 @@
   (org-block ((t (:background nil))))
   (org-block-begin-line ((t (:background nil))))
   (org-block-end-line ((t (:background nil))))
-  ;; (show-paren-match-expression . '((t (:background "#ebedeb"))))
+  (show-paren-match-expression ((t (:background "#ebedeb"))))
 		
   :config
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
-  (load-theme 'doom-opera-light t)
+  (load-theme 'doom-plain t)
   )
 
 ;;(leaf lambda-themes

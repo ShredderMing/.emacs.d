@@ -25,7 +25,7 @@
 ;;; Code:
 
 (use-package doom-modeline
-  :hook (after-init-hook . doom-modeline-mode)
+  :hook (after-init . doom-modeline-mode)
   :custom
   (doom-modeline-icon t)
   (doom-modeline-major-mode-icon t)

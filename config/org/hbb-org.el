@@ -65,9 +65,7 @@
    'org-babel-load-languages '((C . t)
    			       (shell . t)
    			       (scheme . t)
-   			       (racket . t)
-			       )
-   )
+   			       (racket . t)))
   )
 
 ;; (use-package ob-racket
@@ -84,7 +82,7 @@
 	     :files ("*.el" "*.rkt")))
 
 (use-package org-superstar
-  :hook (org-mode-hook . org-superstar-mode)
+  :hook (org-mode . org-superstar-mode)
   :custom
   (org-superstar-special-todo-items t)
   (org-superstar-headline-bullets-list '("⁖" "◉" "✸" "✫"))
@@ -94,13 +92,12 @@
 
 (use-package org-fancy-priorities
   :hook
-  (org-mode-hook . org-fancy-priorities-mode)
-  (org-agenda-mode-hook . org-fancy-priorities-mode)
+  ((org-mode org-agenda-mode) . org-fancy-priorities-mode)
   :custom
   (org-fancy-priorities-list '("⚑" "⬆" "■")))
 
 (use-package valign
-  :hook (org-mode-hook . valign-mode)
+  :hook (org-mode . valign-mode)
   :custom (valign-fancy-bar t))
 
 (use-package org-pomodoro
