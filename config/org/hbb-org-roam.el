@@ -40,6 +40,16 @@
   :config
   (org-roam-db-autosync-mode))
 
+(use-package org-roam-ui
+  :straight
+  (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+  :after org-roam
+  :custom
+  (org-roam-ui-sync-theme t)
+  (org-roam-ui-follow t)
+  (org-roam-ui-update-on-save t)
+  (org-roam-ui-open-on-start t))
+
 (use-package deft
   :after org-roam
   :bind ("C-c n r d" . deft)
