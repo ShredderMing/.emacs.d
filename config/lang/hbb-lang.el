@@ -36,7 +36,7 @@
 
 (use-package elec-pair
   :straight nil
-  :hook (org-mode-hook . (lambda ()
+  :hook (org-mode . (lambda ()
 			     (setq-local electric-pair-inhibit-predicate
 					 `(lambda (c)
 					    (if (char-equal c ?<)
