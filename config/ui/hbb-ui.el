@@ -64,7 +64,7 @@
 (use-package beacon
   :hook (after-init . beacon-mode)
   :custom
-  (beacon-color "#bd93f9")
+  (beacon-color "#eeeeee")
   (beacon-blink-duration 0.7)
   (beacon-size 100))
 
