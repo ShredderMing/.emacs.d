@@ -25,7 +25,7 @@
 ;;; Code:
 
 (require 'hbb-sidebar)
-(require 'hbb-tabs)
+;; (require 'hbb-tabs)
 
 (use-package ace-window
   :bind (("M-o" . ace-window))
