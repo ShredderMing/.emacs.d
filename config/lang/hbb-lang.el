@@ -29,6 +29,7 @@
 (require 'hbb-markdown)
 (require 'hbb-dart)
 (require 'hbb-rust)
+(require 'hbb-json)
 
 (use-package lispy
   :hook
