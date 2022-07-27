@@ -17,6 +17,8 @@
 (setq straight-use-package-by-default t
       use-package-compute-statistics t)
 
+(setq make-backup-files nil)
+
 (use-package startup
   :straight nil
   :init

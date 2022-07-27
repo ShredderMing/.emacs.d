@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-;; (require 'theme)
+(require 'theme)
 (require 'modeline)
 (require 'font)
 
