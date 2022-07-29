@@ -72,8 +72,8 @@
   :commands fci-mode)
 
 (use-package paren
-  ;; :custom
-  ;; ((show-paren-style . 'expression))
+  :custom
+  (show-paren-style 'expression)
   :config (show-paren-mode))
 
 (use-package paren-face
