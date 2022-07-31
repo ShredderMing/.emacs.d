@@ -24,12 +24,12 @@
 
 ;;; Code:
 
-(defconst *font* "Cascadia Code")
+(defconst *font* "LXGW WenKai Mono")
 (defconst *font-weight* 'normal)
-(defconst *font-size* 16)
-(defconst *font-cjk* "Noto Sans CJK SC")
+(defconst *font-size* 18)
+(defconst *font-cjk* "LXGW WenKai")
 (defconst *font-weight-cjk* 'normal)
-(defconst *font-size-cjk* 16)
+(defconst *font-size-cjk* 18)
 
 (defun hbb/set--font (frame)
   "HBB set font for `FRAME'."
@@ -58,12 +58,12 @@
     (set-face-attribute 'mode-line nil
                         :font (font-spec :name   *font*
                                          :weight 'normal
-                                         :size   14))
+                                         :size   16))
     
     (set-face-attribute 'mode-line-inactive nil
                         :font (font-spec :name   *font*
                                          :weight 'normal
-                                         :size   14))))
+                                         :size   16))))
 
 (defun hbb/set-font (&rest _)
   "HBB set font."
