@@ -24,12 +24,12 @@
 
 ;;; Code:
 
-(defconst *font* "LXGW WenKai Mono")
+(defconst *font* "Cascadia Code")
 (defconst *font-weight* 'normal)
-(defconst *font-size* 18)
+(defconst *font-size* 16)
 (defconst *font-cjk* "LXGW WenKai")
 (defconst *font-weight-cjk* 'normal)
-(defconst *font-size-cjk* 18)
+(defconst *font-size-cjk* 16)
 
 (defun hbb/set--font (frame)
   "HBB set font for `FRAME'."

@@ -26,20 +26,20 @@
 
 ;; (use-package twilight-bright-theme)
 
-(use-package doom-themes
-  :custom
-  (doom-themes-enable-italic t)
-  (doom-themes-enable-bold t)
-  (doom-themes-treemacs-theme "doom-colors")
-  :custom-face
-  (org-block ((t (:background nil))))
-  (org-block-begin-line ((t (:background nil))))
-  (org-block-end-line ((t (:background nil))))
-  (show-paren-match-expression ((t (:background "#ebedeb"))))
-  :config
-  (doom-themes-org-config)
-  (doom-themes-treemacs-config)
-  (load-theme 'doom-plain t))
+;; (use-package doom-themes
+;;   :custom
+;;   (doom-themes-enable-italic t)
+;;   (doom-themes-enable-bold t)
+;;   (doom-themes-treemacs-theme "doom-colors")
+;;   :custom-face
+;;   (org-block ((t (:background nil))))
+;;   (org-block-begin-line ((t (:background nil))))
+;;   (org-block-end-line ((t (:background nil))))
+;;   (show-paren-match-expression ((t (:background "#ebedeb"))))
+;;   :config
+;;   (doom-themes-org-config)
+;;   (doom-themes-treemacs-config)
+;;   (load-theme 'doom-plain t))
 
 ;;(leaf lambda-themes
 ;;  :el-get lambda-emacs/lambda-themes
@@ -58,6 +58,16 @@
 ;;   (global-hl-line-mode t)
 ;;   (set-cursor-color "#dc322f")
 ;;   (load-theme 'spaceway t))
+
+(use-package hbb-themes
+  :straight nil
+  :load-path "config/ui/hbb-themes/"
+  :config
+  (load-theme 'hbb-plain t))
+
+;; (use-package panda-theme
+;;   :config
+;;   (load-theme 'panda t))
 
 (provide 'theme)
 ;;; theme.el ends here

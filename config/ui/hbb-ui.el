@@ -39,8 +39,8 @@
 
 (use-package focus)
 
-(use-package color-identifiers-mode
-  :hook (after-init . global-color-identifiers-mode))
+;; (use-package color-identifiers-mode
+;;   :hook (after-init . global-color-identifiers-mode))
 
 (use-package highlight-indent-guides
   :hook (yaml-mode . highlight-indent-guides-mode)
@@ -91,7 +91,7 @@
 
 (use-package centered-window
   :custom
-  (cwm-centered-window-width 180)
+  (cwm-centered-window-width 120)
   :config
   (centered-window-mode))
 
