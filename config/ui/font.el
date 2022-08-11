@@ -28,7 +28,7 @@
 (defconst *font-weight* 'normal)
 (defconst *font-size* 16)
 (defconst *font-cjk* "LXGW WenKai")
-(defconst *font-weight-cjk* 'normal)
+(defconst *font-weight-cjk* 'bold)
 (defconst *font-size-cjk* 16)
 
 (defun hbb/set--font (frame)

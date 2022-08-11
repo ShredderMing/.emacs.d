@@ -51,7 +51,7 @@
        (error color15)
        (warning "#ff0000")
        (highlight color2)
-       (selection color1)
+       (selection color11)
        (success fg)
        (builtin "#010101")
        (comments "#77767b")
@@ -74,7 +74,7 @@
    `(error ((t (:foreground ,error))))
    `(warning ((t (:foreground ,warning))))
    `(success ((t (:foreground ,success))))
-   `(region ((t (:foreground ,color0 :background ,color1))))
+   `(region ((t (:foreground ,color0 :background ,color11))))
    `(fringe ((t (:background ,fringe))))
    `(link ((t (:foreground ,constants :underline t))))
    ;; Syntax highlighting
