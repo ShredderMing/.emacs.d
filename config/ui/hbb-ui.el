@@ -72,14 +72,14 @@
   :commands fci-mode)
 
 (use-package paren
-  :custom
-  (show-paren-style 'expression)
+  ;; :custom
+  ;; (show-paren-style 'expression)
   :config (show-paren-mode))
 
-(use-package paren-face
-  :custom-face (parenthesis ((t (:foreground "#dadcda"))))
-  :config
-  (global-paren-face-mode))
+;; (use-package paren-face
+;;   :custom-face (parenthesis ((t (:foreground "#dadcda"))))
+;;   :config
+;;   (global-paren-face-mode))
 
 ;(use-package rainbow-delimiters
 ;  :hook (prog-mode-hook))

@@ -1,8 +1,8 @@
-;;; editor.el --- editor                             -*- lexical-binding: t; -*-
+;;; hbb-magit.el --- magit                           -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  xlmx
+;; Copyright (C) 2022  Harry
 
-;; Author: xlmx <xlmx@SummerTear>
+;; Author: Harry <harry@SummerTear>
 ;; Keywords: 
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,23 +24,8 @@
 
 ;;; Code:
 
-(require 'hbb-sidebar)
-;; (require 'hbb-tabs)
+(use-package magit
+  :bind (("C-M-g" . magit-status)))
 
-(setq scroll-conservatively 101
-      scroll-margin 20)
-
-(use-package ace-window
-  :bind (("M-s" . ace-window))
-  :custom
-  (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-  (aw-background nil))
-
-(use-package hideshow
-  :straight nil
-  :hook (prog-mode . hs-minor-mode)
-  :bind
-  ("C-<tab>" . hs-toggle-hiding))
-
-(provide 'hbb-editor)
-;;; editor.el ends here
+(provide 'hbb-magit)
+;;; hbb-magit.el ends here

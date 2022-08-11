@@ -26,20 +26,19 @@
 
 ;; (use-package twilight-bright-theme)
 
-;; (use-package doom-themes
-;;   :custom
-;;   (doom-themes-enable-italic t)
-;;   (doom-themes-enable-bold t)
-;;   (doom-themes-treemacs-theme "doom-colors")
-;;   :custom-face
-;;   (org-block ((t (:background nil))))
-;;   (org-block-begin-line ((t (:background nil))))
-;;   (org-block-end-line ((t (:background nil))))
-;;   (show-paren-match-expression ((t (:background "#ebedeb"))))
-;;   :config
-;;   (doom-themes-org-config)
-;;   (doom-themes-treemacs-config)
-;;   (load-theme 'doom-plain t))
+(use-package doom-themes
+  :custom
+  (doom-themes-enable-italic t)
+  (doom-themes-enable-bold t)
+  (doom-themes-treemacs-theme "doom-colors")
+  :custom-face
+  (org-block ((t (:background nil))))
+  (org-block-begin-line ((t (:background nil))))
+  (org-block-end-line ((t (:background nil))))
+  (show-paren-match-expression ((t (:background "#ebedeb"))))
+  :config
+  (doom-themes-org-config)
+  (doom-themes-treemacs-config))
 
 ;;(leaf lambda-themes
 ;;  :el-get lambda-emacs/lambda-themes
