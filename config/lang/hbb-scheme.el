@@ -26,6 +26,9 @@
 
 (use-package geiser-chez
   :hook ((scheme-mode-hook) . geiser-mode)
+  :config
+  (put 'define-ftype 'scheme-indent-function 'defun)
+  (put 'define-ftype 'scheme-indent-function 0)
   :custom
   (geiser-activate-implementation '(chez))
   (geiser-chez-binary "scheme")
