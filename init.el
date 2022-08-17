@@ -17,7 +17,8 @@
 (setq straight-use-package-by-default t
       use-package-compute-statistics t)
 
-(setq make-backup-files nil)
+(setq make-backup-files nil
+      native-comp-async-report-warnings-errors nil)
 
 (use-package startup
   :straight nil

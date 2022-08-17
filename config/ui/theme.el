@@ -24,7 +24,9 @@
 
 ;;; Code:
 
-;; (use-package twilight-bright-theme)
+(use-package twilight-bright-theme
+  :config
+  (load-theme 'twilight-bright t))
 
 (use-package doom-themes
   :custom
@@ -61,8 +63,9 @@
 (use-package hbb-themes
   :straight nil
   :load-path "config/ui/hbb-themes/"
-  :config
-  (load-theme 'hbb-plain t))
+  ;; :config
+  ;; (load-theme 'hbb-plain t)
+  )
 
 ;; (use-package panda-theme
 ;;   :config

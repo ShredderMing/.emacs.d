@@ -29,6 +29,7 @@
   :config
   (put 'define-ftype 'scheme-indent-function 'defun)
   (put 'define-ftype 'scheme-indent-function 0)
+  (put 'make-ftype-pointer 'scheme-indent-function 1)
   :custom
   (geiser-activate-implementation '(chez))
   (geiser-chez-binary "scheme")
