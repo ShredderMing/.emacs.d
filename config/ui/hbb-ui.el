@@ -91,9 +91,7 @@
 
 (use-package centered-window
   :custom
-  (cwm-centered-window-width 120)
-  :config
-  (centered-window-mode))
+  (cwm-centered-window-width 120))
 
 (provide 'hbb-ui)
 ;;; hbb-ui.el ends here
