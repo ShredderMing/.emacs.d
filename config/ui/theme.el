@@ -24,9 +24,9 @@
 
 ;;; Code:
 
-(use-package twilight-bright-theme
-  :config
-  (load-theme 'twilight-bright t))
+;; (use-package twilight-bright-theme
+;;   :config
+;;   (load-theme 'twilight-bright t))
 
 (use-package doom-themes
   :custom
@@ -40,7 +40,8 @@
   (show-paren-match-expression ((t (:background "#ebedeb"))))
   :config
   (doom-themes-org-config)
-  (doom-themes-treemacs-config))
+  (doom-themes-treemacs-config)
+  (load-theme 'doom-rouge t))
 
 ;;(leaf lambda-themes
 ;;  :el-get lambda-emacs/lambda-themes

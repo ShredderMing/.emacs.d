@@ -50,5 +50,8 @@
   :config
   (global-prettify-symbols-mode))
 
+(setq fill-column 80)
+(add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
+
 (provide 'hbb-lang)
 ;;; hbb-lang.el ends here
