@@ -31,7 +31,9 @@
 (use-package all-the-icons
   :config
   (add-to-list 'all-the-icons-extension-icon-alist
-	       '("ss" all-the-icons-fileicon "scheme" :height 1.2 :face all-the-icons-red))
+	       '("ss" all-the-icons-fileicon "scheme"
+		 :height 1.2
+		 :face all-the-icons-red))
   :custom
   (all-the-icons-scale-factor 0.8))
 
@@ -54,19 +56,19 @@
   (git-gutter:modified-sign "~")
   (git-gutter:added-sign "+")
   (git-gutter:deleted-sign "-")
-  :custom-face
-  (git-gutter:modified ((t (:background "#f1fa8c"))))
-  (git-gutter:added ((t (:background "#50fa7b"))))
-  (git-gutter:deleted ((t (:background "#ff79c6"))))
+  ;; :custom-face
+  ;; (git-gutter:modified ((t (:background "#f1fa8c"))))
+  ;; (git-gutter:added ((t (:background "#50fa7b"))))
+  ;; (git-gutter:deleted ((t (:background "#ff79c6"))))
   :config
   (global-git-gutter-mode 1))
 
 (use-package beacon
   :hook (after-init . beacon-mode)
   :custom
-  (beacon-color "#eeeeee")
+  (beacon-color "hot pink")
   (beacon-blink-duration 0.7)
-  (beacon-size 100))
+  (beacon-size 40))
 
 (use-package fill-column-indicator
   :commands fci-mode)

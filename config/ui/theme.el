@@ -41,7 +41,7 @@
   :config
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
-  (load-theme 'doom-rouge t))
+  (load-theme 'doom-nord t))
 
 ;;(leaf lambda-themes
 ;;  :el-get lambda-emacs/lambda-themes

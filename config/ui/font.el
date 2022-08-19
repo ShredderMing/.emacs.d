@@ -26,7 +26,7 @@
 
 (defconst *font* "Cascadia Code")
 (defconst *font-weight* 'normal)
-(defconst *font-size* 16)
+(defconst *font-size* 14)
 (defconst *font-cjk* "LXGW WenKai")
 (defconst *font-weight-cjk* 'bold)
 (defconst *font-size-cjk* 16)
@@ -58,12 +58,12 @@
     (set-face-attribute 'mode-line nil
                         :font (font-spec :name   *font*
                                          :weight 'normal
-                                         :size   16))
+                                         :size   *font-size*))
     
     (set-face-attribute 'mode-line-inactive nil
                         :font (font-spec :name   *font*
                                          :weight 'normal
-                                         :size   16))))
+                                         :size   *font-size*))))
 
 (defun hbb/set-font (&rest _)
   "HBB set font."
