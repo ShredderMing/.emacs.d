@@ -19,6 +19,7 @@
 
 (setq make-backup-files nil
       native-comp-async-report-warnings-errors nil)
+(defalias 'yes-or-no-p 'y-or-n-p)
 
 (use-package startup
   :straight nil
