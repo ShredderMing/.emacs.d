@@ -38,17 +38,21 @@
 (use-package elec-pair
   :straight nil
   :hook (org-mode . (lambda ()
-			     (setq-local electric-pair-inhibit-predicate
-					 `(lambda (c)
-					    (if (char-equal c ?<)
-						t
-					      (,electric-pair-inhibit-predicate c))))))
+		      (setq-local electric-pair-inhibit-predicate
+				  `(lambda (c)
+				     (if (char-equal c ?<)
+					 t
+				       (,electric-pair-inhibit-predicate c))))))
   :config (electric-pair-mode))
 
 (use-package prog-mode
   :straight nil
   :config
   (global-prettify-symbols-mode))
+
+(use-package display-line-numbers
+  :straight nil
+  :hook (prog-mode . display-line-numbers-mode))
 
 (use-package display-fill-column-indicator
   :straight nil

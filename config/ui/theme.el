@@ -41,7 +41,7 @@
   :config
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
-  (load-theme 'doom-solarized-light t)
+  (load-theme 'doom-material t)
   (set-cursor-color "#dc322f"))
 
 ;;(leaf lambda-themes

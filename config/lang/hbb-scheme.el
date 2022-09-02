@@ -32,6 +32,7 @@
   (put 'make-ftype-pointer 'scheme-indent-function 1)
   (put 'begin0 'scheme-indent-function 0)
   (put 'call-with-errno 'scheme-indent-function 0)
+  (put 'critical-section 'scheme-indent-function 0)
   :custom
   (geiser-activate-implementation '(chez))
   (geiser-chez-binary "scheme")
