@@ -28,6 +28,8 @@
 ;;   :config
 ;;   (load-theme 'twilight-bright t))
 
+(defvar current-theme nil)
+
 (use-package doom-themes
   :custom
   (doom-themes-enable-italic t)
@@ -41,8 +43,9 @@
   :config
   (doom-themes-org-config)
   (doom-themes-treemacs-config)
-  (load-theme 'doom-material t)
-  (set-cursor-color "#dc322f"))
+  ;; (load-theme 'doom-material t)
+  ;; (set-cursor-color "#dc322f")
+  )
 
 ;;(leaf lambda-themes
 ;;  :el-get lambda-emacs/lambda-themes
@@ -72,6 +75,22 @@
 ;; (use-package panda-theme
 ;;   :config
 ;;   (load-theme 'panda t))
+
+(defun hbb/auto-update-theme ()
+  "depending on time use different theme"
+  (let* ((hour (nth 2 (decode-time (current-time))))
+	 (theme (cond ((<= 7 hour 8)   'doom-gruvbox-light)
+		      ((= 9 hour)      'doom-solarized-light)
+		      ((<= 10 hour 16) 'doom-nord-light)
+		      ((<= 17 hour 18) 'doom-gruvbox-light)
+		      ((<= 19 hour 22) 'doom-oceanic-next)
+		      (t               'doom-laserwave))))
+    (when (not (equal current-theme theme))
+      (setq current-theme theme)
+      (load-theme current-theme t))
+    (run-at-time (format "%02d:%02d" (+ hour 1) 0) nil 'hbb/auto-update-theme)))
+
+(hbb/auto-update-theme)
 
 (provide 'theme)
 ;;; theme.el ends here
