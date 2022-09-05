@@ -25,7 +25,7 @@
 ;;; Code:
 
 (require 'hbb-sidebar)
-;; (require 'hbb-tabs)
+(require 'hbb-tabs)
 
 (setq scroll-conservatively 101
       scroll-margin 20)
