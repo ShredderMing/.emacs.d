@@ -54,10 +54,11 @@
   :after org-roam
   :bind ("C-c n r d" . deft)
   :custom
+  (deft-extensions '("org" "gpg" "md" "txt"))
   (deft-recursive t)
-  (deft-directory org-roam-directory)
-  (deft-strip-summary-regexp ":PROPERTIES:\n\\(.+\n\\)+:END:\n")
-  (deft-use-filename-as-title t))
+  (deft-use-filter-string-for-filename t)
+  (deft-default-extension "org")
+  (deft-directory org-roam-directory))
 
 (provide 'hbb-org-roam)
 ;;; hbb-org-roam.el ends here

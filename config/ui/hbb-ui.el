@@ -28,6 +28,10 @@
 (require 'modeline)
 (require 'font)
 
+(use-package hl-line
+  :straight nil
+  :config (global-hl-line-mode))
+
 (use-package all-the-icons
   :config
   (add-to-list 'all-the-icons-extension-icon-alist
@@ -83,13 +87,15 @@
 ;;   :config
 ;;   (global-paren-face-mode))
 
-;(use-package rainbow-delimiters
-;  :hook (prog-mode-hook))
+(use-package rainbow-delimiters
+  :hook (prog-mode-hook))
 
 (use-package presentation
   :commands presentation-mode)
 
-(use-package rainbow-mode)
+(use-package rainbow-mode
+  :config
+  (rainbow-mode))
 
 (use-package centered-window
   :custom

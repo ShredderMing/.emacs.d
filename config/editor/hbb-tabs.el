@@ -46,6 +46,7 @@
   (centaur-tabs-set-modified-marker t)
   (centaur-tabs-modified-marker "●")
   :config
+  (centaur-tabs-headline-match)
   (centaur-tabs-mode t)
   (setq uniquify-separator "/"
 	uniquify-buffer-name-style 'forward)
