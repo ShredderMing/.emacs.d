@@ -63,7 +63,8 @@
 	 ([tab] . corfu-next)
 	 ("S-TAB" . corfu-previous)
 	 ([backtab] . corfu-previous)))
-  :config (global-corfu-mode))
+  :init
+  (global-corfu-mode))
 
 (use-package corfu-doc
   :after corfu
