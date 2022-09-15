@@ -81,6 +81,16 @@
   :straight (lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
 			:files ("*"))
   :after corfu
+  :custom
+  (lsp-bridge-single-lang-server-mode-list
+   '(
+     ((c-mode c++-mode objc-mode) . lsp-bridge-c-lsp-server)
+     (go-mode . "gopls")
+     ((js2-mode js-mode rjsx-mode) . "javascript")
+     (typescript-tsx-mode . "typescript")
+     ((sh-mode) . "bash-language-server")
+     (dockerfile-mode . "docker-langserver")
+     ))
   :config
   (global-lsp-bridge-mode))
 
