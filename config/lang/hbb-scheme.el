@@ -28,7 +28,7 @@
   :hook ((scheme-mode-hook) . geiser-mode)
   :config
   (put 'define-ftype 'scheme-indent-function 'defun)
-  (put 'define-ftype 'scheme-indent-function 0)
+  ;; (put 'define-ftype 'scheme-indent-function 0)
   (put 'make-ftype-pointer 'scheme-indent-function 1)
   (put 'begin0 'scheme-indent-function 0)
   (put 'call-with-errno 'scheme-indent-function 0)
