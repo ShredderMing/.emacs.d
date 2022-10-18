@@ -47,7 +47,7 @@
   ;; src block
   (org-src-fontify-natively t)
   (org-src-window-setup 'current-window)
-  (org-src-preserve-indentation t)
+  ;; (org-src-preserve-indentation t)
   (org-src-tab-acts-natively t)
   (org-ellipsis " ⋯")
   (org-startup-folded 'content)
