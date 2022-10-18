@@ -52,27 +52,27 @@
   :config
   (all-the-icons-completion-mode))
 
-(use-package corfu
-  :custom
-  (corfu-auto t)
-  (corfu-cycle t)
-  (corfu-preselect-first nil)
-  :bind
-  ((:map corfu-map
-	 ("TAB" . corfu-next)
-	 ([tab] . corfu-next)
-	 ("S-TAB" . corfu-previous)
-	 ([backtab] . corfu-previous)))
-  :init
-  (global-corfu-mode))
+;; (use-package corfu
+;;   :custom
+;;   (corfu-auto t)
+;;   (corfu-cycle t)
+;;   (corfu-preselect-first nil)
+;;   :bind
+;;   ((:map corfu-map
+;; 	 ("TAB" . corfu-next)
+;; 	 ([tab] . corfu-next)
+;; 	 ("S-TAB" . corfu-previous)
+;; 	 ([backtab] . corfu-previous)))
+;;   :init
+;;   (global-corfu-mode))
 
-(use-package corfu-doc
-  :after corfu
-  :hook corfu-mode-hook
-  :custom
-  (corfu-doc-delay 0.8)
-  (corfu-doc-max-width 70)
-  (corfu-doc-max-height 20))
+;; (use-package corfu-doc
+;;   :after corfu
+;;   :hook corfu-mode-hook
+;;   :custom
+;;   (corfu-doc-delay 0.8)
+;;   (corfu-doc-max-width 70)
+;;   (corfu-doc-max-height 20))
 
 (use-package yasnippet
   :config (yas-global-mode))
@@ -80,7 +80,6 @@
 (use-package lsp-bridge
   :straight (lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
 			:files ("*"))
-  :after corfu
   :custom
   (lsp-bridge-single-lang-server-mode-list
    '(

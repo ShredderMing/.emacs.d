@@ -107,17 +107,17 @@
 (use-package org-superstar
   :hook (org-mode . org-superstar-mode)
   :custom
-  (org-superstar-special-todo-items t)
   (org-superstar-headline-bullets-list '("⁖" "◉" "✸" "✫"))
   (org-superstar-item-bullet-alist '((?* . ?✼)
 				     (?+ . ?✚)
-				     (?- . ?⁍))))
+				     (?- . ?⁍)))
+  )
 
-(use-package org-fancy-priorities
-  :hook
-  ((org-mode org-agenda-mode) . org-fancy-priorities-mode)
-  :custom
-  (org-fancy-priorities-list '("⚑" "⬆" "■")))
+;; (use-package org-fancy-priorities
+;;   :hook
+;;   ((org-mode org-agenda-mode) . org-fancy-priorities-mode)
+;;   :custom
+;;   (org-fancy-priorities-list '("⚑" "⬆" "■")))
 
 (use-package valign
   :hook (org-mode . valign-mode)
