@@ -29,6 +29,8 @@
   (org-roam-v2-ack t)
   (org-roam-directory "~/Box/roam/")
   (org-roam-db-location "~/Box/roam/org-roam.db")
+  (org-roam-node-display-template
+   (concat "${title:*} " (propertize "${tags:30}" 'face 'org-tag)))
   :bind (("C-c n r f" . org-roam-node-find)
 	 ("C-c n r r" . org-roam-node-random)
 	 (:map org-mode-map

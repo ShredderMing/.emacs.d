@@ -36,9 +36,9 @@
   (doom-themes-enable-bold t)
   (doom-themes-treemacs-theme "doom-colors")
   :custom-face
-  (org-block ((t (:background nil))))
-  (org-block-begin-line ((t (:background nil))))
-  (org-block-end-line ((t (:background nil))))
+  (org-block ((t (:background unspecified))))
+  (org-block-begin-line ((t (:background unspecified))))
+  (org-block-end-line ((t (:background unspecified))))
   (show-paren-match-expression ((t (:background "#ebedeb"))))
   :config
   (doom-themes-org-config)

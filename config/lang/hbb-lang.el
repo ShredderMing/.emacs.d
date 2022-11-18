@@ -30,6 +30,7 @@
 (require 'hbb-dart)
 (require 'hbb-rust)
 (require 'hbb-json)
+(require 'hbb-yaml)
 
 (use-package lispy
   :hook
