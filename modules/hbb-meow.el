@@ -96,5 +96,18 @@
   (meow-setup)
   (meow-global-mode))
 
+(use-package which-key
+  :straight t
+  :custom
+  (which-key-idle-delay 0.3)
+  (which-key-prefix-prefix "↪ ")
+  (which-key-sort-order 'which-key-key-order-alpha)
+  (which-key-min-display-lines 5)
+  (which-key-max-display-columns nil)
+  (which-key-allow-multiple-replacements t)
+  :config
+  (which-key-mode)
+  (which-key-setup-minibuffer))
+
 (provide 'hbb-meow)
 ;;; hbb-meow.el ends here

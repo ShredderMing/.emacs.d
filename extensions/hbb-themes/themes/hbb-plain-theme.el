@@ -50,7 +50,7 @@
        ;; =====
        (error color15)
        (warning "#ff0000")
-       (highlight color2)
+       (highlight color0)
        (selection color11)
        (success fg)
        (builtin "#010101")

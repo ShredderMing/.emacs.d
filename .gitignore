@@ -13,6 +13,9 @@ racket-mode/
 straight/
 transient/
 el-get/
+local/
+places
+history
 bookmarks
 projectile-bookmarks.eld
 .org-id-locations

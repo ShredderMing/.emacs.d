@@ -44,7 +44,7 @@
  ;; Use y or n istead of yes or no
  use-short-answers t
  ;; Confirm before quitting
- confirm-kill-emacs 'y-or-n-p
+ ;confirm-kill-emacs 'y-or-n-p
  ;; Filter duplicate entries in kill ring
  kill-do-not-save-duplicates t
  ;; Save existing clipboard text into the kill ring before replacing it.

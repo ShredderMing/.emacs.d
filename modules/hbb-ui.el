@@ -3,11 +3,11 @@
 ;; Font
 (progn
   (set-face-attribute 'default nil
-                      :font (font-spec :family "CaskaydiaCove Nerd Font" :size 14))
+                      :font (font-spec :family "CaskaydiaCove Nerd Font Mono" :size 16))
   (set-fontset-font t 'unicode
-                    (font-spec :family "Noto Color Emoji" :size 14) nil 'prepend)
+                    (font-spec :family "Noto Color Emoji" :size 16) nil 'prepend)
   (set-fontset-font t '(#x2ff0 . #x9ffc)
-                    (font-spec :family "Noto Sans CJK SC" :size 14) nil 'prepend)
+                    (font-spec :family "Noto Sans CJK SC" :size 16) nil 'prepend)
   )
 
 ;; Theme
