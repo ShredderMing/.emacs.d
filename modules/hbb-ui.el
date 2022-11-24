@@ -7,8 +7,10 @@
   (set-fontset-font t 'unicode
                     (font-spec :family "Noto Color Emoji" :size 16) nil 'prepend)
   (set-fontset-font t '(#x2ff0 . #x9ffc)
-                    (font-spec :family "Noto Sans CJK SC" :size 16) nil 'prepend)
-  )
+                    (font-spec :family "Noto Sans CJK SC" :size 16) nil 'prepend))
+
+;; Cursor
+(blink-cursor-mode 0)
 
 ;; Theme
 (use-package hbb-themes

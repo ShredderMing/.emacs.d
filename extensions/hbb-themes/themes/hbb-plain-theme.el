@@ -62,8 +62,8 @@
        (strings "#77767b")
        (type "#010101")
        (variables "#010101")
-       (fringe bg)
-       )
+       (fringe bg))
+
   (custom-theme-set-faces
    'hbb-plain
    ;; Default
@@ -110,7 +110,19 @@
    ;; show-paren
    `(show-paren-match ((t (:background ,color0 :weight ultra-bold))))
    `(show-paren-mismatch ((t (:background ,color15 :weight ultra-bold))))
-   ))
+   ;; centaur-tabs
+   `(centaur-tabs-default ((t (:foreground ,fg :background ,bg))))
+   `(centaur-tabs-selected ((t (:foreground ,fg :background ,bg))))
+   `(centaur-tabs-unselected ((t (:foreground ,fg :background ,color0))))
+   `(centaur-tabs-selected-modified ((t (:foreground ,fg :background ,bg))))
+   `(centaur-tabs-unselected-modified ((t (:foreground ,fg :background ,color0))))
+   `(centaur-tabs-active-bar-face ((t :background ,fg)))
+   `(centaur-tabs-modified-marker-selected ((t :foreground ,bg :inherit centaur-tabs-selected)))
+   `(centaur-tabs-modified-marker-unselected ((t :foreground ,bg :inherit centaur-tabs-unselected)))))
+
+
+
+
 
 (provide-theme 'hbb-plain)
 (provide 'hbb-plain-theme)
