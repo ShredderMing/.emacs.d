@@ -80,5 +80,34 @@
    ("C-h F" . #'helpful-function)
    ("C-h f" . #'helpful-callable)))
 
+(use-package page-break-lines
+  :straight t
+  :hook ((prog-mode text-mode) . page-break-lines-mode))
+
+(use-package rainbow-delimiters
+  :straight t
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package highlight-numbers
+  :straight t
+  :hook (prog-mode . highlight-numbers-mode))
+
+(use-package smartparens
+  :straight t
+  :hook (prog-mode . smartparens-mode))
+
+(use-package smartparens-config
+  :after smartparens)
+
+(when (< emacs-major-version 29)
+  (use-package good-scroll
+    :straight t
+    :config
+    (good-scroll-mode 1)))
+
+(use-package goggles
+  :straight t
+  :hook ((prog-mode text-mode) . goggles-mode))
+
 (provide 'hbb-editor)
 ;;; hbb-editor.el ends here
