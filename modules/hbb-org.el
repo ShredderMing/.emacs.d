@@ -40,7 +40,7 @@
   (org-src-fontify-natively t)
   (org-src-window-setup 'current-window)
   (org-src-tab-acts-natively t)
-  (org-ellipsis " ...")
+  (org-ellipsis " ↵")
   (org-return-follows-link t)
   (org-confirm-babel-evaluate nil)
   (org-agenda-files '("~/Box/roam/projects.org"))

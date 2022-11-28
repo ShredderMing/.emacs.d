@@ -5,7 +5,7 @@
 (defconst *hbb-cache-dir* (concat *hbb-root-dir* "cache/"))
 
 (defconst hbb-modules
-  '(bootstrap defaults editor ui tabs completion meow vterm org prog lisp rss)
+  '(bootstrap defaults editor ui tabs completion vc meow vterm org prog lisp rss)
   "HBBEmacs enabled modules.")
 
 (dolist (module hbb-modules)
