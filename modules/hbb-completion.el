@@ -26,18 +26,6 @@
   (add-hook 'minibuffer-setup-hook #'+corfu-enable-in-minibuffer)
   (global-corfu-mode 1))
 
-(use-package corfu-doc
-  :straight t
-  :hook (corfu-mode . corfu-doc-mode)
-  :custom
-  (corfu-doc-auto t)
-  (corfu-doc-delay 0.1)
-  (corfu-doc-max-height 15)
-  :config
-  (define-key corfu-map (kbd "M-p") #'corfu-doc-scroll-down)
-  (define-key corfu-map (kbd "M-n") #'corfu-doc-scroll-up)
-  (define-key corfu-map (kbd "M-d") #'corfu-doc-toggle))
-
 (use-package kind-icon
   :straight t
   :after corfu
