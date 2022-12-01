@@ -139,5 +139,28 @@
   :config
   (setq-default completion-in-region-function #'consult-completion-in-region))
 
+(use-package yasnippet
+  :straight t
+  :config (yas-global-mode))
+
+(use-package posframe :straight t)
+
+(use-package markdown-mode :straight t)
+
+(use-package lsp-bridge
+  :straight (lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge" :files ("*"))
+  :custom
+  (lsp-bridge-single-lang-server-mode-list
+   '(((c-mode c++-mode objc-mode) . lsp-bridge-c-lsp-server)
+     (go-mode . "gopls")
+     ((js2-mode js-mode rjsx-mode) . "javascript")
+     (typescript-tsx-mode . "typescriptreact")
+     ((typescript-mode) . "typescript")
+     ((sh-mode) . "bash-language-server")
+     (dockerfile-mode . "docker-langserver")))
+  (acm-enable-tabnine nil)
+  :config
+  (global-lsp-bridge-mode))
+
 (provide 'hbb-completion)
 ;;; hbb-completion.el ends here
