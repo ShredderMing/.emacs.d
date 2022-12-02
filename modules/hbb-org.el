@@ -45,6 +45,7 @@
   (org-confirm-babel-evaluate nil)
   (org-agenda-files '("~/Box/roam/projects.org"))
   (org-log-into-drawer t)
+  (org-hide-emphasis-markers t)
   (org-deadline-warning-days 7)
   (org-agenda-skip-scheduled-if-deadline-is-shown t)
   (org-habit-show-habits-only-for-today nil)
@@ -79,6 +80,19 @@
    '((C .t) (js . t) (dot . t) (awk . t) (sed . t) (python . t)
      (sql . t) (org . t) (shell . t) (scheme . t)
      (gnuplot . t) (plantuml . t) (makefile . t))))
+
+(use-package org-appear
+  :straight t
+  :hook (org-mode . org-appear-mode)
+  :custom
+  (org-appear-inside-latex t)
+  (org-appear-autokeywords t)
+  (org-appear-autoentities t)
+  (org-appear-autoemphasis t)
+  (org-appear-autosubmarkers t)
+  (org-appear-autolinks 'just-brackets)
+  :config
+  (run-at-time nil nil #'org-appear--set-elements))
 
 (use-package org-modern
   :straight t
