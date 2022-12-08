@@ -50,7 +50,7 @@
        ;; =====
        (error color15)
        (warning "#ff0000")
-       (highlight color0)
+       (highlight "#efefef")
        (selection color11)
        (success fg)
        (builtin "#010101")
@@ -70,12 +70,12 @@
    `(default ((t (:background ,bg :foreground ,fg))))
    `(italic ((t (:italic t))))
    `(cursor ((t (:background ,cursor))))
-   `(hl-line ((t (:background ,color0))))
+   `(hl-line ((t (:background ,highlight))))
    `(highlight ((t (:background ,highlight))))
    `(error ((t (:foreground ,error))))
    `(warning ((t (:foreground ,warning))))
    `(success ((t (:foreground ,success))))
-   `(region ((t (:foreground ,color0 :background ,color11))))
+   `(region ((t (:background ,highlight))))
    `(fringe ((t (:background ,fringe))))
    `(link ((t (:foreground ,constants :underline t))))
    ;; Syntax highlighting
