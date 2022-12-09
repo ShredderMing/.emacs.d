@@ -118,7 +118,9 @@
    `(centaur-tabs-unselected-modified ((t (:foreground ,fg :background ,color0))))
    `(centaur-tabs-active-bar-face ((t :background ,fg)))
    `(centaur-tabs-modified-marker-selected ((t :foreground ,bg :inherit centaur-tabs-selected)))
-   `(centaur-tabs-modified-marker-unselected ((t :foreground ,bg :inherit centaur-tabs-unselected)))))
+   `(centaur-tabs-modified-marker-unselected ((t :foreground ,bg :inherit centaur-tabs-unselected)))
+   ;; org
+   `(org-document-title ((t (:foreground ,color15 :weight bold))))))
 
 
 

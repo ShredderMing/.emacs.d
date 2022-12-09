@@ -23,3 +23,16 @@
   (gcmh-high-cons-threshold (* 16 1024 1024))
   :config
   (gcmh-mode 1))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("572a3708f7414f55b59ddb38e863e209a3f5f0445e2dfe20e85d06555d37a6e9" "0f8333cde07c18c2bd7c8dcbcaad1fa9c253072c8f85e928b61a72c422af6088" "0ac50d6c41ad447ffa154d520625bfc06b279434a425ff97ae0c8acfb3221b0c" default)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
