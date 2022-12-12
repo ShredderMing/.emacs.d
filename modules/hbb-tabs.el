@@ -46,6 +46,7 @@
   :config
   (centaur-tabs-headline-match)
   (centaur-tabs-mode t)
+  (centaur-tabs-change-fonts "Hack" 100)
   (setq uniquify-separator "/"
         uniquify-buffer-name-style 'forward)
   (defun centaur-tabs-buffer-groups ()
