@@ -82,10 +82,11 @@
      (gnuplot . t) (plantuml . t) (makefile . t)))
   ;; theme tweak
   (let* ((variable-tuple
-          (cond ((x-list-fonts "ETBembo") '(:font "ETBembo"))
-                ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
-                ((x-family-fonts "Sans Serif") '(:family "Sans Serif"))
-                (t (warn "Cannot find a Sans Serif Font. Install Source Sans Pro."))))
+          (cond
+           ((x-list-fonts "ETBembo") '(:font "ETBembo"))
+           ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
+           ((x-family-fonts "Sans Serif") '(:family "Sans Serif"))
+           (t (warn "Cannot find a Sans Serif Font. Install Source Sans Pro."))))
          (base-font-color (face-foreground 'default nil 'default))
          (headline `(:inherit default :weight bold :foreground ,base-font-color)))
     (custom-theme-set-faces
@@ -99,7 +100,7 @@
      `(org-level-2 ((t (,@headline ,@variable-tuple))))
      `(org-level-1 ((t (,@headline ,@variable-tuple))))
      `(org-document-title ((t (,@headline ,@variable-tuple))))
-     '(variable-pitch ((t (:family "ETBembo"))))
+     '(variable-pitch ((t (:family "ShouShuTi"))))
      '(fixed-pitch ((t (:family "CaskaydiaCove Nerd Font"))))
      '(org-block ((t (:inherit fixed-pitch))))
      '(org-code ((t (:inherit (shadow fixed-pitch)))))
