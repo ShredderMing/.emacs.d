@@ -18,5 +18,17 @@
   :config
   (load-theme 'hbb-plain t))
 
+;; Modeline
+(use-package doom-modeline
+  :straight t
+  :custom
+  (doom-modeline-height 24)
+  (doom-modeline-bar-width 8)
+  (doom-modeline-time-icon nil)
+  (doom-modeline-buffer-encoding 'nondefault)
+  (doom-modeline-unicode-fallback t)
+  :config
+  (doom-modeline-mode 1))
+
 (provide 'hbb-ui)
 ;;; hbb-ui.el ends here
