@@ -14,6 +14,7 @@ straight/
 transient/
 el-get/
 local/
+url/
 places
 history
 bookmarks
