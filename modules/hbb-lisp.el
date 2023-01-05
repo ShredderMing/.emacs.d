@@ -52,5 +52,9 @@
   :straight t
   :defer t)
 
+(use-package racket-mode
+  :straight t
+  :defer t)
+
 (provide 'hbb-lisp)
 ;;; hbb-lisp.el ends here

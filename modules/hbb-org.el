@@ -78,7 +78,7 @@
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((C .t) (js . t) (dot . t) (awk . t) (sed . t) (python . t)
-     (sql . t) (org . t) (shell . t) (scheme . t)
+     (sql . t) (org . t) (shell . t) (scheme . t) (racket . t)
      (gnuplot . t) (plantuml . t) (makefile . t)))
   ;; theme tweak
   ;;(let* ((variable-tuple
@@ -117,6 +117,15 @@
   ;;   '(org-modern-label ((t (:inherit fixed-pitch))))))
   ;;  (add-hook 'org-mode-hook 'variable-pitch-mode)
   )
+
+(use-package ob-racket
+  :after org
+  :config
+  (add-hook 'ob-racket-pre-runtime-library-load-hook
+	          #'ob-racket-raco-make-runtime-library)
+  :straight (ob-racket
+	           :type git :host github :repo "hasu/emacs-ob-racket"
+	           :files ("*.el" "*.rkt")))
 
 (use-package org-appear
   :straight t

@@ -122,10 +122,6 @@
    ;; org
    `(org-document-title ((t (:foreground ,color15 :weight bold))))))
 
-
-
-
-
 (provide-theme 'hbb-plain)
 (provide 'hbb-plain-theme)
 ;;; hbb-plain-theme.el ends here
