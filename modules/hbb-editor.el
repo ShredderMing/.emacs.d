@@ -109,5 +109,28 @@
   :straight t
   :hook ((prog-mode text-mode) . goggles-mode))
 
+(use-package treemacs
+  :straight t
+  :bind
+  (:map global-map
+        ("C-c o p" . treemacs))
+  :custom
+  (treemacs-text-scale -0.5)
+  :config
+  (treemacs-resize-icons 16))
+
+(use-package treemacs-icons-dired
+  :straight t
+  :after treemacs dired
+  :config (treemacs-icons-dired-mode))
+
+(use-package treemacs-magit
+  :straight t
+  :after treemacs magit)
+
+(use-package treemacs-projectile
+  :straight t
+  :after treemacs projectile)
+
 (provide 'hbb-editor)
 ;;; hbb-editor.el ends here
