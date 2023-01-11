@@ -36,7 +36,7 @@
  large-file-warning-threshold (* 50 1024 1024)
  ;; Initial scratch message (will be overriten if "fortune" is installed)
  initial-scratch-message (concat ";; Happy hacking, " user-login-name
-				 " - Emacs ♥ you!\n\n")
+				                         " - Emacs ♥ you!\n\n")
  ;; Set initial buffer to fundamental-mode for faster load
  initial-major-mode 'fundamental-mode
  ;; Always prompt in minibuffer (no GUI)
@@ -44,7 +44,7 @@
  ;; Use y or n istead of yes or no
  use-short-answers t
  ;; Confirm before quitting
- ;confirm-kill-emacs 'y-or-n-p
+                                        ;confirm-kill-emacs 'y-or-n-p
  ;; Filter duplicate entries in kill ring
  kill-do-not-save-duplicates t
  ;; Save existing clipboard text into the kill ring before replacing it.
@@ -209,43 +209,43 @@ or file path may exist now."
    (when (and (>= (recursion-depth) 1) (active-minibuffer-window))
      (abort-recursive-edit))))
 
-  ;; Scroll pixel by pixel
-  (pixel-scroll-mode 1)
+;; Scroll pixel by pixel
+(pixel-scroll-mode 1)
 
-  ;; Window layout undo/redo (`winner-undo' / `winner-redo')
-  (winner-mode 1)
+;; Window layout undo/redo (`winner-undo' / `winner-redo')
+(winner-mode 1)
 
-  ;; Precision scroll
-  (when (>= emacs-major-version 29)
-    (pixel-scroll-precision-mode 1))
+;; Precision scroll
+(when (>= emacs-major-version 29)
+  (pixel-scroll-precision-mode 1))
 
-  ;; Display time in mode-line
-  (display-time-mode 1)
+;; Display time in mode-line
+(display-time-mode 1)
 
-  ;; Replace selection after start typing
-  (delete-selection-mode 1)
+;; Replace selection after start typing
+(delete-selection-mode 1)
 
-  ;; Enable recentf-mode globally
-  (recentf-mode 1)
+;; Enable recentf-mode globally
+(recentf-mode 1)
 
-  ;; Save place in files
-  (save-place-mode 1)
+;; Save place in files
+(save-place-mode 1)
 
-  ;; Enable saving minibuffer history
-  (savehist-mode 1)
+;; Enable saving minibuffer history
+(savehist-mode 1)
 
-  ;; Show line and column numbers (cursor position) in mode-line
-  (line-number-mode 1)
-  (column-number-mode 1)
+;; Show line and column numbers (cursor position) in mode-line
+(line-number-mode 1)
+(column-number-mode 1)
 
-  ;; Wrap long lines
-  (global-visual-line-mode 1)
+;; Wrap long lines
+(global-visual-line-mode 1)
 
-  ;; Better handling for files with so long lines
-  (global-so-long-mode 1)
+;; Better handling for files with so long lines
+(global-so-long-mode 1)
 
-  ;; Global SubWord mode
-  (global-subword-mode 1)
+;; Global SubWord mode
+(global-subword-mode 1)
 
 (provide 'hbb-defaults)
 ;;; hbb-defaults.el ends here

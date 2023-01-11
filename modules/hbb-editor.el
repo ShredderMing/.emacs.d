@@ -119,6 +119,12 @@
   :config
   (treemacs-resize-icons 16))
 
+(use-package treemacs-all-the-icons
+  :straight t
+  :after treemacs
+  :config
+  (treemacs-load-theme "all-the-icons"))
+
 (use-package treemacs-icons-dired
   :straight t
   :after treemacs dired

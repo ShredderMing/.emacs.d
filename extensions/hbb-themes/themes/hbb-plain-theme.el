@@ -78,6 +78,7 @@
    `(region ((t (:background ,highlight))))
    `(fringe ((t (:background ,fringe))))
    `(link ((t (:foreground ,constants :underline t))))
+   `(vertical-border ((t (:foreground ,highlight))))
    ;; Syntax highlighting
    `(font-lock-builtin-face ((t (:foreground ,builtin))))
    `(font-lock-comment-face ((t (:foreground ,comments))))

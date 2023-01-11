@@ -12,6 +12,10 @@
 ;; Cursor
 (blink-cursor-mode 0)
 
+;; Icon
+(use-package all-the-icons
+  :straight t)
+
 ;; Theme
 (use-package hbb-themes
   :load-path "extensions/hbb-themes"
