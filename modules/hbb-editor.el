@@ -115,9 +115,7 @@
   (:map global-map
         ("C-c o p" . treemacs))
   :custom
-  (treemacs-text-scale -0.5)
-  :config
-  (treemacs-resize-icons 16))
+  (treemacs-text-scale -0.5))
 
 (use-package treemacs-all-the-icons
   :straight t

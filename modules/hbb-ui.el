@@ -14,7 +14,12 @@
 
 ;; Icon
 (use-package all-the-icons
-  :straight t)
+  :straight t
+  :config
+  (add-to-list 'all-the-icons-extension-icon-alist
+               '("ss" all-the-icons-fileicon "scheme"
+                 :height 0.8
+                 :face all-the-icons-red)))
 
 ;; Theme
 (use-package hbb-themes
