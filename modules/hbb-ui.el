@@ -5,7 +5,7 @@
   (set-fontset-font t 'unicode
                     (font-spec :family "Noto Color Emoji" :size 16))
   (set-face-attribute 'default nil
-                      :font (font-spec :family "CaskaydiaCove Nerd Font Mono" :size 16))
+                      :font (font-spec :family "Hack" :size 16))
   (set-fontset-font t '(#x2ff0 . #x9ffc)
                     (font-spec :family "Noto Sans CJK SC" :size 16)))
 
@@ -28,9 +28,9 @@
   :custom
   (doom-modeline-height 24)
   (doom-modeline-bar-width 8)
-  (doom-modeline-time-icon nil)
-  (doom-modeline-buffer-encoding 'nondefault)
-  (doom-modeline-unicode-fallback t)
+  ;;  (doom-modeline-time-icon nil)
+  ;;(doom-modeline-buffer-encoding 'nondefault)
+  ;;(doom-modeline-unicode-fallback t)
   :config
   (doom-modeline-mode 1))
 
