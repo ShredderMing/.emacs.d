@@ -38,23 +38,16 @@
 ;; Scheme
 (use-package geiser
   :straight t
-  :defer t
   :hook ((scheme-mode-hook) . geiser-mode)
   :custom
   (geiser-active-implementations '(chez racket))
   (geiser-default-implementation 'chez))
 
 (use-package geiser-chez
-  :straight t
-  :defer t)
-
-(use-package geiser-racket
-  :straight t
-  :defer t)
+  :straight t)
 
 (use-package racket-mode
-  :straight t
-  :defer t)
+  :straight t)
 
 (provide 'hbb-lisp)
 ;;; hbb-lisp.el ends here
