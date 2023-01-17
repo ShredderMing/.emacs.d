@@ -40,7 +40,7 @@
   :straight t
   :hook ((scheme-mode-hook) . geiser-mode)
   :custom
-  (geiser-active-implementations '(chez racket))
+  (geiser-active-implementations '(chez))
   (geiser-default-implementation 'chez))
 
 (use-package geiser-chez
