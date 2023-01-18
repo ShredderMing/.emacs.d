@@ -41,7 +41,8 @@
   :hook ((scheme-mode-hook) . geiser-mode)
   :custom
   (geiser-active-implementations '(chez))
-  (geiser-default-implementation 'chez))
+  (geiser-default-implementation 'chez)
+  (geiser-chez-extra-keywords '("define-constants" "define-foreign" "define-foreign*")))
 
 (use-package geiser-chez
   :straight t)
