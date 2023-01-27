@@ -2,6 +2,7 @@
 
 (setq gc-cons-threshold (* 2 1024 1024 1024)
       load-prefer-newer t
+      package-enable-at-startup nil
       inhibit-startup-message t)
 
 (push '(menu-bar-lines . 0) default-frame-alist)

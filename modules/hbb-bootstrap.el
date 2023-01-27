@@ -3,7 +3,7 @@
 ;; Copyright (C) 2022  Harry
 
 ;; Author: Harry <harry@SummerTear>
-;; Keywords: 
+;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,12 +20,11 @@
 
 ;;; Commentary:
 
-;; 
+;;
 
 ;;; Code:
 
-(setq package-enable-at-startup nil
-      straight-base-dir *hbb-local-dir*
+(setq straight-base-dir *hbb-local-dir*
       straight-repository-branch "develop"
       straight-vc-git-default-clone-depth '(1 single-branch)
       straight-build-dir (format "build-%s" emacs-version)
@@ -43,7 +42,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(straight-use-package 'use-package)
+(straight-use-package 'emacsql-sqlite-builtin)
 
 (provide 'hbb-bootstrap)
 ;;; hbb-bootstrap.el ends here
