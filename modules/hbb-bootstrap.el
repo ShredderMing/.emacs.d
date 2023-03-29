@@ -42,7 +42,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(straight-use-package 'emacsql-sqlite-builtin)
+;;(straight-use-package 'emacsql-sqlite-builtin)
 
 (provide 'hbb-bootstrap)
 ;;; hbb-bootstrap.el ends here

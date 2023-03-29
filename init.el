@@ -5,7 +5,7 @@
 (defconst *hbb-cache-dir* (concat *hbb-root-dir* "cache/"))
 
 (defconst hbb-modules
-  '(bootstrap defaults editor ui tabs completion vc meow vterm org lisp web rss json yaml)
+  '(bootstrap defaults editor ui tabs completion vc meow vterm org lisp erlang web rss json yaml docker)
   "HBBEmacs enabled modules.")
 
 (dolist (module hbb-modules)

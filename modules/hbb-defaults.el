@@ -36,7 +36,7 @@
  large-file-warning-threshold (* 50 1024 1024)
  ;; Initial scratch message (will be overriten if "fortune" is installed)
  initial-scratch-message (concat ";; Happy hacking, " user-login-name
-				                         " - Emacs ♥ you!\n\n")
+				                         " - Emacs ♥️ you!\n\n")
  ;; Set initial buffer to fundamental-mode for faster load
  initial-major-mode 'fundamental-mode
  ;; Always prompt in minibuffer (no GUI)

@@ -178,7 +178,7 @@
   :straight t
   :custom
   (org-roam-v2-ack t)
-  (org-roam-database-connector 'sqlite-builtin)
+ ;; (org-roam-database-connector 'sqlite-builtin)
   (org-roam-directory "~/Box/roam/")
   (org-roam-db-location "~/Box/roam/org-roam.db")
   (org-roam-node-display-template

@@ -35,18 +35,18 @@
   :bind (("s-{" . centaur-tabs-backward)
          ("s-}" . centaur-tabs-forward))
   :custom
-  (centaur-tabs-height 32)
-  (centaur-tabs-style "bar")
+  (centaur-tabs-height 48)
+  (centaur-tabs-style "alternate")
   (centaur-tabs-set-icons t)
-  (centaur-tabs-set-bar 'under)
-  (x-underline-at-descent-line t)
+;  (centaur-tabs-set-bar 'under)
+ ; (x-underline-at-descent-line t)
   (centaur-tabs-set-close-button nil)
   (centaur-tabs-set-modified-marker t)
   (centaur-tabs-modified-marker "●")
   :config
   (centaur-tabs-headline-match)
   (centaur-tabs-mode t)
-  (centaur-tabs-change-fonts "Hack" 100)
+  (centaur-tabs-change-fonts "CaskaydiaCove Nerd Font" 125)
   (setq uniquify-separator "/"
         uniquify-buffer-name-style 'forward)
   (defun centaur-tabs-buffer-groups ()

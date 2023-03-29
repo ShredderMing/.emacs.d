@@ -11,4 +11,4 @@
 ;;(push '(left-fringe . 0) default-frame-alist)
 ;;(push '(right-fringe . 0) default-frame-alist)
 
-;; (push '(alpha . 95) default-frame-alist)
+;;(push '(alpha . 85) default-frame-alist)
